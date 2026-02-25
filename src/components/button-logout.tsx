@@ -4,7 +4,7 @@ import { Role } from "@/constants/type";
 import { handleErrorApi } from "@/lib/utils";
 import { useLogoutMutation } from "@/queries/useAuth";
 import { useGuestLogoutMutation } from "@/queries/useGuest";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 
 export default function ButtonLogout() {
   const socket = useAppStore((state) => state.socket);

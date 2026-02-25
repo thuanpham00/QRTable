@@ -1,6 +1,6 @@
 import { Mail, Phone } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 
 const Footer = () => (
   <footer className="bg-linear-to-br from-gray-900 via-[#18181b] to-gray-950 py-14 px-6 sm:px-8 lg:px-33.75 shadow-inner">

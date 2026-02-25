@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useAppStore } from "@/components/app-provider";
+import { usePathname, useRouter } from "@/i18n/routing";
 import { checkAndRefreshToken } from "@/lib/utils";
-import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 // component dùng để kiểm tra và refresh token liên tục khi người dùng truy cập các trang private

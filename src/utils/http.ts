@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { redirect } from "@/i18n/routing";
 import {
   getAccessTokenFromLocalStorage,
   normalizePath,
@@ -7,8 +8,8 @@ import {
   setRefreshTokenFromLocalStorage,
 } from "@/lib/utils";
 import { LoginResType } from "@/schemaValidations/auth.schema";
-import { envConfig } from "@/utils/config";
-import { redirect } from "next/navigation";
+import { defaultLocale, envConfig } from "@/utils/config";
+import Cookies from "js-cookie";
 
 type CustomOptions = Omit<RequestInit, "method"> & {
   baseUrl?: string | undefined;
@@ -117,6 +118,8 @@ const request = async <Response>(
     } else if (res.status === AUTHENTICATION_ERROR_STATUS) {
       // xử lý token hết hạn hoặc ko hợp lệ thì logout - xử lý ở client
       if (isClient) {
+        const locale = Cookies.get("NEXT_LOCALE");
+
         // case token hết hạn hoặc ko hợp lệ -> xóa token ở client
         await fetch("/api/auth/logout", {
           method: "POST",
@@ -133,13 +136,17 @@ const request = async <Response>(
           // Redirect về trang login có thể bị loop vô hạn nếu ko xử lý đúng cách
           // vì nếu rơi vào trường hợp tại trang login, chúng ta có gọi các API cần AT
           // mà AT đã bị xóa thì nó lại nhảy vào đây và cứ thế nó sẽ bị lặp
-          location.href = "/login"; // gọi theo kiểu client - reload trang
+          location.href = `/${locale}/login`; // gọi theo kiểu client - reload trang
         }
       } else {
         // xử lý token hết hạn hoặc ko hợp lệ thì logout - xử lý ở server
         // và chúng ta gọi API ở nextjs server (route handler, server component)
         const accessToken = (options?.headers as any)?.Authorization.split("Bearer ")[1];
-        redirect(`/logout?accessToken=${accessToken}`); // chạy ở server
+        const locale = Cookies.get("NEXT_LOCALE");
+        redirect({
+          href: `/login?accessToken=${accessToken}`,
+          locale: locale ?? defaultLocale,
+        });
       }
     } else {
       throw new HttpError(data as any);

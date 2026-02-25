@@ -58,3 +58,33 @@ export const useDeleteTableMutation = () => {
     },
   });
 };
+
+export const useGetListTableSessionHistoryQuery = ({
+  tableNumber,
+  enable,
+}: {
+  tableNumber: number;
+  enable: boolean;
+}) => {
+  return useQuery({
+    queryKey: ["table-session-history", tableNumber],
+    queryFn: () => {
+      return tableApiRequests.getListTableSessionHistory(tableNumber);
+    },
+    placeholderData: keepPreviousData,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    enabled: enable,
+  });
+};
+
+export const useCleaningTableMutation = () => {
+  // const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (tableNumber: number) => {
+      return tableApiRequests.cleanTable(tableNumber);
+    },
+    // onSuccess: () => {
+    //   queryClient.invalidateQueries({ queryKey: ["tables"] });
+    // },
+  });
+};

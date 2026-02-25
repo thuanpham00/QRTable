@@ -1,10 +1,12 @@
 import {
+  CleanTableResType,
   CreateTableBodyType,
   TableListResType,
   TableQueryType,
   TableResType,
   UpdateTableBodyType,
 } from "@/schemaValidations/table.schema";
+import { TableSessionListResType } from "@/schemaValidations/tableSessions.schema";
 import http from "@/utils/http";
 import queryString from "query-string";
 
@@ -23,5 +25,11 @@ export const tableApiRequests = {
   },
   getTableById: (id: number) => {
     return http.get<TableResType>(`/tables/${id}`);
+  },
+  getListTableSessionHistory: (tableNumber: number) =>
+    http.get<TableSessionListResType>("/tables/" + tableNumber + "/sessions"),
+
+  cleanTable: (tableNumber: number) => {
+    return http.post<CleanTableResType>(`/tables/clean`, { tableNumber });
   },
 };

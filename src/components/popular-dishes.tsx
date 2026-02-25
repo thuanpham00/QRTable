@@ -7,8 +7,8 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { ChevronRight, ChevronLeft, Flame, Sparkles, Star } from "lucide-react";
 import Image from "next/image";
 import { formatCurrency } from "@/lib/utils";
-import Link from "next/link";
-import { DishSuggestList } from "@/app/(public)/page";
+import { Link } from "@/i18n/routing";
+import { DishSuggestList } from "@/app/[locale]/(public)/page";
 
 export default function PopularDishes({ data }: { data: DishSuggestList }) {
   return (

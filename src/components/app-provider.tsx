@@ -166,11 +166,13 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     socket.on("count-call-waiter", onGuestCallListener);
     socket.on("count-order", onCountOrder);
     socket.on("update-status-table", onUpdateStatusTable);
+    socket.on("table-token-rotated", onUpdateStatusTable);
 
     return () => {
       socket.off("count-call-waiter", onGuestCallListener);
       socket.off("count-order", onCountOrder);
       socket.off("update-status-table", onUpdateStatusTable);
+      socket.off("table-token-rotated", onUpdateStatusTable);
     };
   }, [socket, setCountGuestCalls, countPending, countOrder, queryClient]);
 

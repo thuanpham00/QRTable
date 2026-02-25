@@ -1,3 +1,4 @@
+import { PaymentGroupSummaryRes } from "@/schemaValidations/tableSessions.schema";
 import { PaginationRes } from "@/schemaValidations/util.schema";
 import z from "zod";
 
@@ -154,6 +155,7 @@ export const PaymentItemSchema = z.object({
   sepayGateway: z.string().nullable(),
   sepayTransactionDate: z.date().nullable(),
   sepayContent: z.string().nullable(),
+  paymentGroup: PaymentGroupSummaryRes.nullable(),
 });
 
 // ============ Response Schemas ============

@@ -1,8 +1,8 @@
 "use client";
 import { useAppStore } from "@/components/app-provider";
+import { usePathname, useRouter } from "@/i18n/routing";
 import { handleErrorApi } from "@/lib/utils";
 import { useLogoutMutation } from "@/queries/useAuth";
-import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 // tự động logout khi tài khoản bị xóa
@@ -38,9 +38,11 @@ export default function LogoutSocket() {
     }
 
     socket?.on("logout", onLogout);
+    socket?.on("force-logout", onLogout);
 
     return () => {
       socket?.off("logout", onLogout);
+      socket?.off("force-logout", onLogout);
     };
   }, [pathname, router, socket, logoutMutation, setIsRole, setSocket, setInfoGuest]);
 
