@@ -6,7 +6,7 @@ import { Navigation, Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { ChevronRight, ChevronLeft, Flame, Sparkles, Star } from "lucide-react";
 import Image from "next/image";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, generateSlugUrl } from "@/lib/utils";
 import { Link } from "@/i18n/routing";
 import { DishSuggestList } from "@/app/[locale]/(public)/page";
 
@@ -99,7 +99,10 @@ export default function PopularDishes({ data }: { data: DishSuggestList }) {
 
                         {/* Action Button */}
                         <Link
-                          href={`/dishes/${dish.id}`}
+                          href={`/dishes/${generateSlugUrl({
+                            name: dish.dish.name,
+                            id: dish.id,
+                          })}`}
                           className="text-gray-600 dark:text-white text-sm hover:underline transition-all duration-300 group/btn block"
                         >
                           <span>Xem chi tiết</span>

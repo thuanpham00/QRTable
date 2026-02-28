@@ -17,7 +17,6 @@
   },
   "Login": {
     "title": "Login",
-    "description": "Manager login area",
     "cardDescription": "Enter your email and password to log in to the system",
     "buttonLogin": "Login",
     "loginWithGoogle": "Login with Google"

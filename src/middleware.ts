@@ -21,9 +21,16 @@ const onlyOwnerPath = [
 const privatePath = [...managePath, ...guestPath];
 
 export function middleware(request: NextRequest) {
+  /**
+   * Khi localeDetection: true (mặc định), next-intl sẽ tự động detect locale theo thứ tự ưu tiên:
+    Cookie NEXT_LOCALE (nếu có)
+    Browser Accept-Language header (ví dụ: vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7)
+    defaultLocale (fallback cuối cùng)
+   */
   const handleI18nRouting = createIntlMiddleware({
     locales: locales,
     defaultLocale,
+    localeDetection: false,
   });
   const response = handleI18nRouting(request);
 
@@ -31,7 +38,7 @@ export function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
   const locale = request.cookies.get("NEXT_LOCALE")?.value ?? defaultLocale;
-
+  console.log(locale);
   // 1. Chưa đăng nhập
   // trường hợp chưa đăng nhập thì ko vào được privatePath
   // cũng dành cho trường hợp đã đăng nhập nhưng RT hết hạn rồi
@@ -89,5 +96,5 @@ export function middleware(request: NextRequest) {
 // mỗi lần có request vào, trước khi tới route/page tương ứng.
 
 export const config = {
-  matcher: ["/", "/(vi|en)/:path*"],
+  matcher: ["/", "/(en|vi)/:path*"],
 };

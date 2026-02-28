@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 
 export default function LanguageSwitcher() {
   const t = useTranslations("SwitchLanguage");
-  const locale = useLocale();
+  const locale = useLocale(); // lấy locale hiện tại từ context của next-intl - ngôn ngữ hiện tại
   const pathName = usePathname();
   const router = useRouter();
   const params = useParams();

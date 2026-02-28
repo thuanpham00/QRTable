@@ -15,14 +15,20 @@ import React from "react";
 import Footer from "@/components/footer";
 import NavItems from "@/app/[locale]/(public)/nav-items";
 import LanguageSwitcher from "@/components/Lauguage-Switcher";
+import { setRequestLocale } from "next-intl/server";
 
-export default function Layout({
+export default async function Layout({
   children,
   modal,
+  params,
 }: Readonly<{
   children: React.ReactNode;
   modal: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }>) {
+  const locale = (await params).locale;
+  setRequestLocale(locale); // Thiết lập locale cho request hiện tại - Đặt ngôn ngữ cho toàn bộ Server Components trong request đó
+
   return (
     <div className="flex min-h-screen w-full flex-col relative">
       <header className="sticky top-0 flex h-16 z-30 items-center gap-4 border-b bg-background px-4 md:px-6">

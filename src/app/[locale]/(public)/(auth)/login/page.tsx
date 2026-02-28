@@ -1,7 +1,10 @@
 import LoginForm from "@/app/[locale]/(public)/(auth)/login/login-form";
 import bgLogin from "../../../../../../public/images/restaurant.png";
+import { setRequestLocale } from "next-intl/server";
 
-export default function Login() {
+export default async function Login({ params }: { params: Promise<{ locale: string }> }) {
+  const locale = (await params).locale;
+  setRequestLocale(locale);
   return (
     <div className="relative">
       <div

@@ -4,9 +4,8 @@ import SlideImageHero from "@/components/slide-image-hero";
 import { Link } from "@/i18n/routing";
 import { wrapServerApi } from "@/lib/utils";
 import { Award, ChefHat, Sparkles, Users } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import Image from "next/image";
-
 
 export type DishSuggestList = {
   id: number;
@@ -40,10 +39,13 @@ export type DishSuggestList = {
   updatedAt: Date;
 }[];
 
-export default async function Home() {
+export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
+  const locale = (await params).locale;
+  setRequestLocale(locale);
+
+  const t = await getTranslations("HomePage");
   const resultSuggested = await wrapServerApi(() => menuApiRequests.getMenuSuggested());
   const listDishSuggested = resultSuggested?.payload.data;
-  const t = await getTranslations("HomePage");
 
   return (
     <div className="w-full space-y-4">

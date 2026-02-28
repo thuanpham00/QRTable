@@ -10,13 +10,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useLoginMutation } from "@/queries/useAuth";
 import { toast } from "sonner";
 import { generateSocket, handleErrorApi } from "@/lib/utils";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 import { useAppStore } from "@/components/app-provider";
 import { envConfig } from "@/utils/config";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/routing";
+import SearchParamsLoader, { useSearchParamsLoader } from "@/components/search-params-loader";
 
 const getOauthGoogleUrl = () => {
   const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
@@ -36,7 +36,7 @@ const getOauthGoogleUrl = () => {
 };
 const googleOauthUrl = getOauthGoogleUrl();
 
-function Login() {
+export default function LoginForm() {
   /**
    *  1. Client component gọi api login route handler là `/auth/login`
       2. Route handler này sẽ gọi tiếp api login đến Server Backend để nhận về token, sau đó lưu token vào cookie client, cuối cùng trả kết quả về cho client component
@@ -46,8 +46,8 @@ function Login() {
   const setIsRole = useAppStore((state) => state.setIsRole);
   const setSocket = useAppStore((state) => state.setSocket);
 
-  const searchParams = useSearchParams();
-  const clearTokens = searchParams.get("clearTokens");
+  const { searchParams, setSearchParams } = useSearchParamsLoader();
+  const clearTokens = searchParams?.get("clearTokens");
 
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
@@ -86,6 +86,8 @@ function Login() {
 
   return (
     <Card className="mx-auto md:max-w-md w-full mt-16">
+      <SearchParamsLoader onParamsReceived={setSearchParams} />
+
       <CardHeader>
         <CardTitle className="text-2xl">{t("title")}</CardTitle>
         <CardDescription>{t("cardDescription")}</CardDescription>
@@ -166,10 +168,15 @@ function Login() {
 }
 
 // để fix lỗi useSearchParams từ nextjs thì dùng suspense bao ngoài
-export default function LoginForm() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <Login />
-    </Suspense>
-  );
-}
+// export default function LoginForm() {
+//   return (
+//     <Suspense fallback={<div>Loading...</div>}>
+//       <Login />
+//     </Suspense>
+//   );
+// }
+
+// nếu dùng useSearchParams (dùng Suspense bọc component) thì sẽ bị
+// tình trạng là bên ngoài static bên trong dynamic vì Suspense chặn static không render html hết page - cách cũ 
+
+// cách mới là ko dùng Suspense nữa dùng hook SearchParamsLoader thì lúc này sẽ render được hết page - full html
