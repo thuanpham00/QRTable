@@ -21,12 +21,14 @@ import { useEffect } from "react";
 import { useAppStore } from "@/components/app-provider";
 import { OrderMode, OrderModeType } from "@/constants/type";
 import { useRouter } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 
 export default function GuestLoginForm() {
   const setSocket = useAppStore((state) => state.setSocket);
   const setIsRole = useAppStore((state) => state.setIsRole);
   const setInfoGuest = useAppStore((state) => state.setInfoGuest);
 
+  const t = useTranslations("LoginGuest")
   const searchParams = useSearchParams();
   const params = useParams();
   const tokenTable = searchParams.get("token");
@@ -86,7 +88,7 @@ export default function GuestLoginForm() {
   return (
     <Card className="mx-auto max-w-100 w-full">
       <CardHeader>
-        <CardTitle className="text-2xl">Đăng nhập gọi món</CardTitle>
+        <CardTitle className="text-2xl">{t("title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -104,7 +106,7 @@ export default function GuestLoginForm() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid gap-2">
-                      <Label htmlFor="name">Tên khách hàng</Label>
+                      <Label htmlFor="name">{t("nameGuest")}</Label>
                       <Input id="name" type="text" required {...field} />
                       <FormMessage />
                     </div>
@@ -113,7 +115,7 @@ export default function GuestLoginForm() {
               />
 
               <Button type="submit" className="w-full">
-                Đăng nhập
+                {t("buttonLogin")}
               </Button>
             </div>
           </form>

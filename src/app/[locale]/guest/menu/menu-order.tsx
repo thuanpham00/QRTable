@@ -24,12 +24,14 @@ import logoFavourite from "../../../../../public/images/favorites.png";
 import { useAppStore } from "@/components/app-provider";
 import { Check, House, Truck } from "lucide-react";
 import { useRouter } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 
 type OrderList = (GuestCreateOrdersBodyType["listOrder"][number] & {
   price: number;
 })[];
 
 export default function MenuOrder() {
+  const t = useTranslations("GuestOrderPage");
   const socket = useAppStore((state) => state.socket);
   const infoGuest = useAppStore((state) => state.infoGuest);
   const setInfoGuest = useAppStore((state) => state.setInfoGuest);
@@ -211,7 +213,9 @@ export default function MenuOrder() {
             setOpen(true);
           }}
         >
-          <span>Gọi món · {orders.length} món</span>
+          <span>
+            {t("Order")} · {orders.length} món
+          </span>
           <span>{formatCurrency(totalPriceOrder)} </span>
         </Button>
 
@@ -238,7 +242,7 @@ export default function MenuOrder() {
                   "text-white dark:text-white": orderMode === OrderModeType.DINE_IN,
                 })}
               >
-                Ăn tại chỗ
+                {t("DineIn")}
               </span>
               {orderMode === OrderModeType.DINE_IN && <Check className="text-white dark:text-foreground" />}
             </Button>
@@ -263,7 +267,7 @@ export default function MenuOrder() {
                   "text-white dark:text-white": orderMode === OrderModeType.TAKE_OUT,
                 })}
               >
-                Mang đi
+                {t("TakeAway")}
               </span>
 
               {orderMode === OrderModeType.TAKE_OUT && <Check className="text-white dark:text-foreground" />}
@@ -273,7 +277,7 @@ export default function MenuOrder() {
 
         {infoGuest?.orderTypeQR === OrderModeType.TAKE_OUT &&
           infoGuest.tableTypeQR === OrderModeType.TAKE_OUT && (
-            <div className="p-2 rounded bg-red-500 text-white">Bạn đang ở chế độ Mang về — không thể đổi</div>
+            <div className="p-2 rounded bg-red-500 text-white">{t("takeawayModeNotice")}</div>
           )}
       </div>
       <div className="grid grid-cols-6 gap-2">
@@ -312,13 +316,13 @@ export default function MenuOrder() {
                 className="flex-1 block text-center bg-green-500 hover:bg-green-600 text-white"
                 onClick={() => toast.info("Chức năng đang phát triển")}
               >
-                <span>Chatbot tư vấn</span>
+                <span>{t("Chatbot")}</span>
               </Button>
               <Button
                 className="flex-1 block text-center bg-yellow-500 hover:bg-yellow-600 text-white"
                 onClick={() => handleCallWaiter()}
               >
-                <span>Gọi nhân viên</span>
+                <span>{t("GuestCall")}</span>
               </Button>
             </div>
           </div>
@@ -425,11 +429,11 @@ export default function MenuOrder() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Xác nhận đổi hình thức order?</AlertDialogTitle>
+            <AlertDialogTitle>{t("confirmChangeModeTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Bạn có chắc muốn đổi sang hình thức{" "}
+              {t("confirmChangeModeDesc")}{" "}
               <strong className="text-orange-600">
-                {pendingOrderMode === OrderModeType.DINE_IN ? "Ăn tại quán" : "Mang về"}
+                {pendingOrderMode === OrderModeType.DINE_IN ? t("DineIn") : t("TakeAway")}
               </strong>
               ?
               {orders.length > 0 && (
@@ -440,11 +444,16 @@ export default function MenuOrder() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setPendingOrderMode(null)}>Hủy</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmChangeMode}>Xác nhận</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setPendingOrderMode(null)}>
+              {t("cancelChangeMode")}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmChangeMode}>{t("confirmChangeMode")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>
   );
 }
+
+// SSG chỉ build được phần server component (lớp ngoài).
+// Client component như MenuOrder luôn render ở client, không build được HTML tĩnh cho phần đó.

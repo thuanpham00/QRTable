@@ -1,56 +1,88 @@
-export default function About() {
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import Image from "next/image";
+
+export default async function About({ params }: { params: Promise<{ locale: string }> }) {
+  const locale = (await params).locale;
+  setRequestLocale(locale);
+  const t = await getTranslations("AboutPage");
+
   return (
-    <div className='flex flex-col'>
-      <section className='bg-secondary  py-20 px-4 md:px-6 lg:px-8'>
-        <div className='max-w-4xl text-center'>
-          <h1 className='text-4xl font-bold sm:text-5xl md:text-6xl'>
-            Về nhà hàng QRTable
-          </h1>
-          <p className='mt-4 text-lg md:text-xl'>
-            Địa chỉ: Số 1, đường Nguyễn Văn Linh, thành phố Đà Nẵng
-          </p>
-        </div>
-      </section>
-      <section className='py-12 md:py-20 lg:py-24'>
-        <div className='max-w-4xl space-y-8'>
-          <div>
-            <h2 className='text-3xl font-bold'>Câu chuyện của chúng tôi</h2>
-            <p className='mt-4 text-muted-foreground leading-8'>
-              Big Boy được thành lập vào năm 2010 với một sứ mệnh đơn giản: phục
-              vụ món ăn ngon, chất lượng cao để gắn kết mọi người lại với nhau.
-              Niềm đam mê của chúng tôi đối với nguyên liệu đặc biệt và công
-              thức sáng tạo đã đưa chúng tôi trở thành một tổ chức địa phương
-              được yêu thích, nổi tiếng với cam kết tạo ra những bữa ăn nuôi
-              dưỡng cơ thể và tâm hồn.
-            </p>
+    <div className="w-full flex justify-center bg-secondary">
+      <div className="w-full max-w-7xl flex flex-col">
+        {/* Banner Image */}
+        <section className="relative py-0">
+          <div className="w-full h-64 md:h-96 overflow-hidden rounded-b-3xl shadow-lg">
+            <Image
+              src="/images/restaurant_banner.png"
+              alt="Banner Nhà hàng"
+              width={1200}
+              height={400}
+              className="w-full h-full object-cover"
+            />
           </div>
-          <div>
-            <h2 className='text-3xl font-bold'>Giá trị của chúng tôi</h2>
-            <p className='mt-4 text-muted-foreground leading-8'>
-              Tại trung tâm của Big Boy là sự cống hiến sâu sắc cho tính bền
-              vững, cộng đồng và sự xuất sắc trong ẩm thực. Chúng tôi lấy nguyên
-              liệu từ các nông dân và nhà sản xuất địa phương, đảm bảo sự tươi
-              mới và hỗ trợ nền kinh tế địa phương. Đội ngũ của chúng tôi đam mê
-              tạo ra những món ăn không chỉ làm hài lòng vị giác mà còn nuôi
-              dưỡng cơ thể, với sự tập trung vào thực phẩm lành mạnh, không qua
-              chế biến.
-            </p>
+        </section>
+        <section className="py-16 px-4 sm:px-8 lg:px-16 xl:px-24">
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-4xl font-bold sm:text-5xl md:text-6xl text-primary mb-4">{t("title")}</h1>
+            <p className="mt-2 text-lg md:text-xl text-muted-foreground">{t("address")}</p>
           </div>
-          <div>
-            <h2 className='text-3xl font-bold'>Cam kết của chúng tôi</h2>
-            <p className='mt-4 text-muted-foreground leading-8'>
-              Chúng tôi tin rằng món ăn ngon có sức mạnh gắn kết mọi người lại
-              với nhau và tạo ra những kỷ niệm lâu dài. Đó là lý do tại sao
-              chúng tôi cam kết cung cấp một trải nghiệm ẩm thực tuyệt vời, từ
-              lúc bạn bước qua cửa cho đến miếng cuối cùng của bữa ăn. Các đầu
-              bếp tài năng của chúng tôi làm việc không ngừng để tạo ra những
-              món ăn thể hiện tốt nhất các nguyên liệu theo mùa, được lấy từ địa
-              phương, đảm bảo rằng mỗi đĩa ăn là một lễ kỷ niệm của hương vị và
-              chất lượng.
-            </p>
+        </section>
+        <section className="py-10 md:py-16 lg:py-8 px-4 sm:px-8 lg:px-16 xl:px-24">
+          <div className="max-w-4xl mx-auto space-y-16">
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              <div className="md:w-1/2 mb-4 md:mb-0">
+                <Image
+                  src="/images/restaurant.png"
+                  alt={t("storyTitle")}
+                  width={400}
+                  height={300}
+                  className="rounded-2xl shadow-lg w-full h-64 object-cover"
+                />
+              </div>
+              <div className="md:w-1/2">
+                <h2 className="text-3xl font-bold text-primary mb-2">{t("storyTitle")}</h2>
+                <p className="mt-2 text-muted-foreground leading-8 text-base md:text-lg">
+                  {t("storyContent")}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col md:flex-row-reverse items-center gap-8">
+              <div className="md:w-1/2 mb-4 md:mb-0">
+                <Image
+                  src="/images/chef.png"
+                  alt={t("valueTitle")}
+                  width={400}
+                  height={300}
+                  className="rounded-2xl shadow-lg w-full h-64 object-cover"
+                />
+              </div>
+              <div className="md:w-1/2">
+                <h2 className="text-3xl font-bold text-primary mb-2">{t("valueTitle")}</h2>
+                <p className="mt-2 text-muted-foreground leading-8 text-base md:text-lg">
+                  {t("valueContent")}
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              <div className="md:w-1/2 mb-4 md:mb-0">
+                <Image
+                  src="/images/Dish.png"
+                  alt={t("commitmentTitle")}
+                  width={400}
+                  height={300}
+                  className="rounded-2xl shadow-lg w-full h-64 object-cover"
+                />
+              </div>
+              <div className="md:w-1/2">
+                <h2 className="text-3xl font-bold text-primary mb-2">{t("commitmentTitle")}</h2>
+                <p className="mt-2 text-muted-foreground leading-8 text-base md:text-lg">
+                  {t("commitmentContent")}
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
-  )
+  );
 }

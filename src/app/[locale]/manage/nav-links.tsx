@@ -1,17 +1,19 @@
 "use client";
-import menuItems from "@/app/[locale]/manage/menuItems";
 import { useAppStore } from "@/components/app-provider";
 import { Tooltip, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { Settings } from "lucide-react";
 import Image from "next/image";
 import { Link, usePathname } from "@/i18n/routing";
+import { getMenuItems } from "@/app/[locale]/manage/menuItems";
+import { useTranslations } from "next-intl";
 
 export default function NavLinks() {
   const pathname = usePathname();
   const isRole = useAppStore((state) => state.isRole);
   const countGuestCalls = useAppStore((state) => state.countGuestCalls);
   const countOrderToday = useAppStore((state) => state.countOrderToday);
+  const t = useTranslations("NavItemManage");
+  const menuItems = getMenuItems(t);
 
   return (
     <TooltipProvider>
@@ -68,26 +70,6 @@ export default function NavLinks() {
               </Tooltip>
             );
           })}
-        </nav>
-        <nav className="mt-auto flex flex-col items-center gap-4 px-2 py-4">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                href="/manage/setting"
-                className={cn(
-                  "flex h-9 w-9 items-center justify-start gap-2 p-2 pl-4 rounded-lg transition-colors hover:text-foreground md:h-8 md:w-full",
-                  {
-                    "bg-accent text-accent-foreground": pathname === "/manage/setting",
-                    "text-muted-foreground": pathname !== "/manage/setting",
-                  },
-                )}
-              >
-                <Settings className="h-5 w-5" />
-                <div>Cài đặt</div>
-                <span className="sr-only">Cài đặt</span>
-              </Link>
-            </TooltipTrigger>
-          </Tooltip>
         </nav>
       </aside>
     </TooltipProvider>

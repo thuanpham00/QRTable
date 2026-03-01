@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Users, UtensilsCrossed, Printer, History, BrushCleaning } from "lucide-react";
 import { GetOrdersResType } from "@/schemaValidations/order.schema";
 import { usePayOrderByTableMutation } from "@/queries/usePayment";
-import { useState, useEffect, Fragment, createContext } from "react";
+import { useState, useEffect, Fragment, createContext, Suspense } from "react";
 import { format } from "date-fns";
 import { CreatePaymentResType } from "@/schemaValidations/payment.schema";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -35,7 +35,7 @@ export const OrderByTableContext = createContext<{
   tableSessionId: null,
 });
 
-export default function AllOrderByTablePage() {
+function AllOrderByTablePage() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
@@ -1014,5 +1014,13 @@ export default function AllOrderByTablePage() {
         )}
       </div>
     </OrderByTableContext.Provider>
+  );
+}
+
+export default function TableSessionPage() {
+  return (
+    <Suspense>
+      <AllOrderByTablePage />
+    </Suspense>
   );
 }

@@ -38,7 +38,6 @@ export function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("accessToken")?.value;
   const refreshToken = request.cookies.get("refreshToken")?.value;
   const locale = request.cookies.get("NEXT_LOCALE")?.value ?? defaultLocale;
-  console.log(locale);
   // 1. Chưa đăng nhập
   // trường hợp chưa đăng nhập thì ko vào được privatePath
   // cũng dành cho trường hợp đã đăng nhập nhưng RT hết hạn rồi

@@ -1,15 +1,20 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Suspense } from "react";
 import MenuTable from "@/app/[locale]/manage/menus/menu-table";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
-export default function MenusPage() {
+export default async function MenusPage({ params }: { params: Promise<{ locale: string }> }) {
+  const locale = (await params).locale;
+  setRequestLocale(locale);
+  const t = await getTranslations("ManageMenus");
+
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
       <div className="space-y-2">
         <Card x-chunk="dashboard-06-chunk-0">
           <CardHeader>
-            <CardTitle className="text-xl">Menu</CardTitle>
-            <CardDescription>Quản lý menu</CardDescription>
+            <CardTitle className="text-xl">{t("title")}</CardTitle>
+            <CardDescription>{t("description")}</CardDescription>
           </CardHeader>
           <CardContent>
             <Suspense>
@@ -22,3 +27,10 @@ export default function MenusPage() {
     </main>
   );
 }
+
+
+/**
+ * Các page như trên vẫn là SSG vì có generateStaticParams với [locale], nên Next.js sẽ build ra HTML tĩnh cho từng locale.
+Tuy nhiên, phần bên trong (component con như AccountTable) được bọc bởi <Suspense> và là client component, nên chỉ render nội dung tĩnh ở lớp ngoài, còn bên trong sẽ hydrate và render ở client.
+Như vậy, bạn vẫn giữ được SSG cho phần ngoài, còn phần bên trong sẽ luôn cập nhật theo trạng thái client (ví dụ: dùng hook, lấy dữ liệu động, v.v.).
+ */

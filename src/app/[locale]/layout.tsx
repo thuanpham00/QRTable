@@ -30,6 +30,9 @@ export const metadata: Metadata = {
 // generateStaticParams đây là 1 api của next giúp render ra các ngôn ngữ, ví dụ trang có 2 ngôn ngữ là vi và en thì nó sẽ kết hợp với setRequestLocale để hiện thị đúng trang html tĩnh (đúng ngôn ngữ hiện tại)
 // nhờ generateStaticParams render ra nhiều html tĩnh khiến page từ dynamic -> static, còn nếu ko có generateStaticParams thì page sẽ là dynamic, mỗi lần có request vào thì mới render ra html tương ứng với ngôn ngữ đó
 // Ví dụ: Nếu có ["en", "vi"], Next.js sẽ build ra /en/... và /vi/... dưới dạng static HTML.
+// ○ Static: file tĩnh, không có params, không cần generateStaticParams.
+// ● SSG: static HTML, nhưng có params, dùng generateStaticParams để build ra nhiều file tĩnh cho từng trường hợp.
+
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
@@ -48,7 +51,7 @@ export default async function RootLayout({
   }
 
   // Enable static rendering
-  setRequestLocale(locale); // Thiết lập locale cho request hiện tại - Đặt ngôn ngữ cho toàn bộ Server Components trong request đó
+  setRequestLocale(locale); // Thiết lập locale cho request hiện tại - Đặt ngôn ngữ cho toàn bộ Server Components trong request đó - chỉ dùng dc cho server component 
 
   const messages = await getMessages();
 

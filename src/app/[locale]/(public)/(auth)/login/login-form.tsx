@@ -64,7 +64,7 @@ export default function LoginForm() {
     if (loginMutation.isPending) return;
     try {
       const result = await loginMutation.mutateAsync(data);
-      toast.success(result.payload.message, {
+      toast.success(t("loginSuccess"), {
         duration: 2000,
       });
       router.push("/manage/dashboard");
@@ -177,6 +177,6 @@ export default function LoginForm() {
 // }
 
 // nếu dùng useSearchParams (dùng Suspense bọc component) thì sẽ bị
-// tình trạng là bên ngoài static bên trong dynamic vì Suspense chặn static không render html hết page - cách cũ 
+// tình trạng là bên ngoài static bên trong dynamic vì Suspense chặn static không render html hết page - cách cũ
 
 // cách mới là ko dùng Suspense nữa dùng hook SearchParamsLoader thì lúc này sẽ render được hết page - full html

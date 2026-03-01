@@ -10,49 +10,92 @@
   },
   "HomePage": {
     "hello": "Welcome to QRTable!",
-    "title": "Home page",
-    "description": "Craving a classic American diner experience? Look no further than Big Boy! Savor our iconic Big Boy burger, juicy and flavorful, paired with creamy milkshakes and crispy fries. Perfect for families and friends!",
-    "slogan": "Taste good, every moment",
-    "h2": "A variety of dishes"
+    "title": "It's not just food, it's an emotional experience!",
+    "description": "Cooking is an art, a joy, and a connection. Discover our diverse menu and cozy atmosphere!",
+    "noPopularDishes": "No popular dishes yet",
+    "noPopularDishesDescription": "Please check back later to discover amazing dishes!",
+    "exploreMenu": "Explore the menu",
+    "findUs": "Find us here",
+    "openingHours": "Opening hours",
+    "mondayToSunday": "Monday - Sunday",
+    "visitRestaurant": "Visit our restaurant",
+    "visitRestaurantDescription": "Our quality farmhouse-style menu, friendly and efficient service, combined with real value has made our restaurant serve families like yours for over 5 years.",
+    "restaurantSpace": "Restaurant space",
+    "lobby": "Lobby",
+    "mainDiningRoom": "Main dining room",
+    "featuredDish": "Featured dish",
+    "professionalChef": "Professional chef",
+    "whyChooseUs": "Why choose us?",
+    "greatTaste": "Great taste",
+    "selfService": "Self-service",
+    "fastConvenient": "Fast and convenient",
+    "bestDish": "Best dish",
+    "topQuality": "Top quality",
+    "experiencedChef": "Experienced chef",
+    "popularDishes": "Popular dishes",
+    "popularDishesDescription": "Discover the list of most popular dishes, including main courses, drinks and desserts, to have an authentic culinary experience!",
+    "discoverAllDishes": "Discover all dishes"
   },
   "Login": {
     "title": "Login",
     "cardDescription": "Enter your email and password to log in to the system",
     "buttonLogin": "Login",
-    "loginWithGoogle": "Login with Google"
+    "loginWithGoogle": "Login with Google",
+    "loginSuccess": "Login successful"
   },
   "DishDetail": {
     "notFound": "Dish not found"
   },
   "LoginGuest": {
     "title": "Login to order",
-    "description": "Enter login information to place an order"
+    "nameGuest": "Guest name",
+    "buttonLogin": "Login"
   },
   "GuestMenu": {
     "title": "Menu",
     "description": "Choose your favorite dishes"
   },
-  "ManageAccounts": {
-    "title": "Manage accounts",
-    "description": "Manage employee accounts"
-  },
   "Dashboard": {
     "title": "Dashboard",
     "description": "View and analyze sales data"
   },
-  "Dishes": {
+  "ManageAccounts": {
+    "title": "Accounts",
+    "description": "Manage employee accounts"
+  },
+  "ManageCallWaiters": {
+    "title": "Call Waiters",
+    "description": "Request waiter service from customers"
+  },
+  "ManageCategories": {
+    "title": "Food Categories",
+    "description": "Manage Food Categories"
+  },
+  "ManageDishes": {
     "title": "Dishes",
     "description": "Manage dishes"
+  },
+  "ManageIngredients": {
+    "title": "Ingredients",
+    "description": "Manage ingredients"
+  },
+  "ManageMenus": {
+    "title": "Menus",
+    "description": "Manage menus"
   },
   "Orders": {
     "title": "Orders",
     "description": "Manage orders"
   },
+  "ManagePayments": {
+    "title": "Payments",
+    "description": "Manage payment history"
+  },
   "Setting": {
     "title": "Setting",
     "description": "Manage your account settings"
   },
-  "Tables": {
+  "ManageTables": {
     "title": "Tables",
     "description": "Manage tables"
   },
@@ -65,7 +108,7 @@
     "home": "Home",
     "menu": "Menu",
     "orders": "Orders",
-    "guestMenu": "Gọi món",
+    "guestMenu": "Order",
     "login": "Login",
     "logout": "Logout",
     "manage": "Manage",
@@ -74,5 +117,98 @@
       "logoutCancel": "Cancel",
       "logoutConfirm": "Signing out may result in loss of your orders"
     }
+  },
+  "NavItemManage": {
+    "dashboard": "Dashboard",
+    "orders": "Orders",
+    "payments": "Payments",
+    "callWaiters": "Call Waiter",
+    "tables": "Tables",
+    "menus": "Menu Items",
+    "categories": "Categories",
+    "dishes": "Dishes",
+    "ingredients": "Ingredients",
+    "accounts": "Staff"
+  },
+  "Footer": {
+    "brand": "Restaurant",
+    "slogan": "Enjoy the taste of our restaurant — explore the attractive menu and easily order your favorite dishes.",
+    "quickLinks": "Quick links",
+    "home": "Home",
+    "menu": "Menu",
+    "about": "About",
+    "contact": "Contact",
+    "termOfService": "Term of Service",
+    "privacyPolicy": "Privacy Policy",
+    "email": "phamminhthuan912@gmail.com",
+    "phone": "+0123 456 7890",
+    "address": "123 HV HCM City",
+    "copyright": "©2026 Restaurant. All rights reserved."
+  },
+  "AboutPage": {
+    "title": "About QRTable Restaurant",
+    "address": "Address: 123 HV HCM City",
+    "storyTitle": "Our Story",
+    "storyContent": "Big Boy was founded in 2010 with a simple mission: to serve delicious, high-quality food that brings people together. Our passion for special ingredients and creative recipes has made us a beloved local establishment, known for our commitment to creating meals that nourish both body and soul.",
+    "valueTitle": "Our Values",
+    "valueContent": "At the heart of Big Boy is a deep dedication to sustainability, community, and culinary excellence. We source ingredients from local farmers and producers, ensuring freshness and supporting the local economy. Our team is passionate about creating dishes that not only delight the palate but also nourish the body, with a focus on wholesome, unprocessed foods.",
+    "commitmentTitle": "Our Commitment",
+    "commitmentContent": "We believe that great food has the power to bring people together and create lasting memories. That's why we are committed to providing an exceptional dining experience, from the moment you walk through the door to the last bite of your meal. Our talented chefs work tirelessly to craft dishes that showcase the best seasonal, locally sourced ingredients, ensuring every plate is a celebration of flavor and quality."
+  },
+  "PrivacyPolicyPage": {
+    "bannerAlt": "Privacy Policy Banner",
+    "title": "Privacy Policy",
+    "description": "We are committed to maximizing the protection of your personal information when using QRTable's services. This policy explains in detail how we collect, use, store, protect, and share your data, as well as your rights and choices regarding your personal information.",
+    "infoTitle": "Information We Collect",
+    "infoContent": "When you use our services, we may collect the following types of information: \n- Personal identification information such as full name, email address, phone number, and contact address.\n- Login and security information such as password and login history.\n- Order information, transaction history, payment methods.\n- Technical data such as IP address, device type, browser, access time, pages viewed.\n- Feedback, reviews, and support contact information from you.\nWe only collect the information necessary to serve the purpose of using the service and to comply with legal regulations.",
+    "usageTitle": "How We Use Information",
+    "usageContent": "Your personal information is used for the following purposes: \n- Processing and managing orders, transactions, and payments.\n- Improving service quality and optimizing user experience.\n- Sending notifications, updates, promotions, or information related to the service.\n- Customer support, resolving complaints, responding to requests.\n- Fulfilling legal requirements, audits, and fraud prevention.\nWe do not use personal information for external advertising purposes or share it with unrelated third parties, except with your consent or as required by law.",
+    "securityTitle": "Data Security and Storage",
+    "securityContent": "We apply physical, technical, and administrative security measures to protect personal data from unauthorized access, loss, alteration, or disclosure.\n- Data is encrypted during transmission and storage on secure systems.\n- Only authorized personnel have access to personal information.\n- Regularly inspect and update security systems to prevent risks.\n- Data is stored for the necessary period for service use and in compliance with legal regulations.\nIf a security incident is detected, we will promptly notify you and the authorities as required."
+  },
+  "TermOfServicePage": {
+    "title": "Terms of Service",
+    "description": "By using our services, you agree to comply with the following terms and conditions. Please read carefully to understand your rights, obligations, and responsibilities when using the QRTable system.",
+    "introTitle": "Introduction",
+    "introContent": "This page sets forth the terms of use for QRTable services, including access rights, usage, security, and regulations for users and service providers. Using the service means you accept all these terms.",
+    "usageTitle": "Service Usage",
+    "usageContent": "You agree to use the service for its intended purpose, not to violate the law, and not to negatively affect the system or other users.\n- Do not distribute illegal, fraudulent, harmful content or infringe on privacy.\n- Do not access, interfere with, or damage QRTable's system or data without authorization.\n- Comply with security, payment, and service usage guidelines.",
+    "ipTitle": "Intellectual Property Rights",
+    "ipContent": "All content, software, images, logos, and documents on QRTable are owned by us or our licensed partners.\n- Copying, reuse, distribution, or modification without written consent is strictly prohibited.\n- Intellectual property violations may be subject to legal action.",
+    "changeTitle": "Changes to Terms",
+    "changeContent": "QRTable reserves the right to update, change, or supplement the terms of service at any time.\n- Changes will be announced on the website or via email.\n- Continued use of the service after changes means you accept the new terms.",
+    "contactTitle": "Contact",
+    "contactContent": "If you have questions, complaints, or need support regarding the terms of service, please contact us via email or phone number on the website. We will respond as soon as possible."
+  },
+  "Others": {
+    "logout": "Logout",
+    "buttonBack": "Back",
+    "setting": "Setting",
+    "profileTitle": "Profile Information",
+    "name": "Name",
+    "avatar": "Avatar",
+    "uploadAvatar": "Upload Avatar",
+    "cancel": "Cancel",
+    "save": "Save Information",
+    "changePasswordTitle": "Change Password",
+    "oldPassword": "Old Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "seenDetail": "View Details"
+  },
+  "MenuPage": {
+    "NoMenuActive": "No active menu"
+  },
+  "GuestOrderPage": {
+    "Chatbot": "Chatbot for advice",
+    "GuestCall": "Call waiter",
+    "Order": "Order",
+    "takeawayModeNotice": "You are in Takeaway Mode — cannot change",
+    "DineIn": "Dine In",
+    "TakeAway": "Take Away",
+    "confirmChangeModeTitle": "Confirm Change Order Mode?",
+    "confirmChangeModeDesc": "Are you sure you want to change to this order mode",
+    "confirmChangeMode": "Confirm",
+    "cancelChangeMode": "Cancel"
   }
 }

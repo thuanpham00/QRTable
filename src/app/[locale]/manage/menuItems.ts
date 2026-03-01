@@ -12,67 +12,67 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 
-const menuItems = [
-  {
-    title: "Dashboard",
-    Icon: LayoutDashboard,
-    href: "/manage/dashboard",
-    roles: [Role.Owner, Role.Employee],
-  },
-  {
-    title: "Đơn hàng",
-    Icon: ShoppingCart,
-    href: "/manage/orders",
-    roles: [Role.Owner, Role.Employee],
-  },
-  {
-    title: "Thanh toán",
-    Icon: DollarSign,
-    href: "/manage/payments",
-    roles: [Role.Owner, Role.Employee],
-  },
-  {
-    title: "Gọi phục vụ",
-    Icon: Headset,
-    href: "/manage/call-waiters",
-    roles: [Role.Owner, Role.Employee],
-  },
-  {
-    title: "Bàn ăn",
-    Icon: Table,
-    href: "/manage/tables",
-    roles: [Role.Owner, Role.Employee],
-  },
-  {
-    title: "Menu món ăn",
-    Icon: List,
-    href: "/manage/menus",
-    roles: [Role.Owner, Role.Employee],
-  },
-  {
-    title: "Danh mục món",
-    Icon: Columns3,
-    href: "/manage/categories",
-    roles: [Role.Owner],
-  },
-  {
-    title: "Món ăn",
-    Icon: Salad,
-    href: "/manage/dishes",
-    roles: [Role.Owner],
-  },
-  {
-    title: "Nguyên liệu",
-    Icon: ShoppingBasket,
-    href: "/manage/ingredients",
-    roles: [Role.Owner],
-  },
-  {
-    title: "Nhân viên",
-    Icon: Users2,
-    href: "/manage/accounts",
-    roles: [Role.Owner],
-  },
-];
-
-export default menuItems;
+export function getMenuItems(t: (key: string) => string) {
+  return [
+    {
+      title: t("dashboard"),
+      Icon: LayoutDashboard,
+      href: "/manage/dashboard",
+      roles: [Role.Owner, Role.Employee],
+    },
+    {
+      title: t("orders"),
+      Icon: ShoppingCart,
+      href: "/manage/orders",
+      roles: [Role.Owner, Role.Employee],
+    },
+    {
+      title: t("payments"),
+      Icon: DollarSign,
+      href: "/manage/payments",
+      roles: [Role.Owner, Role.Employee],
+    },
+    {
+      title: t("callWaiters"),
+      Icon: Headset,
+      href: "/manage/call-waiters",
+      roles: [Role.Owner, Role.Employee],
+    },
+    {
+      title: t("tables"),
+      Icon: Table,
+      href: "/manage/tables",
+      roles: [Role.Owner, Role.Employee],
+    },
+    {
+      title: t("menus"),
+      Icon: List,
+      href: "/manage/menus",
+      roles: [Role.Owner, Role.Employee],
+    },
+    {
+      title: t("categories"),
+      Icon: Columns3,
+      href: "/manage/categories",
+      roles: [Role.Owner],
+    },
+    {
+      title: t("dishes"),
+      Icon: Salad,
+      href: "/manage/dishes",
+      roles: [Role.Owner],
+    },
+    {
+      title: t("ingredients"),
+      Icon: ShoppingBasket,
+      href: "/manage/ingredients",
+      roles: [Role.Owner],
+    },
+    {
+      title: t("accounts"),
+      Icon: Users2,
+      href: "/manage/accounts",
+      roles: [Role.Owner],
+    },
+  ];
+}

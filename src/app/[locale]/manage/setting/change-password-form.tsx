@@ -13,6 +13,7 @@ import InputPassword from "@/app/[locale]/manage/setting/input-password";
 import { useChangePasswordMutation } from "@/queries/useAccount";
 import { toast } from "sonner";
 import { handleErrorApi, setAccessTokenFromLocalStorage, setRefreshTokenFromLocalStorage } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 export default function ChangePasswordForm() {
   const changePasswordFormMutation = useChangePasswordMutation();
@@ -48,6 +49,8 @@ export default function ChangePasswordForm() {
     }
   };
 
+  const t = useTranslations("Others");
+
   return (
     <Form {...form}>
       <form
@@ -60,7 +63,7 @@ export default function ChangePasswordForm() {
       >
         <Card className="overflow-hidden" x-chunk="dashboard-07-chunk-4">
           <CardHeader>
-            <CardTitle>Đổi mật khẩu</CardTitle>
+            <CardTitle>{t("changePasswordTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-6">
@@ -69,7 +72,11 @@ export default function ChangePasswordForm() {
                 name="oldPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <InputPassword field={field} label="Mật khẩu cũ" controlLabel="oldPassword" />
+                    <InputPassword
+                      field={field}
+                      label={t("oldPassword") || "Old Password"}
+                      controlLabel="oldPassword"
+                    />
                   </FormItem>
                 )}
               />
@@ -78,7 +85,11 @@ export default function ChangePasswordForm() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <InputPassword field={field} label="Mật khẩu mới" controlLabel="password" />
+                    <InputPassword
+                      field={field}
+                      label={t("newPassword") || "New Password"}
+                      controlLabel="password"
+                    />
                   </FormItem>
                 )}
               />
@@ -89,7 +100,7 @@ export default function ChangePasswordForm() {
                   <FormItem>
                     <InputPassword
                       field={field}
-                      label="Xác nhận mật khẩu mới"
+                      label={t("confirmNewPassword") || "Confirm New Password"}
                       controlLabel="confirmPassword"
                     />
                   </FormItem>
@@ -97,9 +108,9 @@ export default function ChangePasswordForm() {
               />
               <div className=" items-center gap-2 md:ml-auto flex">
                 <Button variant="outline" size="sm">
-                  Hủy
+                  {t("cancel")}
                 </Button>
-                <Button size="sm">Lưu thông tin</Button>
+                <Button size="sm">{t("save")}</Button>
               </div>
             </div>
           </CardContent>

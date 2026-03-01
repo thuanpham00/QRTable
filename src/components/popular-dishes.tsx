@@ -9,8 +9,12 @@ import Image from "next/image";
 import { formatCurrency, generateSlugUrl } from "@/lib/utils";
 import { Link } from "@/i18n/routing";
 import { DishSuggestList } from "@/app/[locale]/(public)/page";
+import { useTranslations } from "next-intl";
 
 export default function PopularDishes({ data }: { data: DishSuggestList }) {
+  const t = useTranslations("HomePage");
+  const t2= useTranslations("Others");
+
   return (
     <section className="py-16 md:py-12 px-4 sm:px-6 lg:px-33.75">
       <div className="text-center mb-12 md:mb-16">
@@ -19,15 +23,14 @@ export default function PopularDishes({ data }: { data: DishSuggestList }) {
             <Flame className="w-6 h-6 text-orange-400" />
           </div>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-linear-to-r from-orange-400 to-orange-300 bg-clip-text text-transparent">
-            Món ăn phổ biến
+            {t("popularDishes")}
           </h2>
           <div className="w-12 h-12 rounded-full bg-orange-500/20 border-2 border-orange-500/30 flex items-center justify-center">
             <Star className="w-6 h-6 text-orange-400 fill-orange-400" />
           </div>
         </div>
         <p className="text-black dark:text-white text-lg max-w-3xl mx-auto leading-relaxed px-4 tracking-wide">
-          Khám phá danh sách các món ăn được yêu thích nhất, bao gồm món chính, đồ uống và tráng miệng, để có
-          trải nghiệm ẩm thực đích thực!
+          {t("popularDishesDescription")}
         </p>
         <div className="mt-6 h-1 w-32 mx-auto bg-linear-to-r from-transparent via-orange-400 to-transparent rounded-full" />
       </div>
@@ -105,7 +108,7 @@ export default function PopularDishes({ data }: { data: DishSuggestList }) {
                           })}`}
                           className="text-gray-600 dark:text-white text-sm hover:underline transition-all duration-300 group/btn block"
                         >
-                          <span>Xem chi tiết</span>
+                          <span>{t2("seenDetail")}</span>
                         </Link>
                       </div>
                     </div>
@@ -127,8 +130,8 @@ export default function PopularDishes({ data }: { data: DishSuggestList }) {
             <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gray-800/50 border-2 border-gray-700 mb-6">
               <Flame className="w-12 h-12 text-gray-500" />
             </div>
-            <h3 className="text-2xl font-semibold text-gray-400 mb-2">Chưa có món ăn phổ biến</h3>
-            <p className="text-gray-500">Hãy quay lại sau để khám phá những món ăn tuyệt vời!</p>
+            <h3 className="text-2xl font-semibold text-gray-400 mb-2">{t("noPopularDishes")}</h3>
+            <p className="text-gray-500">{t("noPopularDishesDescription")}</p>
           </div>
         )}
       </div>
@@ -141,7 +144,7 @@ export default function PopularDishes({ data }: { data: DishSuggestList }) {
             className="inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold text-lg rounded-xl shadow-xl hover:shadow-2xl hover:shadow-orange-500/50 transition-all duration-300 hover:-translate-y-1 border-2 border-orange-400/50"
           >
             <Sparkles className="w-5 h-5" />
-            <span>Khám phá tất cả món ăn</span>
+            <span>{t("discoverAllDishes")}</span>
             <ChevronRight className="w-5 h-5" />
           </Link>
           <div className="mt-4 h-1 w-48 mx-auto bg-linear-to-r from-transparent via-orange-400 to-transparent rounded-full" />

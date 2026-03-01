@@ -14,9 +14,11 @@ import { useLogoutMutation } from "@/queries/useAuth";
 import { handleErrorApi } from "@/lib/utils";
 import { useGetMeQuery } from "@/queries/useAccount";
 import { useAppStore } from "@/components/app-provider";
+import { useTranslations } from "next-intl";
 
 // những trang cần login thì ko cần seo nên cứ gọi api ở client thoải mái
 export default function DropdownAvatar() {
+  const t = useTranslations("Others")
   const socket = useAppStore((state) => state.socket);
   const setSocket = useAppStore((state) => state.setSocket);
   const setIsRole = useAppStore((state) => state.setIsRole);
@@ -63,12 +65,11 @@ export default function DropdownAvatar() {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href={"/manage/setting"} className="cursor-pointer">
-            Cài đặt
+            {t("setting")}
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>Hỗ trợ</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={logout}>Đăng xuất</DropdownMenuItem>
+        <DropdownMenuItem onClick={logout}>{t("logout")}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -1,5 +1,4 @@
 "use client";
-import menuItems from "@/app/[locale]/manage/menuItems";
 import { useAppStore } from "@/components/app-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,10 +12,16 @@ import {
 import { cn } from "@/lib/utils";
 import { Package2, PanelLeft } from "lucide-react";
 import { Link, usePathname } from "@/i18n/routing";
+import { getMenuItems } from "@/app/[locale]/manage/menuItems";
+import { useTranslations } from "next-intl";
 
 export default function MobileNavLinks() {
   const pathname = usePathname();
   const isRole = useAppStore((state) => state.isRole);
+  const countGuestCalls = useAppStore((state) => state.countGuestCalls);
+  const countOrderToday = useAppStore((state) => state.countOrderToday);
+  const t = useTranslations("NavItemManage");
+  const menuItems = getMenuItems(t);
 
   return (
     <Sheet>
@@ -41,7 +46,9 @@ export default function MobileNavLinks() {
           </Link>
           {menuItems.map((Item, index) => {
             if (!Item.roles.includes(isRole as "Owner" | "Employee")) return null;
-            const isActive = pathname === Item.href;
+            const isActive = pathname.includes(Item.href);
+            const isCallGuest = Item.href === "/manage/call-waiters";
+            const isOrderToday = Item.href === "/manage/orders";
             return (
               <Link
                 key={index}
@@ -51,6 +58,16 @@ export default function MobileNavLinks() {
                   "text-muted-foreground": !isActive,
                 })}
               >
+                {isCallGuest && (
+                  <span className="absolute top-0 left-7.5 w-4 h-4 bg-red-500 rounded-full text-white text-xs text-center block">
+                    {countGuestCalls}
+                  </span>
+                )}
+                {isOrderToday && (
+                  <span className="absolute top-0 left-7.5 w-4 h-4 bg-red-500 rounded-full text-white text-xs text-center block">
+                    {countOrderToday}
+                  </span>
+                )}
                 <Item.Icon className="h-5 w-5" />
                 {Item.title}
               </Link>

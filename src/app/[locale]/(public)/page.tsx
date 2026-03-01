@@ -55,17 +55,14 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             <div className="text-center md:text-left">
               <p className="text-orange-400 text-base font-semibold mb-4">{t("hello")}</p>
               <h1 className="text-white text-4xl sm:text-4xl lg:text-6xl font-extrabold leading-tight mb-5 drop-shadow-lg">
-                Không chỉ là món ăn, mà là trải nghiệm cảm xúc!
+                {t("title")}
               </h1>
-              <p className="text-white/80 text-lg mb-8 max-w-lg mx-auto md:mx-0">
-                Nấu ăn là nghệ thuật, là niềm vui và là sự kết nối. Hãy khám phá thực đơn đa dạng và không
-                gian ấm cúng của chúng tôi!
-              </p>
+              <p className="text-white/80 text-lg mb-8 max-w-lg mx-auto md:mx-0">{t("description")}</p>
               <Link
                 href="/menu"
                 className="inline-block px-6 py-4 bg-linear-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold text-lg rounded-xl shadow-xl hover:shadow-orange-500/40 transition-all duration-300"
               >
-                Khám phá thực đơn
+                {t("exploreMenu")}
               </Link>
             </div>
             <div className="relative flex justify-center md:justify-end">
@@ -90,7 +87,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             />
             <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm rounded-lg" />
             <div className="relative z-10 p-10 text-center text-white border border-white/20 rounded-lg h-full flex flex-col justify-center">
-              <h3 className="text-2xl font-medium mb-6">Tìm chúng tôi tại đây</h3>
+              <h3 className="text-2xl font-medium mb-6">{t("findUs")}</h3>
               <div className="space-y-2">
                 <p>123 HV HCM City</p>
                 <p>+0123 456 7890</p>
@@ -99,10 +96,10 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             </div>
           </div>
           <div className="bg-orange-400 p-10 rounded-lg">
-            <h3 className="text-white text-2xl font-medium mb-6 text-center">Giờ mở cửa</h3>
+            <h3 className="text-white text-2xl font-medium mb-6 text-center">{t("openingHours")}</h3>
             <div className="space-y-4 text-white text-center">
               <div className="flex flex-col items-center">
-                <span className="font-semibold text-lg">Thứ Hai - Chủ Nhật</span>
+                <span className="font-semibold text-lg">{t("mondayToSunday")}</span>
                 <span className="mt-1 px-4 py-2 rounded-full bg-orange-100 text-orange-700 font-bold text-xl shadow inline-block">
                   8:00 - 22:00
                 </span>
@@ -116,11 +113,10 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <section className="py-16 px-6 sm:px-8 lg:px-33.75">
         <div className="text-center mb-16">
           <h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-linear-to-r from-orange-400 to-orange-300 bg-clip-text text-transparent">
-            Ghé thăm nhà hàng của chúng tôi
+            {t("visitRestaurant")}
           </h2>
           <p className="mt-4 text-black dark:text-white/80 text-lg max-w-2xl mx-auto tracking-wide">
-            Thực đơn phong cách đồng quê chất lượng, dịch vụ thân thiện và hiệu quả, kết hợp với giá trị thực
-            sự đã khiến nhà hàng của chúng tôi phục vụ các gia đình như bạn trong hơn 5 năm.
+            {t("visitRestaurantDescription")}
           </p>
           <div className="mt-4 h-1 w-32 mx-auto bg-linear-to-r from-transparent via-orange-400 to-transparent rounded-full" />
         </div>
@@ -136,7 +132,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 className="w-full h-71.25 object-cover transition-transform duration-500 group-hover:scale-105 group-hover:shadow-2xl"
               />
               <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-gray-900/80 to-transparent px-4 py-2">
-                <span className="text-white text-base font-semibold">Không gian nhà hàng</span>
+                <span className="text-white text-base font-semibold">{t("restaurantSpace")}</span>
               </div>
             </div>
             <div className="relative group overflow-hidden shadow-lg">
@@ -148,7 +144,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 className="w-full h-71.25 object-cover transition-transform duration-500 group-hover:scale-105 group-hover:shadow-2xl"
               />
               <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-gray-900/80 to-transparent px-4 py-2">
-                <span className="text-white text-base font-semibold">Sảnh tiếp khách</span>
+                <span className="text-white text-base font-semibold">{t("lobby")}</span>
               </div>
             </div>
           </div>
@@ -162,7 +158,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 className="w-full h-full lg:h-146.5 object-cover transition-transform duration-500 group-hover:scale-105 group-hover:shadow-2xl"
               />
               <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-gray-900/80 to-transparent px-4 py-2">
-                <span className="text-white text-base font-semibold">Phòng ăn chính</span>
+                <span className="text-white text-base font-semibold">{t("mainDiningRoom")}</span>
               </div>
             </div>
           </div>
@@ -176,7 +172,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 className="w-full h-71.25 object-cover transition-transform duration-500 group-hover:scale-105 group-hover:shadow-2xl"
               />
               <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-gray-900/80 to-transparent px-4 py-2">
-                <span className="text-white text-base font-semibold">Món ăn đặc sắc</span>
+                <span className="text-white text-base font-semibold">{t("featuredDish")}</span>
               </div>
             </div>
             <div className="relative group overflow-hidden shadow-lg">
@@ -188,7 +184,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
                 className="w-full h-71.25 object-cover transition-transform duration-500 group-hover:scale-105 group-hover:shadow-2xl"
               />
               <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-gray-900/80 to-transparent px-4 py-2">
-                <span className="text-white text-base font-semibold">Đầu bếp chuyên nghiệp</span>
+                <span className="text-white text-base font-semibold">{t("professionalChef")}</span>
               </div>
             </div>
           </div>
@@ -206,7 +202,7 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
           {/* Section Header */}
           <div className="text-center mb-12">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold bg-linear-to-r from-orange-400 to-orange-300 bg-clip-text text-transparent mb-3">
-              Tại sao chọn chúng tôi?
+              {t("whyChooseUs")}
             </h2>
             <div className="mt-4 h-1 w-32 mx-auto bg-linear-to-r from-transparent via-orange-400 to-transparent rounded-full" />
           </div>
@@ -215,8 +211,8 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
             {[
               {
                 Icon: Sparkles,
-                title: "Hương vị tuyệt vời",
-                description: "Món ăn đặc sắc",
+                title: t("greatTaste"),
+                description: t("featuredDish"),
                 color: "text-yellow-400",
                 bgColor: "bg-yellow-500/20",
                 borderColor: "border-yellow-400/30",
@@ -224,8 +220,8 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               },
               {
                 Icon: Users,
-                title: "Tự phục vụ",
-                description: "Nhanh chóng tiện lợi",
+                title: t("selfService"),
+                description: t("fastConvenient"),
                 color: "text-blue-400",
                 bgColor: "bg-blue-500/20",
                 borderColor: "border-blue-400/30",
@@ -233,8 +229,8 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               },
               {
                 Icon: Award,
-                title: "Món ăn ngon nhất",
-                description: "Chất lượng hàng đầu",
+                title: t("bestDish"),
+                description: t("topQuality"),
                 color: "text-green-400",
                 bgColor: "bg-green-500/20",
                 borderColor: "border-green-400/30",
@@ -242,8 +238,8 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
               },
               {
                 Icon: ChefHat,
-                title: "Đầu bếp chuyên nghiệp",
-                description: "Kinh nghiệm lâu năm",
+                title: t("professionalChef"),
+                description: t("experiencedChef"),
                 color: "text-red-400",
                 bgColor: "bg-red-500/20",
                 borderColor: "border-red-400/30",

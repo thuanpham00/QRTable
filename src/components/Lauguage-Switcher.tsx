@@ -12,8 +12,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { Suspense } from "react";
 
-export default function LanguageSwitcher() {
+function LanguageSwitcherInner() {
   const t = useTranslations("SwitchLanguage");
   const locale = useLocale(); // lấy locale hiện tại từ context của next-intl - ngôn ngữ hiện tại
   const pathName = usePathname();
@@ -56,5 +57,13 @@ export default function LanguageSwitcher() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+export default function LanguageSwitcher() {
+  return (
+    <Suspense>
+      <LanguageSwitcherInner />
+    </Suspense>
   );
 }

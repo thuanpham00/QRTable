@@ -5,8 +5,10 @@ import { handleErrorApi } from "@/lib/utils";
 import { useLogoutMutation } from "@/queries/useAuth";
 import { useGuestLogoutMutation } from "@/queries/useGuest";
 import { useRouter } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 
 export default function ButtonLogout() {
+  const t = useTranslations("Others");
   const socket = useAppStore((state) => state.socket);
   const setSocket = useAppStore((state) => state.setSocket);
   const setIsRole = useAppStore((state) => state.setIsRole);
@@ -44,7 +46,7 @@ export default function ButtonLogout() {
 
   return (
     <button onClick={logout} className="cursor-pointer">
-      Đăng xuất
+      {t("logout")}
     </button>
   );
 }

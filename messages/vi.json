@@ -10,49 +10,92 @@
   },
   "HomePage": {
     "hello": "Chào mừng bạn mới đến với QRTable!",
-    "title": "Trang chủ",
-    "description": "Khát khao một trải nghiệm ẩm thực Mỹ cổ điển? Big Boy là lựa chọn hoàn hảo! Thưởng thức chiếc Big Boy burger biểu tượng, thơm ngon và đậm đà, cùng với những ly milkshake béo ngậy và khoai tây chiên giòn tan. Hoàn hảo cho các buổi gặp mặt gia đình và bạn bè!",
-    "slogan": "Vị ngon, trọn khoảnh khắc",
-    "h2": "Đa dạng các món ăn"
+    "title": "Không chỉ là món ăn, mà là trải nghiệm cảm xúc!",
+    "description": "Nấu ăn là nghệ thuật, là niềm vui và là sự kết nối. Hãy khám phá thực đơn đa dạng và không gian ấm cúng của chúng tôi!",
+    "noPopularDishes": "Chưa có món ăn phổ biến",
+    "noPopularDishesDescription": "Hãy quay lại sau để khám phá những món ăn tuyệt vời!",
+    "exploreMenu": "Khám phá thực đơn",
+    "findUs": "Tìm chúng tôi tại đây",
+    "openingHours": "Giờ mở cửa",
+    "mondayToSunday": "Thứ Hai - Chủ Nhật",
+    "visitRestaurant": "Ghé thăm nhà hàng của chúng tôi",
+    "visitRestaurantDescription": "Thực đơn phong cách đồng quê chất lượng, dịch vụ thân thiện và hiệu quả, kết hợp với giá trị thực sự đã khiến nhà hàng của chúng tôi phục vụ các gia đình như bạn trong hơn 5 năm.",
+    "restaurantSpace": "Không gian nhà hàng",
+    "lobby": "Sảnh tiếp khách",
+    "mainDiningRoom": "Phòng ăn chính",
+    "featuredDish": "Món ăn đặc sắc",
+    "professionalChef": "Đầu bếp chuyên nghiệp",
+    "whyChooseUs": "Tại sao chọn chúng tôi?",
+    "greatTaste": "Hương vị tuyệt vời",
+    "selfService": "Tự phục vụ",
+    "fastConvenient": "Nhanh chóng tiện lợi",
+    "bestDish": "Món ăn ngon nhất",
+    "topQuality": "Chất lượng hàng đầu",
+    "experiencedChef": "Kinh nghiệm lâu năm",
+    "popularDishes": "Món ăn phổ biến",
+    "popularDishesDescription": "Khám phá danh sách các món ăn được yêu thích nhất, bao gồm món chính, đồ uống và tráng miệng, để có trải nghiệm ẩm thực đích thực!",
+    "discoverAllDishes": "Khám phá tất cả món ăn"
   },
   "DishDetail": {
     "notFound": "Món ăn không tồn tại"
   },
   "LoginGuest": {
     "title": "Đăng nhập để gọi món",
-    "description": "Nhập thông tin đăng nhập để thực hiện gọi món"
+    "nameGuest": "Tên khách hàng",
+    "buttonLogin": "Đăng nhập"
   },
   "Login": {
     "title": "Đăng nhập",
     "cardDescription": "Nhập email và mật khẩu của bạn để đăng nhập vào hệ thống",
     "buttonLogin": "Đăng nhập",
-    "loginWithGoogle": "Đăng nhập với Google"
-  }, 
+    "loginWithGoogle": "Đăng nhập với Google",
+    "loginSuccess": "Đăng nhập thành công"
+  },
   "GuestMenu": {
     "title": "Thực đơn",
     "description": "Chọn món ăn yêu thích của bạn"
-  },
-  "ManageAccounts": {
-    "title": "Quản lý tài khoản",
-    "description": "Quản lý tài khoản nhân viên"
   },
   "Dashboard": {
     "title": "Bảng điều khiển",
     "description": "Xem và phân tích dữ liệu bán hàng"
   },
-  "Dishes": {
+  "ManageAccounts": {
+    "title": "Tài khoản",
+    "description": "Quản lý tài khoản nhân viên"
+  },
+  "ManageCallWaiters": {
+    "title": "Gọi phục vụ",
+    "description": "Yêu cầu gọi phục vụ từ khách"
+  },
+  "ManageCategories": {
+    "title": "Danh mục món ăn",
+    "description": "Quản lý danh mục món ăn"
+  },
+  "ManageDishes": {
     "title": "Món ăn",
     "description": "Quản lý món ăn"
+  },
+  "ManageIngredients": {
+    "title": "Nguyên liệu",
+    "description": "Quản lý nguyên liệu"
+  },
+  "ManageMenus": {
+    "title": "Thực đơn",
+    "description": "Quản lý thực đơn"
   },
   "Orders": {
     "title": "Đơn hàng",
     "description": "Quản lý đơn hàng"
   },
+  "ManagePayments": {
+    "title": "Thanh toán",
+    "description": "Quản lý lịch sử thanh toán"
+  },
   "Setting": {
     "title": "Cài đặt",
     "description": "Quản lý cài đặt tài khoản của bạn"
   },
-  "Tables": {
+  "ManageTables": {
     "title": "Bàn ăn",
     "description": "Quản lý bàn ăn"
   },
@@ -74,5 +117,98 @@
       "logoutCancel": "Hủy",
       "logoutConfirm": "Đăng xuất có thể dẫn đến mất dữ liệu đơn hàng của bạn"
     }
+  },
+  "NavItemManage": {
+    "dashboard": "Bảng điều khiển",
+    "orders": "Đơn hàng",
+    "payments": "Thanh toán",
+    "callWaiters": "Gọi phục vụ",
+    "tables": "Bàn ăn",
+    "menus": "Menu món ăn",
+    "categories": "Danh mục món",
+    "dishes": "Món ăn",
+    "ingredients": "Nguyên liệu",
+    "accounts": "Nhân viên"
+  },
+  "Footer": {
+    "brand": "Restaurant",
+    "slogan": "Thưởng thức hương vị của Nhà hàng chúng tôi — khám phá thực đơn hấp dẫn và đặt món ăn yêu thích của bạn một cách dễ dàng.",
+    "quickLinks": "Khám phá nhanh",
+    "home": "Trang chủ",
+    "menu": "Thực đơn",
+    "about": "Giới thiệu",
+    "termOfService": "Điều khoản dịch vụ",
+    "privacyPolicy": "Chính sách bảo mật",
+    "contact": "Liên hệ",
+    "email": "phamminhthuan912@gmail.com",
+    "phone": "+0123 456 7890",
+    "address": "123 HV HCM City",
+    "copyright": "©2026 Restaurant. Bản quyền thuộc về chúng tôi."
+  },
+  "AboutPage": {
+    "title": "Về nhà hàng QRTable",
+    "address": "Địa chỉ: 123 HV HCM City",
+    "storyTitle": "Câu chuyện của chúng tôi",
+    "storyContent": "Big Boy được thành lập vào năm 2010 với một sứ mệnh đơn giản: phục vụ món ăn ngon, chất lượng cao để gắn kết mọi người lại với nhau. Niềm đam mê của chúng tôi đối với nguyên liệu đặc biệt và công thức sáng tạo đã đưa chúng tôi trở thành một tổ chức địa phương được yêu thích, nổi tiếng với cam kết tạo ra những bữa ăn nuôi dưỡng cơ thể và tâm hồn.",
+    "valueTitle": "Giá trị của chúng tôi",
+    "valueContent": "Tại trung tâm của Big Boy là sự cống hiến sâu sắc cho tính bền vững, cộng đồng và sự xuất sắc trong ẩm thực. Chúng tôi lấy nguyên liệu từ các nông dân và nhà sản xuất địa phương, đảm bảo sự tươi mới và hỗ trợ nền kinh tế địa phương. Đội ngũ của chúng tôi đam mê tạo ra những món ăn không chỉ làm hài lòng vị giác mà còn nuôi dưỡng cơ thể, với sự tập trung vào thực phẩm lành mạnh, không qua chế biến.",
+    "commitmentTitle": "Cam kết của chúng tôi",
+    "commitmentContent": "Chúng tôi tin rằng món ăn ngon có sức mạnh gắn kết mọi người lại với nhau và tạo ra những kỷ niệm lâu dài. Đó là lý do tại sao chúng tôi cam kết cung cấp một trải nghiệm ẩm thực tuyệt vời, từ lúc bạn bước qua cửa cho đến miếng cuối cùng của bữa ăn. Các đầu bếp tài năng của chúng tôi làm việc không ngừng để tạo ra những món ăn thể hiện tốt nhất các nguyên liệu theo mùa, được lấy từ địa phương, đảm bảo rằng mỗi đĩa ăn là một lễ kỷ niệm của hương vị và chất lượng."
+  },
+  "PrivacyPolicyPage": {
+    "bannerAlt": "Banner Chính sách bảo mật",
+    "title": "Chính sách bảo mật",
+    "description": "Chúng tôi cam kết bảo vệ tối đa thông tin cá nhân của bạn khi sử dụng dịch vụ của QRTable. Chính sách này giải thích chi tiết về cách chúng tôi thu thập, sử dụng, lưu trữ, bảo vệ và chia sẻ dữ liệu của bạn, cũng như quyền lợi và lựa chọn của bạn đối với thông tin cá nhân.",
+    "infoTitle": "Thông tin chúng tôi thu thập",
+    "infoContent": "Khi bạn sử dụng dịch vụ của chúng tôi, chúng tôi có thể thu thập các loại thông tin sau: \n- Thông tin nhận diện cá nhân như họ tên, địa chỉ email, số điện thoại, địa chỉ liên hệ.\n- Thông tin đăng nhập và bảo mật như mật khẩu, lịch sử đăng nhập.\n- Thông tin về đơn hàng, lịch sử giao dịch, phương thức thanh toán.\n- Dữ liệu kỹ thuật như địa chỉ IP, loại thiết bị, trình duyệt, thời gian truy cập, trang đã xem.\n- Thông tin phản hồi, đánh giá, liên hệ hỗ trợ từ bạn.\nChúng tôi chỉ thu thập thông tin cần thiết để phục vụ mục đích sử dụng dịch vụ và tuân thủ quy định pháp luật.",
+    "usageTitle": "Cách chúng tôi sử dụng thông tin",
+    "usageContent": "Thông tin cá nhân của bạn được sử dụng cho các mục đích sau: \n- Xử lý và quản lý đơn hàng, giao dịch, thanh toán.\n- Cải thiện chất lượng dịch vụ, tối ưu trải nghiệm người dùng.\n- Gửi thông báo, cập nhật, khuyến mãi hoặc thông tin liên quan đến dịch vụ.\n- Hỗ trợ khách hàng, giải quyết khiếu nại, phản hồi yêu cầu.\n- Đáp ứng yêu cầu pháp lý, kiểm toán, phòng chống gian lận.\nChúng tôi không sử dụng thông tin cá nhân cho mục đích quảng cáo bên ngoài hoặc chia sẻ với bên thứ ba không liên quan, trừ khi có sự đồng ý của bạn hoặc theo quy định pháp luật.",
+    "securityTitle": "Bảo mật và lưu trữ dữ liệu",
+    "securityContent": "Chúng tôi áp dụng các biện pháp bảo mật vật lý, kỹ thuật và quản trị để bảo vệ dữ liệu cá nhân khỏi truy cập trái phép, mất mát, thay đổi hoặc tiết lộ.\n- Dữ liệu được mã hóa khi truyền tải và lưu trữ trên hệ thống bảo mật.\n- Chỉ nhân viên có thẩm quyền mới được truy cập thông tin cá nhân.\n- Thường xuyên kiểm tra, cập nhật hệ thống bảo mật để phòng chống rủi ro.\n- Lưu trữ dữ liệu trong thời gian cần thiết cho mục đích sử dụng dịch vụ và tuân thủ quy định pháp luật.\nNếu phát hiện có sự cố bảo mật, chúng tôi sẽ thông báo kịp thời cho bạn và cơ quan chức năng theo quy định."
+  },
+  "TermOfServicePage": {
+    "title": "Điều khoản dịch vụ",
+    "description": "Khi sử dụng dịch vụ của chúng tôi, bạn đồng ý tuân thủ các điều khoản và điều kiện dưới đây. Vui lòng đọc kỹ để hiểu rõ quyền lợi, nghĩa vụ và trách nhiệm của bạn khi sử dụng hệ thống QRTable.",
+    "introTitle": "Giới thiệu",
+    "introContent": "Trang này quy định các điều khoản sử dụng dịch vụ QRTable, bao gồm quyền truy cập, sử dụng, bảo mật, và các quy định liên quan đến người dùng và nhà cung cấp dịch vụ. Việc sử dụng dịch vụ đồng nghĩa với việc bạn chấp nhận toàn bộ các điều khoản này.",
+    "usageTitle": "Sử dụng dịch vụ",
+    "usageContent": "Bạn cam kết sử dụng dịch vụ đúng mục đích, không vi phạm pháp luật, không gây ảnh hưởng xấu đến hệ thống hoặc người dùng khác.\n- Không phát tán nội dung bất hợp pháp, lừa đảo, gây hại hoặc xâm phạm quyền riêng tư.\n- Không truy cập trái phép, can thiệp, phá hoại hệ thống hoặc dữ liệu của QRTable.\n- Tuân thủ các quy định về bảo mật, thanh toán, và các hướng dẫn sử dụng dịch vụ.",
+    "ipTitle": "Quyền sở hữu trí tuệ",
+    "ipContent": "Toàn bộ nội dung, phần mềm, hình ảnh, logo, tài liệu trên QRTable đều thuộc quyền sở hữu của chúng tôi hoặc đối tác cấp phép.\n- Nghiêm cấm sao chép, sử dụng lại, phát tán hoặc chỉnh sửa mà không có sự đồng ý bằng văn bản.\n- Vi phạm quyền sở hữu trí tuệ có thể bị xử lý theo quy định pháp luật.",
+    "changeTitle": "Thay đổi điều khoản",
+    "changeContent": "QRTable có quyền cập nhật, thay đổi, bổ sung điều khoản dịch vụ bất kỳ lúc nào.\n- Các thay đổi sẽ được thông báo trên website hoặc qua email.\n- Việc tiếp tục sử dụng dịch vụ sau khi điều khoản thay đổi đồng nghĩa với việc bạn chấp nhận các điều khoản mới.",
+    "contactTitle": "Liên hệ",
+    "contactContent": "Nếu bạn có thắc mắc, khiếu nại hoặc cần hỗ trợ về điều khoản dịch vụ, vui lòng liên hệ với chúng tôi qua email hoặc số điện thoại trên website. Chúng tôi sẽ phản hồi trong thời gian sớm nhất."
+  },
+  "Others": {
+    "logout": "Đăng xuất",
+    "buttonBack": "Quay lại",
+    "setting": "Cài đặt",
+    "profileTitle": "Thông tin cá nhân",
+    "name": "Tên",
+    "avatar": "Ảnh đại diện",
+    "uploadAvatar": "Tải ảnh lên",
+    "cancel": "Hủy",
+    "save": "Lưu thông tin",
+    "changePasswordTitle": "Đổi mật khẩu",
+    "oldPassword": "Mật khẩu cũ",
+    "newPassword": "Mật khẩu mới",
+    "confirmNewPassword": "Xác nhận mật khẩu mới",
+    "seenDetail": "Xem chi tiết"
+  },
+  "MenuPage": {
+    "NoMenuActive": "Chưa có menu nào được kích hoạt"
+  },
+  "GuestOrderPage": {
+    "Chatbot": "Chatbot tư vấn",
+    "GuestCall": "Gọi phục vụ",
+    "Order": "Gọi món",
+    "takeawayModeNotice": "Bạn đang ở chế độ Mang về — không thể đổi",
+    "DineIn": "Ăn tại chỗ",
+    "TakeAway": "Mang đi",
+    "confirmChangeModeTitle": "Xác nhận đổi hình thức order?",
+    "confirmChangeModeDesc": "Bạn có chắc muốn đổi sang hình thức",
+    "confirmChangeMode": "Xác nhận",
+    "cancelChangeMode": "Hủy"
   }
 }

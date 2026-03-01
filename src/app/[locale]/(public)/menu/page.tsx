@@ -7,8 +7,13 @@ import Image from "next/image";
 import bgLogin from "../../../../../public/images/food_example.jpg";
 import logoFavourite from "../../../../../public/images/favorites.png";
 import { Link } from "@/i18n/routing";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
-export default async function MenuPage() {
+export default async function MenuPage({ params }: { params: Promise<{ locale: string }> }) {
+  const locale = (await params).locale;
+  setRequestLocale(locale);
+  const t = await getTranslations("Others");
+  const t2 = await getTranslations("MenuPage");
   let menuActive: MenuActiveResType["data"] | null = null;
 
   const resultMenuActive = await wrapServerApi(() => menuApiRequests.menuActive());
@@ -18,7 +23,7 @@ export default async function MenuPage() {
   const listDishSuggested = resultSuggested?.payload.data;
 
   if (!menuActive || menuActive.menuItems.length === 0) {
-    return <div className="text-center py-10">Chưa có menu nào được kích hoạt</div>;
+    return <div className="text-center py-10">{t2("NoMenuActive")}</div>;
   }
 
   const groupedByCategory = menuActive.menuItems.reduce(
@@ -125,7 +130,7 @@ export default async function MenuPage() {
                             {formatCurrency(dish.price)}
                           </div>
                           <div className="text-xs text-gray-700 dark:text-primary font-semibold">
-                            Xem chi tiết →
+                            {t("seenDetail")}
                           </div>
                         </div>
                       </div>

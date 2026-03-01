@@ -1,55 +1,38 @@
-export default function About() {
+import { getTranslations, setRequestLocale } from "next-intl/server";
+
+export default async function PrivacyPolicy({ params }: { params: Promise<{ locale: string }> }) {
+  const locale = (await params).locale;
+  setRequestLocale(locale);
+  const t = await getTranslations("PrivacyPolicyPage");
+
   return (
-    <div className='flex flex-col'>
-      <section className='bg-secondary  py-20 px-4 md:px-6 lg:px-8'>
-        <div className='max-w-4xl text-center'>
-          <h1 className='text-4xl font-bold sm:text-5xl md:text-6xl'>
-            Chính sách bảo mật
-          </h1>
-        </div>
-      </section>
-      <section className='py-12 md:py-20 lg:py-24'>
-        <div className='max-w-4xl space-y-8'>
-          <div>
-            <h2 className='text-3xl font-bold'>Dữ liệu thu thập</h2>
-            <p className='mt-4 text-muted-foreground leading-8'>
-              Chúng tôi thu thập các thông tin cá nhân mà bạn cung cấp khi tạo
-              tài khoản, đặt hàng hoặc liên hệ với chúng tôi. Các thông tin này
-              có thể bao gồm tên. Ngoài ra, chúng tôi cũng thu thập một số thông
-              tin tự động khi bạn truy cập trang web của chúng tôi, như địa chỉ
-              IP và loại trình duyệt.
-            </p>
+    <div className="w-full flex justify-center bg-secondary">
+      <div className="w-full max-w-7xl flex flex-col">
+        <section className="py-16 px-4 sm:px-8 lg:px-16 xl:px-24">
+          <div className="max-w-3xl mx-auto text-center">
+            <h1 className="text-4xl font-bold sm:text-5xl md:text-6xl text-primary mb-4">{t("title")}</h1>
+            <p className="mt-2 text-lg md:text-xl text-muted-foreground">{t("description")}</p>
           </div>
-          <div className='space-y-4'>
-            <h2 className='text-3xl font-bold'>Mục đích sử dụng</h2>
-            <p className=' text-muted-foreground leading-8'>
-              Chúng tôi sử dụng thông tin cá nhân của bạn với các mục đích sau:
-            </p>
-            <ul className='space-y-4 text-muted-foreground leading-8'>
-              <li>
-                Để xử lý đơn hàng của bạn: Chúng tôi sử dụng thông tin liên hệ
-                và thanh toán của bạn để xác nhận và xử lý đơn hàng, cũng như để
-                gửi hóa đơn và thông tin giao hàng.
-              </li>
-              <li>
-                Để cung cấp dịch vụ khách hàng: Chúng tôi sử dụng thông tin liên
-                hệ của bạn để trả lời các câu hỏi, giải quyết các vấn đề và cung
-                cấp hỗ trợ kỹ thuật.
-              </li>
-              <li>
-                Để gửi các thông tin tiếp thị: Với sự đồng ý của bạn, chúng tôi
-                có thể sử dụng địa chỉ email của bạn để gửi các thông tin về các
-                sản phẩm, dịch vụ mới, khuyến mãi và sự kiện đặc biệt.
-              </li>
-              <li>
-                Để cải thiện dịch vụ của chúng tôi: Chúng tôi sử dụng dữ liệu
-                tổng hợp và ẩn danh để phân tích xu hướng và cải thiện dịch vụ
-                của chúng tôi.
-              </li>
-            </ul>
+        </section>
+        <section className="py-10 md:py-16 lg:py-8 px-4 sm:px-8 lg:px-16 xl:px-24">
+          <div className="max-w-4xl mx-auto space-y-16">
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-2">{t("infoTitle")}</h2>
+              <p className="mt-2 text-muted-foreground leading-8 text-base md:text-lg">{t("infoContent")}</p>
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-2">{t("usageTitle")}</h2>
+              <p className="mt-2 text-muted-foreground leading-8 text-base md:text-lg">{t("usageContent")}</p>
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold text-primary mb-2">{t("securityTitle")}</h2>
+              <p className="mt-2 text-muted-foreground leading-8 text-base md:text-lg">
+                {t("securityContent")}
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
-  )
+  );
 }
