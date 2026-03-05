@@ -98,18 +98,18 @@ export default async function MenuPage({ params }: { params: Promise<{ locale: s
 
                 return (
                   <Link
-                    className="group relative flex flex-col bg-gray-50 dark:bg-border shadow border border-border transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-2 cursor-pointer overflow-hidden rounded-lg"
+                    className="group relative flex flex-col bg-background dark:bg-border border-2 border-border transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-2 cursor-pointer overflow-hidden rounded-lg"
                     key={menuItem.id}
                     href={`/dishes/${menuItem.id}`}
                   >
-                    <div className="relative overflow-hidden h-48 bg-muted">
+                    <div className="relative overflow-hidden h-60 bg-muted">
                       <Image
                         alt={dish.name}
                         src={dish.image}
                         width={400}
                         height={300}
                         unoptimized
-                        className="object-cover w-full h-full transition-all duration-500 group-hover:scale-110 group-hover:rotate-1"
+                        className="object-fill w-full h-full transition-all duration-500 group-hover:scale-110 group-hover:rotate-1"
                       />
                       <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
@@ -124,14 +124,12 @@ export default async function MenuPage({ params }: { params: Promise<{ locale: s
                         </p>
                       </div>
 
-                      <div className="pt-3 border-t border-border/50">
-                        <div className="flex items-center justify-between">
-                          <div className="text-sm font-bold text-white bg-linear-to-r from-orange-500 to-amber-500 inline-block px-3 py-1 rounded-lg shadow-lg">
-                            {formatCurrency(dish.price)}
-                          </div>
-                          <div className="text-xs text-gray-700 dark:text-primary font-semibold">
-                            {t("seenDetail")}
-                          </div>
+                      <div className="flex items-center justify-between">
+                        <div className="text-xl font-bold text-gray-800 dark:text-white rounded-lg">
+                          {formatCurrency(dish.price)}
+                        </div>
+                        <div className="text-xs text-gray-700 dark:text-primary font-semibold">
+                          {t("seenDetail")}
                         </div>
                       </div>
                     </div>

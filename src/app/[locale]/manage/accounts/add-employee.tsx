@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/incompatible-library */
 "use client";
 import { Button } from "@/components/ui/button";
@@ -24,11 +25,12 @@ import { useUploadMutation } from "@/queries/useMedia";
 import { toast } from "sonner";
 import { useAddEmployeeMutation } from "@/queries/useAccount";
 import { handleErrorApi } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 export default function AddEmployee() {
   const uploadMutation = useUploadMutation();
   const addEmployeeMutation = useAddEmployeeMutation();
-
+  const t = useTranslations("ManageAccounts");
   const [file, setFile] = useState<File | null>(null);
   const [open, setOpen] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
@@ -38,8 +40,8 @@ export default function AddEmployee() {
       name: "",
       email: "",
       avatar: undefined,
-      password: undefined, // undefined convert thành "" sẽ báo lỗi zod
-      confirmPassword: undefined, // undefined convert thành "" sẽ báo lỗi zod
+      password: "", // undefined convert thành "" sẽ báo lỗi zod
+      confirmPassword: "", // undefined convert thành "" sẽ báo lỗi zod
     },
   });
   const avatar = form.watch("avatar");
@@ -108,13 +110,13 @@ export default function AddEmployee() {
       <DialogTrigger asChild>
         <Button size="sm" className="h-7 gap-1">
           <PlusCircle className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Tạo tài khoản</span>
+          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">{t("createAccount")}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-150 max-h-screen overflow-auto">
         <DialogHeader>
-          <DialogTitle>Tạo tài khoản</DialogTitle>
-          <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
+          <DialogTitle>{t("createAccount")}</DialogTitle>
+          <DialogDescription>{t("descriptionCreate")}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -163,12 +165,14 @@ export default function AddEmployee() {
               <FormField
                 control={form.control}
                 name="name"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid  gap-2">
-                      <Label htmlFor="name">Tên</Label>
+                      <Label htmlFor="name">{t("name")}</Label>
                       <Input id="name" className="w-full" {...field} />
-                      <FormMessage />
+                      <FormMessage>
+                        {Boolean(errors.name?.message) && t(errors.name?.message as any)}
+                      </FormMessage>
                     </div>
                   </FormItem>
                 )}
@@ -176,12 +180,17 @@ export default function AddEmployee() {
               <FormField
                 control={form.control}
                 name="email"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid  gap-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email">{t("email")}</Label>
                       <Input id="email" className="w-full" {...field} />
-                      <FormMessage />
+                      <FormMessage>
+                        {errors.email?.message &&
+                          (errors.email.type === "server"
+                            ? t("emailExisted") // Lỗi từ server → dịch key
+                            : t(errors.email.message as any))}{" "}
+                      </FormMessage>
                     </div>
                   </FormItem>
                 )}
@@ -189,18 +198,30 @@ export default function AddEmployee() {
               <FormField
                 control={form.control}
                 name="password"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
-                    <InputPassword field={field} label="Mật khẩu" controlLabel="password" />
+                    <InputPassword
+                      field={field}
+                      label={t("password")}
+                      controlLabel="password"
+                      nameI18="ManageAccounts"
+                      fieldError={errors.password?.message}
+                    />
                   </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
                 name="confirmPassword"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
-                    <InputPassword field={field} label="Xác nhận mật khẩu" controlLabel="confirmPassword" />
+                    <InputPassword
+                      field={field}
+                      label={t("confirmPassword")}
+                      controlLabel="confirmPassword"
+                      nameI18="ManageAccounts"
+                      fieldError={errors.confirmPassword?.message}
+                    />
                   </FormItem>
                 )}
               />
@@ -209,10 +230,10 @@ export default function AddEmployee() {
         </Form>
         <DialogFooter>
           <Button type="reset" form="add-employee-form">
-            Xóa
+            {t("cancel")}
           </Button>
           <Button type="submit" form="add-employee-form" className="bg-blue-500 hover:bg-blue-400 text-white">
-            Thêm
+            {t("create")}
           </Button>
         </DialogFooter>
       </DialogContent>

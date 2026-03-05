@@ -46,18 +46,18 @@ export type AccountResType = z.TypeOf<typeof AccountRes>;
 
 export const CreateEmployeeAccountBody = z
   .object({
-    name: z.string().trim().min(2).max(256),
-    email: z.string().email(),
-    avatar: z.string().url().optional(),
-    password: z.string().min(6).max(100),
-    confirmPassword: z.string().min(6).max(100),
+    name: z.string().trim().min(2, { message: "nameTooShort" }).max(256, { message: "nameTooLong" }),
+    email: z.string().email({ message: "invalidEmail" }),
+    avatar: z.string().url({ message: "invalidUrl" }).optional(),
+    password: z.string().min(6, { message: "minmaxPassword" }).max(100, { message: "minmaxPassword" }),
+    confirmPassword: z.string().min(6, { message: "minmaxPassword" }).max(100, { message: "minmaxPassword" }),
   })
   .strict()
   .superRefine(({ confirmPassword, password }, ctx) => {
     if (confirmPassword !== password) {
       ctx.addIssue({
         code: "custom",
-        message: "Mật khẩu không khớp",
+        message: "passwordNotMatch",
         path: ["confirmPassword"],
       });
     }
@@ -67,12 +67,20 @@ export type CreateEmployeeAccountBodyType = z.TypeOf<typeof CreateEmployeeAccoun
 
 export const UpdateEmployeeAccountBody = z
   .object({
-    name: z.string().trim().min(2).max(256),
-    email: z.string().email(),
-    avatar: z.string().url().optional(),
+    name: z.string().trim().min(2, { message: "nameTooShort" }).max(256, { message: "nameTooLong" }),
+    email: z.string().email({ message: "invalidEmail" }),
+    avatar: z.string().url({ message: "invalidUrl" }).optional(),
     changePassword: z.boolean().optional(),
-    password: z.string().min(6).max(100).optional(),
-    confirmPassword: z.string().min(6).max(100).optional(),
+    password: z
+      .string()
+      .min(6, { message: "minmaxPassword" })
+      .max(100, { message: "minmaxPassword" })
+      .optional(),
+    confirmPassword: z
+      .string()
+      .min(6, { message: "minmaxPassword" })
+      .max(100, { message: "minmaxPassword" })
+      .optional(),
     role: z.enum([Role.Owner, Role.Employee]).default(Role.Employee).optional(),
   })
   .strict()
@@ -81,13 +89,13 @@ export const UpdateEmployeeAccountBody = z
       if (!password || !confirmPassword) {
         ctx.addIssue({
           code: "custom",
-          message: "Hãy nhập mật khẩu mới và xác nhận mật khẩu mới",
+          message: "changePasswordRequired",
           path: ["changePassword"],
         });
       } else if (confirmPassword !== password) {
         ctx.addIssue({
           code: "custom",
-          message: "Mật khẩu không khớp",
+          message: "passwordNotMatch",
           path: ["confirmPassword"],
         });
       }

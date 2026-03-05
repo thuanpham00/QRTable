@@ -47,6 +47,7 @@ import { useAppStore } from "@/components/app-provider";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Statics } from "@/app/[locale]/manage/orders/order-table-session";
+import { useTranslations } from "next-intl";
 
 const OrderTableContext = createContext({
   orderIdEdit: undefined as number | undefined,
@@ -60,179 +61,191 @@ const OrderTableContext = createContext({
 });
 
 type OrderItem = GetOrdersResType["data"][0];
-const orderTableColumns: ColumnDef<OrderItem>[] = [
-  {
-    accessorKey: "tableNumber",
-    header: "Bàn",
-    cell: ({ row }) => <div>{row.original.tableNumber === 100 ? null : row.original.tableNumber}</div>,
-    filterFn: (row, columnId, filterValue: string) => {
-      if (filterValue === undefined) return true;
-      return simpleMatchText(String(row.getValue(columnId)), String(filterValue));
+const getColumns = (t: any) => {
+  const orderTableColumns: ColumnDef<OrderItem>[] = [
+    {
+      accessorKey: "tableNumber",
+      header: t("tableNumberHeader"),
+      cell: ({ row }) => <div>{row.original.tableNumber === 100 ? null : row.original.tableNumber}</div>,
+      filterFn: (row, columnId, filterValue: string) => {
+        if (filterValue === undefined) return true;
+        return simpleMatchText(String(row.getValue(columnId)), String(filterValue));
+      },
     },
-  },
-  {
-    id: "guestName",
-    header: "Khách hàng",
-    cell: function Cell({ row }) {
-      const guest = row.original.guest;
-      return (
+    {
+      id: "guestName",
+      header: t("guestNameHeader"),
+      cell: function Cell({ row }) {
+        const guest = row.original.guest;
+        return (
+          <div>
+            {!guest && (
+              <div>
+                <span>{t("deletedGuest")}</span>
+              </div>
+            )}
+            {guest && (
+              <div>
+                <span>{guest.name}</span>
+                <span className="font-semibold ml-1">(#{guest.id})</span>
+              </div>
+            )}
+          </div>
+        );
+      },
+      filterFn: (row, columnId, filterValue: string) => {
+        if (filterValue === undefined) return true;
+        return simpleMatchText(row.original.guest?.name ?? t("deletedGuest"), String(filterValue));
+      },
+    },
+    {
+      id: "orderMode",
+      header: t("orderModeHeader"),
+      cell: ({ row }) => (
         <div>
-          {!guest && (
-            <div>
-              <span>Đã bị xóa</span>
-            </div>
-          )}
-          {guest && (
-            <div>
-              <span>{guest.name}</span>
-              <span className="font-semibold ml-1">(#{guest.id})</span>
-            </div>
+          {row.original.orderMode === OrderModeType.DINE_IN ? (
+            <div className="p-2 rounded-md bg-green-600 inline-block">{t("dineIn")}</div>
+          ) : (
+            <div className="p-2 rounded-md bg-blue-600 inline-block">{t("takeOut")}</div>
           )}
         </div>
-      );
+      ),
     },
-    filterFn: (row, columnId, filterValue: string) => {
-      if (filterValue === undefined) return true;
-      return simpleMatchText(row.original.guest?.name ?? "Đã bị xóa", String(filterValue));
-    },
-  },
-  {
-    id: "orderMode",
-    header: "Hình thức",
-    cell: ({ row }) => (
-      <div>
-        {row.original.orderMode === OrderModeType.DINE_IN ? (
-          <div className="p-2 rounded-md bg-green-600 inline-block">Ăn tại quán</div>
-        ) : (
-          <div className="p-2 rounded-md bg-blue-600 inline-block">Mang đi</div>
-        )}
-      </div>
-    ),
-  },
-  {
-    id: "dishName",
-    header: "Món ăn",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <Popover>
-          <PopoverTrigger asChild>
-            <Image
-              src={row.original.dishSnapshot.image}
-              alt={row.original.dishSnapshot.name}
-              width={50}
-              height={50}
-              className="rounded-md object-cover w-12.5 h-12.5 cursor-pointer"
-            />
-          </PopoverTrigger>
-          <PopoverContent>
-            <div className="flex flex-wrap gap-2">
+    {
+      id: "dishName",
+      header: t("dishNameHeader"),
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
               <Image
                 src={row.original.dishSnapshot.image}
                 alt={row.original.dishSnapshot.name}
-                width={100}
-                height={100}
-                className="rounded-md object-cover w-25 h-25"
+                width={50}
+                height={50}
+                className="rounded-md object-cover w-12.5 h-12.5 cursor-pointer"
               />
-              <div className="space-y-1 text-sm">
-                <h3 className="font-semibold">{row.original.dishSnapshot.name}</h3>
-                <div className="italic">{formatCurrency(row.original.dishSnapshot.price)}</div>
-                <div>{row.original.dishSnapshot.description}</div>
+            </PopoverTrigger>
+            <PopoverContent>
+              <div className="flex flex-wrap gap-2">
+                <Image
+                  src={row.original.dishSnapshot.image}
+                  alt={row.original.dishSnapshot.name}
+                  width={100}
+                  height={100}
+                  className="rounded-md object-cover w-25 h-25"
+                />
+                <div className="space-y-1 text-sm">
+                  <h3 className="font-semibold">{row.original.dishSnapshot.name}</h3>
+                  <div className="italic">{formatCurrency(row.original.dishSnapshot.price)}</div>
+                  <div>{row.original.dishSnapshot.description}</div>
+                </div>
               </div>
+            </PopoverContent>
+          </Popover>
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span>{row.original.dishSnapshot.name}</span>
+              <Badge className="px-1" variant={"secondary"}>
+                x{row.original.quantity}
+              </Badge>
             </div>
-          </PopoverContent>
-        </Popover>
-
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <span>{row.original.dishSnapshot.name}</span>
-            <Badge className="px-1" variant={"secondary"}>
-              x{row.original.quantity}
-            </Badge>
+            <span className="italic">
+              {formatCurrency(row.original.dishSnapshot.price * row.original.quantity)}
+            </span>
           </div>
-          <span className="italic">
-            {formatCurrency(row.original.dishSnapshot.price * row.original.quantity)}
-          </span>
         </div>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "status",
-    header: "Trạng thái",
-    cell: function Cell({ row }) {
-      const { changeStatus } = useContext(OrderTableContext);
-      const changeOrderStatus = async (status: (typeof OrderStatusValues)[number]) => {
-        changeStatus({
-          orderId: row.original.id,
-          menuItemId: row.original.dishSnapshot.menuItemId!,
-          status: status,
-          quantity: row.original.quantity,
-        });
-      };
-      return (
-        <Select
-          onValueChange={(value: (typeof OrderStatusValues)[number]) => {
-            changeOrderStatus(value);
-          }}
-          defaultValue={OrderStatus.Pending}
-          value={row.getValue("status")}
-          disabled={row.original.status === OrderStatus.Rejected || row.original.status === OrderStatus.Paid}
-        >
-          <SelectTrigger className="w-35">
-            <SelectValue placeholder="Theme" />
-          </SelectTrigger>
-          <SelectContent>
-            {OrderStatusValues.map((status) => {
-              return (
-                <SelectItem key={status} value={status} disabled={status === OrderStatus.Paid}>
-                  {getVietnameseOrderStatus(status)}
-                </SelectItem>
-              );
-            })}
-          </SelectContent>
-        </Select>
-      );
+      ),
     },
-  },
-
-  {
-    id: "orderHandlerName",
-    header: "Người xử lý",
-    cell: ({ row }) => <div>{row.original.orderHandler?.name ?? ""}</div>,
-  },
-  {
-    accessorKey: "createdAt",
-    header: () => <div>Tạo/Cập nhật</div>,
-    cell: ({ row }) => (
-      <div className="space-y-2 text-sm">
-        <div className="flex items-center space-x-4">
-          {formatDateTimeToLocaleString(row.getValue("createdAt"))}
-        </div>
-        <div className="flex items-center space-x-4">
-          {formatDateTimeToLocaleString(row.original.updatedAt as unknown as string)}
-        </div>
-      </div>
-    ),
-  },
-  {
-    id: "actions",
-    header: "Hành động",
-    cell: function Actions({ row }) {
-      const { setOrderIdEdit } = useContext(OrderTableContext);
-      const openEditOrder = () => {
-        setOrderIdEdit(row.original.id);
-      };
-
-      return (
-        <div className="">
-          <Button size="sm" onClick={openEditOrder} className="bg-blue-500 hover:bg-blue-400 text-white">
-            Sửa
-          </Button>
-        </div>
-      );
+    {
+      accessorKey: "status",
+      header: t("statusHeader"),
+      cell: function Cell({ row }) {
+        const { changeStatus } = useContext(OrderTableContext);
+        const changeOrderStatus = async (status: (typeof OrderStatusValues)[number]) => {
+          changeStatus({
+            orderId: row.original.id,
+            menuItemId: row.original.dishSnapshot.menuItemId!,
+            status: status,
+            quantity: row.original.quantity,
+          });
+        };
+        return (
+          <Select
+            onValueChange={(value: (typeof OrderStatusValues)[number]) => {
+              changeOrderStatus(value);
+            }}
+            defaultValue={OrderStatus.Pending}
+            value={row.getValue("status")}
+            disabled={
+              row.original.status === OrderStatus.Rejected || row.original.status === OrderStatus.Paid
+            }
+          >
+            <SelectTrigger className="w-35">
+              <SelectValue placeholder="Theme" />
+            </SelectTrigger>
+            <SelectContent>
+              {OrderStatusValues.map((status) => {
+                return (
+                  <SelectItem key={status} value={status} disabled={status === OrderStatus.Paid}>
+                    {getVietnameseOrderStatus(status)}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        );
+      },
     },
-  },
-];
+
+    {
+      id: "orderHandlerName",
+      header: t("orderHandlerHeader"),
+      cell: ({ row }) => <div>{row.original.orderHandler?.name ?? ""}</div>,
+    },
+    {
+      accessorKey: "createdAt",
+      header: () => <div>{t("createdUpdatedAtHeader")}</div>,
+      cell: ({ row }) => (
+        <div className="space-y-2 text-sm">
+          <div className="flex items-center space-x-4">
+            {formatDateTimeToLocaleString(row.getValue("createdAt"))}
+          </div>
+          <div className="flex items-center space-x-4">
+            {formatDateTimeToLocaleString(row.original.updatedAt as unknown as string)}
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: "actions",
+      header: t("actionsHeader"),
+      cell: function Actions({ row }) {
+        const { setOrderIdEdit } = useContext(OrderTableContext);
+        const openEditOrder = () => {
+          setOrderIdEdit(row.original.id);
+        };
+
+        return (
+          <div className="">
+            <Button
+              size="sm"
+              onClick={openEditOrder}
+              disabled={
+                row.original.status === OrderStatus.Rejected || row.original.status === OrderStatus.Paid
+              }
+              className="bg-blue-500 hover:bg-blue-400 text-white"
+            >
+              {t("editButton")}
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
+  return orderTableColumns;
+};
 
 const PAGE_SIZE = 10;
 const initFromDate = startOfDay(new Date());
@@ -261,6 +274,9 @@ export default function OrderList({
   countOrderDineInByTab: number;
   countOrderTakeOutByTab: number;
 }) {
+  const t = useTranslations("ManageOrders");
+  const orderTableColumns = getColumns(t);
+
   const socket = useAppStore((state) => state.socket);
   const [selectedTab, setSelectedTab] = useState<OrderMode>(OrderModeType.DINE_IN);
   const [openStatusFilter, setOpenStatusFilter] = useState(false);
@@ -412,8 +428,8 @@ export default function OrderList({
   return (
     <Card x-chunk="dashboard-06-chunk-0">
       <CardHeader>
-        <CardTitle className="text-xl">Đơn hàng</CardTitle>
-        <CardDescription>Quản lý đơn hàng</CardDescription>
+        <CardTitle className="text-xl">{t("title")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <OrderTableContext.Provider
@@ -428,20 +444,20 @@ export default function OrderList({
             <div className=" flex items-center">
               <div className="flex flex-wrap gap-2">
                 <div className="flex items-center">
-                  <span className="mr-2">Từ</span>
+                  <span className="mr-2">{t("fromLabel")}</span>
                   <Input
                     type="datetime-local"
-                    placeholder="Từ ngày"
+                    placeholder={t("fromDatePlaceholder")}
                     className="text-sm"
                     value={format(fromDate, "yyyy-MM-dd HH:mm").replace(" ", "T")}
                     onChange={(event) => setFromDate(new Date(event.target.value))}
                   />
                 </div>
                 <div className="flex items-center">
-                  <span className="mr-2">Đến</span>
+                  <span className="mr-2">{t("toLabel")}</span>
                   <Input
                     type="datetime-local"
-                    placeholder="Đến ngày"
+                    placeholder={t("toDatePlaceholder")}
                     value={format(toDate, "yyyy-MM-dd HH:mm").replace(" ", "T")}
                     onChange={(event) => setToDate(new Date(event.target.value))}
                   />
@@ -456,13 +472,13 @@ export default function OrderList({
             </div>
             <div className="flex flex-wrap items-center gap-4 py-4">
               <Input
-                placeholder="Tên khách"
+                placeholder={t("filterGuestName")}
                 value={(table.getColumn("guestName")?.getFilterValue() as string) ?? ""}
                 onChange={(event) => table.getColumn("guestName")?.setFilterValue(event.target.value)}
                 className="max-w-25"
               />
               <Input
-                placeholder="Số bàn"
+                placeholder={t("filterTableNumber")}
                 value={(table.getColumn("tableNumber")?.getFilterValue() as string) ?? ""}
                 onChange={(event) => table.getColumn("tableNumber")?.setFilterValue(event.target.value)}
                 className="max-w-20"
@@ -479,7 +495,7 @@ export default function OrderList({
                       ? getVietnameseOrderStatus(
                           table.getColumn("status")?.getFilterValue() as (typeof OrderStatusValues)[number],
                         )
-                      : "Trạng thái"}
+                      : t("statusFilter")}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
@@ -523,7 +539,7 @@ export default function OrderList({
             <div className="flex justify-start items-end gap-4 flex-wrap py-4">
               {OrderStatusValues.map((status) => (
                 <Badge variant="secondary" key={status}>
-                  {getVietnameseOrderStatus(status)}: {statics.status[status] ?? 0}
+                  {t(status)}: {statics.status[status] ?? 0}
                 </Badge>
               ))}
             </div>
@@ -535,13 +551,13 @@ export default function OrderList({
             >
               <TabsList variant="default">
                 <TabsTrigger value={OrderModeType.DINE_IN}>
-                  <span>Ăn tại quán</span>
+                  <span>{t("dineIn")}</span>
                   <span className="bg-red-500 w-4 h-4 text-center inline-block rounded-full text-xs">
                     {countOrderDineInByTab}
                   </span>
                 </TabsTrigger>
                 <TabsTrigger value={OrderModeType.TAKE_OUT}>
-                  <span>Mang đi</span>
+                  <span>{t("takeOut")}</span>
                   <span className="bg-red-500 w-4 h-4 text-center inline-block rounded-full text-xs">
                     {countOrderTakeOutByTab}
                   </span>
@@ -590,8 +606,10 @@ export default function OrderList({
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">
               <div className="text-xs text-muted-foreground py-4 flex-1 ">
-                Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong{" "}
-                <strong>{orderList.length}</strong> kết quả
+                {t("showingOf", {
+                  count: table.getPaginationRowModel().rows.length,
+                  total: orderList.length,
+                })}
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -600,7 +618,7 @@ export default function OrderList({
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
                 >
-                  Trước
+                  {t("previous")}
                 </Button>
                 <Button
                   variant="outline"
@@ -608,7 +626,7 @@ export default function OrderList({
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
                 >
-                  Sau
+                  {t("next")}
                 </Button>
               </div>
             </div>

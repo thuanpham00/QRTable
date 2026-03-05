@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 import revalidateApiRequests from "@/apiRequests/revalidate";
@@ -15,6 +16,7 @@ import { formatCurrency, handleErrorApi } from "@/lib/utils";
 import { useEditMenuItemMutation, useGetMenuItemDetail } from "@/queries/useMenu";
 import { MenuItemListResType, UpdateDishInMenu, UpdateDishInMenuType } from "@/schemaValidations/menu.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -28,6 +30,7 @@ export default function EditDishToMenuForm({
   setId: (value: number | undefined) => void;
   dataMenuItemsCurrent: MenuItemListResType["data"]["itemList"];
 }) {
+  const t = useTranslations("ManageMenus");
   const menuItemDetail = useGetMenuItemDetail({
     id: id as number,
     enabled: !!id,
@@ -107,7 +110,7 @@ export default function EditDishToMenuForm({
       >
         <DialogContent className="sm:max-w-150">
           <DialogHeader>
-            <DialogTitle>Chỉnh sửa món ăn</DialogTitle>
+            <DialogTitle>{t("editDish")}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
@@ -123,10 +126,10 @@ export default function EditDishToMenuForm({
                 <FormField
                   control={form.control}
                   name="dishId"
-                  render={({ field }) => (
+                  render={({ field, formState: { errors } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="dishId">Tên món ăn</Label>
+                        <Label htmlFor="dishId">{t("nameDish")}</Label>
                         <div className="col-span-3 w-full space-y-2 flex items-start gap-6">
                           <div className="flex items-start gap-2">
                             <Avatar className="aspect-square w-12.5 h-12.5 rounded-md object-cover flex flex-col">
@@ -146,7 +149,9 @@ export default function EditDishToMenuForm({
                               setSelectedDish(dish);
                             }}
                           />
-                          <FormMessage />
+                          <FormMessage>
+                            {Boolean(errors.dishId?.message) && t(errors.dishId?.message as any)}
+                          </FormMessage>
                         </div>
                       </div>
                     </FormItem>
@@ -156,10 +161,10 @@ export default function EditDishToMenuForm({
                 <FormField
                   control={form.control}
                   name="price"
-                  render={({ field }) => (
+                  render={({ field, formState: { errors } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="price">Giá Menu</Label>
+                        <Label htmlFor="price">{t("menuPrice")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Input
                             id="price"
@@ -168,7 +173,9 @@ export default function EditDishToMenuForm({
                             {...field}
                             onChange={(e) => field.onChange(Number(e.target.value))}
                           />
-                          <FormMessage />
+                          <FormMessage>
+                            {Boolean(errors.price?.message) && t(errors.price?.message as any)}
+                          </FormMessage>
                         </div>
                       </div>
                     </FormItem>
@@ -178,13 +185,15 @@ export default function EditDishToMenuForm({
                 <FormField
                   control={form.control}
                   name="notes"
-                  render={({ field }) => (
+                  render={({ field, formState: { errors } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="notes">Ghi chú</Label>
+                        <Label htmlFor="notes">{t("notes")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Textarea id="notes" className="w-full" {...field} />
-                          <FormMessage />
+                          <FormMessage>
+                            {Boolean(errors.notes?.message) && t(errors.notes?.message as any)}
+                          </FormMessage>
                         </div>
                       </div>
                     </FormItem>
@@ -197,7 +206,7 @@ export default function EditDishToMenuForm({
                   render={({ field }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="status">Trạng thái</Label>
+                        <Label htmlFor="status">{t("status")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Select
                             onValueChange={field.onChange}
@@ -228,7 +237,7 @@ export default function EditDishToMenuForm({
 
             <div className="flex items-center justify-end gap-2">
               <Button type="submit" form="add-dish-to-menu-form">
-                Lưu
+                {t("save")}
               </Button>
             </div>
           </Form>

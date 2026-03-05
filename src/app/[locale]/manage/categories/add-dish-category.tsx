@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,8 +21,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { CreateDishCategoryBody, CreateDishCategoryBodyType } from "@/schemaValidations/dishCategory.schema";
 import { useAddDishCategoryMutation } from "@/queries/useDishCategory";
+import { useTranslations } from "next-intl";
 
 export default function AddDishCategory() {
+  const t = useTranslations("ManageCategories");
   const addDishCategoryMutation = useAddDishCategoryMutation();
 
   const [open, setOpen] = useState(false);
@@ -62,12 +65,12 @@ export default function AddDishCategory() {
       <DialogTrigger asChild>
         <Button size="sm" className="h-7 gap-1">
           <PlusCircle className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Thêm danh mục</span>
+          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">{t("createCategory")}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-150 max-h-screen overflow-auto">
         <DialogHeader>
-          <DialogTitle>Thêm danh mục</DialogTitle>
+          <DialogTitle>{t("createCategory")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -83,13 +86,15 @@ export default function AddDishCategory() {
               <FormField
                 control={form.control}
                 name="name"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="name">Tên danh mục</Label>
+                      <Label htmlFor="name">{t("nameCategory")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input id="name" className="w-full" {...field} />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.name?.message) && t(errors.name?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -99,13 +104,15 @@ export default function AddDishCategory() {
               <FormField
                 control={form.control}
                 name="description"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="description">Mô tả danh mục</Label>
+                      <Label htmlFor="description">{t("description2")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Textarea id="description" className="w-full" {...field} />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.description?.message) && t(errors.description?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -116,14 +123,14 @@ export default function AddDishCategory() {
         </Form>
         <DialogFooter>
           <Button type="reset" form="add-dish-category-form">
-            Xóa
+            {t("delete")}
           </Button>
           <Button
             type="submit"
             form="add-dish-category-form"
             className="bg-blue-500 hover:bg-blue-400 text-white"
           >
-            Thêm
+            {t("create")}
           </Button>
         </DialogFooter>
       </DialogContent>

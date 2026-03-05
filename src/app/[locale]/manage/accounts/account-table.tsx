@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/incompatible-library */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
@@ -36,6 +37,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem } from "@/components/ui/form";
 import { Search, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 type AccountItem = AccountListResType["data"][0];
 
@@ -52,68 +54,71 @@ const AccountTableContext = createContext<{
   setEmployeeDelete: (value: AccountItem | null) => {},
 });
 
-export const columns: ColumnDef<AccountType>[] = [
-  {
-    accessorKey: "id",
-    header: "ID",
-  },
-  {
-    accessorKey: "avatar",
-    header: "Avatar",
-    cell: ({ row }) => (
-      <div>
-        <Avatar className="aspect-square w-25 h-25 rounded-md object-cover">
-          <AvatarImage src={row.getValue("avatar")} />
-          <AvatarFallback className="rounded-none">{row.original.name}</AvatarFallback>
-        </Avatar>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "name",
-    header: "Tên",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
-  },
-  {
-    accessorKey: "role",
-    header: "Role",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("role")}</div>,
-  },
-  {
-    accessorKey: "email",
-    header: "Email",
-    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
-  },
-  {
-    id: "actions",
-    header: "Hành động",
-    cell: function Actions({ row }) {
-      const { setEmployeeIdEdit, setEmployeeDelete } = useContext(AccountTableContext);
-      const openEditEmployee = () => {
-        setEmployeeIdEdit(row.original.id);
-      };
-
-      const openDeleteEmployee = () => {
-        setEmployeeDelete(row.original);
-      };
-      return (
-        <div className="flex items-center gap-2">
-          <Button size="sm" onClick={openEditEmployee} className="bg-blue-500 hover:bg-blue-400 text-white">
-            Sửa
-          </Button>
-          <Button
-            size="sm"
-            onClick={openDeleteEmployee}
-            disabled={row.original.role === "Owner"}
-            className="bg-red-500 hover:bg-red-400 text-white"
-          >
-            Xóa
-          </Button>
-        </div>
-      );
+export const getColumns = (t: any) => {
+  const columns: ColumnDef<AccountType>[] = [
+    {
+      accessorKey: "id",
+      header: "ID",
     },
-  },
-];
+    {
+      accessorKey: "avatar",
+      header: "Avatar",
+      cell: ({ row }) => (
+        <div>
+          <Avatar className="aspect-square w-25 h-25 rounded-md object-cover">
+            <AvatarImage src={row.getValue("avatar")} />
+            <AvatarFallback className="rounded-none">{row.original.name}</AvatarFallback>
+          </Avatar>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "name",
+      header: t("name"),
+      cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+    },
+    {
+      accessorKey: "role",
+      header: t("role"),
+      cell: ({ row }) => <div className="capitalize">{row.getValue("role")}</div>,
+    },
+    {
+      accessorKey: "email",
+      header: t("email"),
+      cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+    },
+    {
+      id: "actions",
+      header: t("actions"),
+      cell: function Actions({ row }) {
+        const { setEmployeeIdEdit, setEmployeeDelete } = useContext(AccountTableContext);
+        const openEditEmployee = () => {
+          setEmployeeIdEdit(row.original.id);
+        };
+
+        const openDeleteEmployee = () => {
+          setEmployeeDelete(row.original);
+        };
+        return (
+          <div className="flex items-center gap-2">
+            <Button size="sm" onClick={openEditEmployee} className="bg-blue-500 hover:bg-blue-400 text-white">
+              {t("edit")}
+            </Button>
+            <Button
+              size="sm"
+              onClick={openDeleteEmployee}
+              disabled={row.original.role === "Owner"}
+              className="bg-red-500 hover:bg-red-400 text-white"
+            >
+              {t("delete")}
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
+  return columns;
+};
 
 function AlertDialogDeleteAccount({
   employeeDelete,
@@ -122,6 +127,7 @@ function AlertDialogDeleteAccount({
   employeeDelete: AccountItem | null;
   setEmployeeDelete: (value: AccountItem | null) => void;
 }) {
+  const t = useTranslations("ManageAccounts");
   const deleteEmployeeMutation = useDeleteEmployeeMutation();
 
   const handleDelete = async () => {
@@ -147,11 +153,11 @@ function AlertDialogDeleteAccount({
     >
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Xóa nhân viên?</AlertDialogTitle>
+          <AlertDialogTitle>{t("deleteAccount")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Tài khoản{" "}
+            {t("deleteAccountDesc")}{" "}
             <span className="bg-foreground text-primary-foreground rounded px-1">{employeeDelete?.name}</span>{" "}
-            sẽ bị xóa vĩnh viễn
+            {t("deleteAccountDesc2")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -160,9 +166,9 @@ function AlertDialogDeleteAccount({
               setEmployeeDelete(null);
             }}
           >
-            Cancel
+            {t("cancel")}
           </AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete}>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={handleDelete}>{t("continue")}</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -170,8 +176,10 @@ function AlertDialogDeleteAccount({
 }
 
 export default function AccountTable() {
+  const t = useTranslations("ManageAccounts");
   const router = useRouter();
   const queryParams = useQueryParams();
+  const columns = getColumns(t);
 
   const limit = queryParams.limit ? Number(queryParams.limit) : 5;
   const page = queryParams.page ? Number(queryParams.page) : 1;
@@ -260,7 +268,7 @@ export default function AccountTable() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <Input placeholder="Lọc email" className="max-w-sm" {...field} />
+                    <Input placeholder={t("filterEmail")} className="max-w-sm" {...field} />
                   </FormItem>
                 )}
               />

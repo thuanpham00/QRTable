@@ -14,6 +14,7 @@ import { useOrderService } from "@/app/[locale]/manage/orders/order.service";
 import { useGetListActiveTableSessionQuery } from "@/queries/useTableSession";
 import { TableSessionActiveListResType } from "@/schemaValidations/tableSessions.schema";
 import { useAppStore } from "@/components/app-provider";
+import { useTranslations } from "next-intl";
 
 export type StatusCountObject = Record<(typeof OrderStatusValues)[number], number>;
 export type Statics = {
@@ -31,6 +32,7 @@ function checkStatus(status: OrderStatusType) {
 const initFromDate = startOfDay(new Date());
 const initToDate = endOfDay(new Date());
 export default function OrderTableSession() {
+  const t = useTranslations("ManageOrders");
   const socket = useAppStore((state) => state.socket);
 
   const [selectedTabPage, setSelectedTabPage] = useState<string>("orders");
@@ -104,13 +106,13 @@ export default function OrderTableSession() {
       <Tabs value={selectedTabPage} onValueChange={(val) => setSelectedTabPage(val)} className="mb-4">
         <TabsList variant="default">
           <TabsTrigger value={"orders"}>
-            <span>Đơn hàng</span>
+            <span>{t("ordersTab")}</span>
             <span className="bg-red-500 w-4 h-4 text-center inline-block rounded-full text-xs">
               {countTotalOrder}
             </span>
           </TabsTrigger>
           <TabsTrigger value={"table-sessions"}>
-            <span>Phiên bàn</span>
+            <span>{t("tableSessionsTab")}</span>
             <span className="bg-red-500 w-4 h-4 text-center inline-block rounded-full text-xs">
               {countTotalTableSession}
             </span>

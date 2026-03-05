@@ -12,22 +12,23 @@ import { useContext } from "react";
 import { intervalToDuration } from "date-fns";
 import { Users, UtensilsCrossed, DollarSign, Clock, User, ShoppingBag, CreditCard } from "lucide-react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 // Helper function để format trạng thái phiên bàn
-const getSessionStatusBadge = (status: string) => {
+const getSessionStatusBadge = (status: string, t: (key: string) => string) => {
   switch (status) {
     case "Completed":
-      return <Badge className="bg-blue-500 text-white">Hoàn thành</Badge>;
+      return <Badge className="bg-blue-500 text-white">{t("statusCompleted")}</Badge>;
     case "Cancelled":
-      return <Badge variant="destructive">Đã hủy</Badge>;
+      return <Badge variant="destructive">{t("statusCancelled")}</Badge>;
     default:
       return <Badge variant="outline">{status}</Badge>;
   }
 };
 
 // Helper function để format thời lượng
-const formatSessionDuration = (startTime: Date, endTime: Date | null) => {
-  if (!endTime) return "Đang phục vụ";
+const formatSessionDuration = (startTime: Date, endTime: Date | null, t: (key: string) => string) => {
+  if (!endTime) return t("serving");
 
   const duration = intervalToDuration({
     start: startTime,
@@ -35,25 +36,25 @@ const formatSessionDuration = (startTime: Date, endTime: Date | null) => {
   });
 
   const parts: string[] = [];
-  if (duration.hours) parts.push(`${duration.hours} giờ`);
-  if (duration.minutes) parts.push(`${duration.minutes} phút`);
+  if (duration.hours) parts.push(`${duration.hours}${t("hourUnit")}`);
+  if (duration.minutes) parts.push(`${duration.minutes}${t("minuteUnit")}`);
 
-  return parts.length > 0 ? parts.join(" ") : "< 1 phút";
+  return parts.length > 0 ? parts.join(" ") : t("lessThanOneMin");
 };
 
 // Helper function để format payment method
-const getPaymentMethodBadge = (method: string) => {
+const getPaymentMethodBadge = (method: string, t: (key: string) => string) => {
   switch (method) {
     case "CASH":
       return (
-        <Badge variant="outline" className="bg-green-50">
-          💵 Tiền mặt
+        <Badge variant="outline" className="bg-green-50 text-black">
+          💵 {t("paymentCash")}
         </Badge>
       );
     case "SEPAY":
       return (
-        <Badge variant="outline" className="bg-blue-50">
-          🏦 Chuyển khoản
+        <Badge variant="outline" className="bg-blue-50 text-black">
+          🏦 {t("paymentTransfer")}
         </Badge>
       );
     default:
@@ -62,24 +63,30 @@ const getPaymentMethodBadge = (method: string) => {
 };
 
 // Helper function để format payment status
-const getPaymentStatusBadge = (status: string) => {
+const getPaymentStatusBadge = (status: string, t: (key: string) => string) => {
+
   switch (status) {
     case "Paid":
-      return <Badge className="bg-green-500 text-white">Thành công</Badge>;
+      return <Badge className="bg-green-500 text-white">{t("paymentSuccess")}</Badge>;
     case "Pending":
-      return <Badge className="bg-yellow-500 text-white">Chờ xử lý</Badge>;
+      return <Badge className="bg-yellow-500 text-white">{t("paymentPending")}</Badge>;
     case "Cancelled":
       return (
-        <Badge variant="destructive" className="text-white">
-          Thất bại
+        <Badge variant="destructive" className="text-white bg-red-500">
+          {t("paymentFailed")}
         </Badge>
       );
     default:
-      return <Badge variant="outline">{status}</Badge>;
+      return (
+        <Badge variant="outline" className="text-white bg-red-500!">
+          {status}
+        </Badge>
+      );
   }
 };
 
 export default function TableSessionDetailDialog() {
+  const t = useTranslations("ManageOrders");
   const { tableSessionId, setTableSessionId } = useContext(OrderByTableContext);
   const detailTableSessionHistory = useGetDetailTableSessionHistoryQuery({
     idTableSession: tableSessionId!,
@@ -100,7 +107,7 @@ export default function TableSessionDetailDialog() {
       >
         <DialogContent className="sm:max-w-5xl">
           <DialogHeader>
-            <DialogTitle>Chi tiết phiên bàn</DialogTitle>
+            <DialogTitle>{t("sessionDetailLoading")}</DialogTitle>
           </DialogHeader>
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
@@ -123,10 +130,12 @@ export default function TableSessionDetailDialog() {
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div>
-              <DialogTitle className="text-2xl">Chi tiết phiên bàn #{data.id}</DialogTitle>
-              <p className="text-sm text-muted-foreground mt-1">Bàn số {data.tableNumber}</p>
+              <DialogTitle className="text-2xl">{t("sessionDetailTitle", { id: data.id })}</DialogTitle>
+              <p className="text-sm text-muted-foreground mt-1">
+                {t("tableNoLabel", { number: data.tableNumber })}
+              </p>
             </div>
-            {getSessionStatusBadge(data.status)}
+            {getSessionStatusBadge(data.status, t as (key: string) => string)}
           </div>
         </DialogHeader>
 
@@ -137,20 +146,23 @@ export default function TableSessionDetailDialog() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <Clock className="w-4 h-4 text-blue-500" />
-                    Thời gian
+                    {t("timeCardTitle")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-xs text-muted-foreground space-y-1">
-                    <div>Bắt đầu: {formatDateTimeToLocaleString(data.startTime)}</div>
+                    <div>
+                      {t("startLabel")} {formatDateTimeToLocaleString(data.startTime)}
+                    </div>
                     <div>
                       {data.endTime
-                        ? `Kết thúc: ${formatDateTimeToLocaleString(data.endTime)}`
-                        : "Đang phục vụ"}
+                        ? `${t("endLabel")} ${formatDateTimeToLocaleString(data.endTime)}`
+                        : t("serving")}
                     </div>
                     <Separator className="my-1" />
                     <div className="font-semibold text-primary">
-                      Thời lượng: {formatSessionDuration(data.startTime, data.endTime)}
+                      {t("durationLabel")}{" "}
+                      {formatSessionDuration(data.startTime, data.endTime, t as (key: string) => string)}
                     </div>
                   </div>
                 </CardContent>
@@ -160,12 +172,12 @@ export default function TableSessionDetailDialog() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <Users className="w-4 h-4 text-green-500" />
-                    Khách hàng
+                    {t("guestsCardTitle")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold">{data.guestCount}</div>
-                  <p className="text-xs text-muted-foreground">khách</p>
+                  <p className="text-xs text-muted-foreground">{t("guestUnit")}</p>
                 </CardContent>
               </Card>
 
@@ -173,12 +185,12 @@ export default function TableSessionDetailDialog() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <UtensilsCrossed className="w-4 h-4 text-orange-500" />
-                    Món ăn
+                    {t("dishesCardTitle")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold">{data.orderCount}</div>
-                  <p className="text-xs text-muted-foreground">món</p>
+                  <p className="text-xs text-muted-foreground">{t("dishUnit")}</p>
                 </CardContent>
               </Card>
 
@@ -186,12 +198,12 @@ export default function TableSessionDetailDialog() {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <DollarSign className="w-4 h-4 text-purple-500" />
-                    Doanh thu
+                    {t("revenueCardTitle")}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-xl font-bold text-green-600">{formatCurrency(data.totalRevenue)}</div>
-                  <p className="text-xs text-muted-foreground">tổng thu</p>
+                  <p className="text-xs text-muted-foreground">{t("totalIncomeLabel")}</p>
                 </CardContent>
               </Card>
             </div>
@@ -200,7 +212,7 @@ export default function TableSessionDetailDialog() {
             {data.note && (
               <div className="mb-4 bg-amber-50 border border-amber-200 rounded-lg p-3">
                 <div className="text-sm">
-                  <span className="font-semibold text-black">Ghi chú:</span>
+                  <span className="font-semibold text-black">{t("noteLabel")}</span>
                   <span className="ml-2 text-black">{data.note}</span>
                 </div>
               </div>
@@ -211,15 +223,15 @@ export default function TableSessionDetailDialog() {
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="orders" className="flex items-center gap-2">
                   <ShoppingBag className="w-4 h-4" />
-                  Món ăn ({data.orders.length})
+                  {t("dishesCardTitle")} ({data.orders.length})
                 </TabsTrigger>
                 <TabsTrigger value="guests" className="flex items-center gap-2">
                   <User className="w-4 h-4" />
-                  Khách ({data.guests.length})
+                  {t("guestsTab")} ({data.guests.length})
                 </TabsTrigger>
                 <TabsTrigger value="payments" className="flex items-center gap-2">
                   <CreditCard className="w-4 h-4" />
-                  Thanh toán ({data.paymentGroups.length + data.individualPayments.length})
+                  {t("paymentsTab")} ({data.paymentGroups.length + data.individualPayments.length})
                 </TabsTrigger>
               </TabsList>
 
@@ -229,22 +241,22 @@ export default function TableSessionDetailDialog() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-15">STT</TableHead>
-                        <TableHead className="w-20">Hình ảnh</TableHead>
-                        <TableHead>Tên món</TableHead>
-                        <TableHead className="text-center">SL</TableHead>
-                        <TableHead className="text-right">Đơn giá</TableHead>
-                        <TableHead className="text-right">Thành tiền</TableHead>
-                        <TableHead className="text-center">Trạng thái</TableHead>
-                        <TableHead>Khách</TableHead>
-                        <TableHead>Thời gian</TableHead>
+                        <TableHead className="w-15">{t("sttHeader")}</TableHead>
+                        <TableHead className="w-20">{t("imageHeader")}</TableHead>
+                        <TableHead>{t("dishNameColumnHeader")}</TableHead>
+                        <TableHead className="text-center">{t("quantityShort")}</TableHead>
+                        <TableHead className="text-right">{t("unitPriceHeader")}</TableHead>
+                        <TableHead className="text-right">{t("totalPriceHeader")}</TableHead>
+                        <TableHead className="text-center">{t("statusHeader")}</TableHead>
+                        <TableHead>{t("guestHeader")}</TableHead>
+                        <TableHead>{t("createdAtHeader")}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {data.orders.length === 0 ? (
                         <TableRow>
                           <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
-                            Chưa có món nào
+                            {t("noOrders")}
                           </TableCell>
                         </TableRow>
                       ) : (
@@ -276,7 +288,9 @@ export default function TableSessionDetailDialog() {
                               </Badge>
                             </TableCell>
                             <TableCell>
-                              <span className="text-sm">Khách #{order.guestId}</span>
+                              <span className="text-sm">
+                                {t("guestIdLabel", { id: order.guestId as number })}
+                              </span>
                             </TableCell>
                             <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
                               {formatDateTimeToLocaleString(order.createdAt)}
@@ -293,7 +307,7 @@ export default function TableSessionDetailDialog() {
               <TabsContent value="guests" className="flex-1 overflow-auto mt-4">
                 <div className="grid gap-4">
                   {data.guests.length === 0 ? (
-                    <div className="text-center py-12 text-muted-foreground">Chưa có khách nào</div>
+                    <div className="text-center py-12 text-muted-foreground">{t("noGuests")}</div>
                   ) : (
                     data.guests.map((guest, index) => (
                       <Card key={guest.id}>
@@ -301,7 +315,7 @@ export default function TableSessionDetailDialog() {
                           <CardTitle className="flex items-center justify-between">
                             <span className="flex items-center gap-2">
                               <User className="w-5 h-5" />
-                              Khách #{index + 1}: {guest.name}
+                              {t("guestNoLabel", { index: index + 1, name: guest.name })}
                             </span>
                             <Badge variant="outline">ID: {guest.id}</Badge>
                           </CardTitle>
@@ -309,20 +323,20 @@ export default function TableSessionDetailDialog() {
                         <CardContent>
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
-                              <span className="text-muted-foreground">Thời gian vào:</span>
+                              <span className="text-muted-foreground">{t("checkInTime")}</span>
                               <div className="font-medium">
                                 {formatDateTimeToLocaleString(guest.createdAt)}
                               </div>
                             </div>
                             {guest.dietaryPreferences && (
                               <div>
-                                <span className="text-muted-foreground">Sở thích ăn:</span>
+                                <span className="text-muted-foreground">{t("dietaryPrefs")}</span>
                                 <div className="font-medium">{guest.dietaryPreferences}</div>
                               </div>
                             )}
                             {guest.allergyInfo && (
                               <div className="col-span-2">
-                                <span className="text-muted-foreground">Dị ứng:</span>
+                                <span className="text-muted-foreground">{t("allergyLabel")}</span>
                                 <div className="font-medium text-red-600">{guest.allergyInfo}</div>
                               </div>
                             )}
@@ -338,7 +352,7 @@ export default function TableSessionDetailDialog() {
               <TabsContent value="payments" className="flex-1 overflow-auto mt-4">
                 <div className="space-y-6">
                   {data.paymentGroups.length === 0 && data.individualPayments.length === 0 ? (
-                    <div className="text-center py-12 text-muted-foreground">Chưa có thanh toán nào</div>
+                    <div className="text-center py-12 text-muted-foreground">{t("noPayments")}</div>
                   ) : (
                     <>
                       {/* Payment Groups Section */}
@@ -346,7 +360,7 @@ export default function TableSessionDetailDialog() {
                         <div className="space-y-4">
                           <div className="flex items-center gap-2 text-lg font-semibold">
                             <div className="w-1 h-6 bg-blue-500 rounded-full"></div>
-                            <span>Thanh toán theo nhóm ({data.paymentGroups.length})</span>
+                            <span>{t("groupPaymentsTitle", { count: data.paymentGroups.length })}</span>
                           </div>
 
                           {data.paymentGroups.map((paymentGroup) => (
@@ -358,9 +372,11 @@ export default function TableSessionDetailDialog() {
                                       G{paymentGroup.id}
                                     </div>
                                     <div>
-                                      <div className="text-lg">Nhóm thanh toán #{paymentGroup.id}</div>
+                                      <div className="text-lg">
+                                        {t("paymentGroupTitle", { id: paymentGroup.id })}
+                                      </div>
                                       <div className="text-sm font-normal text-muted-foreground">
-                                        {paymentGroup.payments.length} payment(s) • Tổng cộng:{" "}
+                                        {t("paymentsCountTotal", { count: paymentGroup.payments.length })}{" "}
                                         <span className="font-semibold text-green-600">
                                           {formatCurrency(paymentGroup.totalAmount)}
                                         </span>
@@ -368,8 +384,11 @@ export default function TableSessionDetailDialog() {
                                     </div>
                                   </span>
                                   <div className="flex items-center gap-2">
-                                    {getPaymentMethodBadge(paymentGroup.paymentMethod)}
-                                    {getPaymentStatusBadge(paymentGroup.status)}
+                                    {getPaymentMethodBadge(
+                                      paymentGroup.paymentMethod,
+                                      t as (key: string) => string,
+                                    )}
+                                    {getPaymentStatusBadge(paymentGroup.status, t as (key: string) => string)}
                                   </div>
                                 </CardTitle>
                               </CardHeader>
@@ -377,14 +396,14 @@ export default function TableSessionDetailDialog() {
                                 {/* Group Info */}
                                 <div className="grid grid-cols-2 gap-4 text-sm bg-white rounded-lg p-3 border">
                                   <div>
-                                    <span className="text-muted-foreground">Thời gian:</span>
+                                    <span className="text-muted-foreground">{t("timeLabel")}</span>
                                     <div className="font-medium text-black">
                                       {formatDateTimeToLocaleString(paymentGroup.createdAt)}
                                     </div>
                                   </div>
                                   {paymentGroup.createdBy && (
                                     <div>
-                                      <span className="text-muted-foreground">Người tạo:</span>
+                                      <span className="text-muted-foreground">{t("createdByLabel")}</span>
                                       <div className="font-medium text-black">
                                         {paymentGroup.createdBy.name}
                                       </div>
@@ -392,7 +411,7 @@ export default function TableSessionDetailDialog() {
                                   )}
                                   {paymentGroup.sepayReferenceCode && (
                                     <div>
-                                      <span className="text-muted-foreground">Mã tham chiếu:</span>
+                                      <span className="text-muted-foreground">{t("referenceCodeLabel")}</span>
                                       <div className="font-mono text-xs text-black">
                                         {paymentGroup.sepayReferenceCode}
                                       </div>
@@ -400,7 +419,9 @@ export default function TableSessionDetailDialog() {
                                   )}
                                   {paymentGroup.sepayTransactionDate && (
                                     <div>
-                                      <span className="text-muted-foreground">Ngày GD:</span>
+                                      <span className="text-muted-foreground">
+                                        {t("transactionDateLabel")}
+                                      </span>
                                       <div className="font-medium text-black">
                                         {formatDateTimeToLocaleString(paymentGroup.sepayTransactionDate)}
                                       </div>
@@ -408,7 +429,7 @@ export default function TableSessionDetailDialog() {
                                   )}
                                   {paymentGroup.note && (
                                     <div className="col-span-2">
-                                      <span className="text-muted-foreground">Ghi chú:</span>
+                                      <span className="text-muted-foreground">{t("noteLabel")}</span>
                                       <div className="font-medium text-black">{paymentGroup.note}</div>
                                     </div>
                                   )}
@@ -417,7 +438,7 @@ export default function TableSessionDetailDialog() {
                                 {/* Nested Payments in Group */}
                                 <div className="space-y-2">
                                   <div className="text-sm font-semibold text-muted-foreground px-2">
-                                    Chi tiết payments trong nhóm:
+                                    {t("groupPaymentDetail")}
                                   </div>
                                   {paymentGroup.payments.map((payment, idx) => (
                                     <div
@@ -435,7 +456,7 @@ export default function TableSessionDetailDialog() {
                                             </div>
                                             {payment.guest && (
                                               <div className="text-xs text-muted-foreground">
-                                                Khách: {payment.guest.name}
+                                                {t("guestLabel")} {payment.guest.name}
                                               </div>
                                             )}
                                           </div>
@@ -444,7 +465,10 @@ export default function TableSessionDetailDialog() {
                                           <div className="font-bold text-green-600">
                                             {formatCurrency(payment.totalAmount)}
                                           </div>
-                                          {getPaymentStatusBadge(payment.status)}
+                                          {getPaymentStatusBadge(
+                                            payment.status,
+                                            t as (key: string) => string,
+                                          )}
                                         </div>
                                       </div>
 
@@ -452,7 +476,7 @@ export default function TableSessionDetailDialog() {
                                       {payment.orders.length > 0 && (
                                         <div className="mt-2 pt-2 border-t">
                                           <div className="text-xs text-muted-foreground mb-1">
-                                            Món đã thanh toán ({payment.orders.length}):
+                                            {t("paidDishes", { count: payment.orders.length })}
                                           </div>
                                           <div className="space-y-1">
                                             {payment.orders.map((order) => (
@@ -498,7 +522,9 @@ export default function TableSessionDetailDialog() {
                         <div className="space-y-4">
                           <div className="flex items-center gap-2 text-lg font-semibold">
                             <div className="w-1 h-6 bg-purple-500 rounded-full"></div>
-                            <span>Thanh toán riêng lẻ ({data.individualPayments.length})</span>
+                            <span>
+                              {t("individualPaymentsTitle", { count: data.individualPayments.length })}
+                            </span>
                           </div>
 
                           {data.individualPayments.map((payment) => (
@@ -512,45 +538,51 @@ export default function TableSessionDetailDialog() {
                                     <div>
                                       <div className="text-lg">Payment #{payment.id}</div>
                                       <div className="text-sm font-normal text-muted-foreground">
-                                        Khách: <span className="font-semibold">{payment.guest.name}</span>
+                                        {t("guestLabel")}{" "}
+                                        <span className="font-semibold">{payment.guest.name}</span>
                                       </div>
                                     </div>
                                   </span>
                                   <div className="flex items-center gap-2">
-                                    {getPaymentMethodBadge(payment.paymentMethod)}
-                                    {getPaymentStatusBadge(payment.status)}
+                                    {getPaymentMethodBadge(
+                                      payment.paymentMethod,
+                                      t as (key: string) => string,
+                                    )}
+                                    {getPaymentStatusBadge(payment.status, t as (key: string) => string)}
                                   </div>
                                 </CardTitle>
                               </CardHeader>
                               <CardContent className="space-y-3">
                                 <div className="grid grid-cols-2 gap-4 text-sm">
                                   <div>
-                                    <span className="text-muted-foreground">Số tiền:</span>
+                                    <span className="text-muted-foreground">{t("amountLabel")}</span>
                                     <div className="text-xl font-bold text-green-600">
                                       {formatCurrency(payment.totalAmount)}
                                     </div>
                                   </div>
                                   <div>
-                                    <span className="text-muted-foreground">Thời gian:</span>
+                                    <span className="text-muted-foreground">{t("timeLabel")}</span>
                                     <div className="font-medium">
                                       {formatDateTimeToLocaleString(payment.createdAt)}
                                     </div>
                                   </div>
                                   {payment.createdBy && (
                                     <div>
-                                      <span className="text-muted-foreground">Người tạo:</span>
+                                      <span className="text-muted-foreground">{t("createdByLabel")}</span>
                                       <div className="font-medium">{payment.createdBy.name}</div>
                                     </div>
                                   )}
                                   {payment.sepayReferenceCode && (
                                     <div>
-                                      <span className="text-muted-foreground">Mã tham chiếu:</span>
+                                      <span className="text-muted-foreground">{t("referenceCodeLabel")}</span>
                                       <div className="font-mono text-xs">{payment.sepayReferenceCode}</div>
                                     </div>
                                   )}
                                   {payment.sepayTransactionDate && (
                                     <div>
-                                      <span className="text-muted-foreground">Ngày GD:</span>
+                                      <span className="text-muted-foreground">
+                                        {t("transactionDateLabel")}
+                                      </span>
                                       <div className="font-medium">
                                         {formatDateTimeToLocaleString(payment.sepayTransactionDate)}
                                       </div>
@@ -558,7 +590,7 @@ export default function TableSessionDetailDialog() {
                                   )}
                                   {payment.note && (
                                     <div className="col-span-2">
-                                      <span className="text-muted-foreground">Ghi chú:</span>
+                                      <span className="text-muted-foreground">{t("noteLabel")}</span>
                                       <div className="font-medium">{payment.note}</div>
                                     </div>
                                   )}
@@ -568,7 +600,7 @@ export default function TableSessionDetailDialog() {
                                 {payment.orders.length > 0 && (
                                   <div className="pt-3 border-t">
                                     <div className="text-sm font-semibold mb-2">
-                                      Món đã thanh toán ({payment.orders.length}):
+                                      {t("paidDishes", { count: payment.orders.length })}
                                     </div>
                                     <div className="space-y-2">
                                       {payment.orders.map((order) => (

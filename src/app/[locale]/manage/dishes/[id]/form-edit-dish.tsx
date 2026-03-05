@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { Button } from "@/components/ui/button";
@@ -29,8 +30,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Select as SelectAntd } from "antd";
+import { useTranslations } from "next-intl";
 
 export default function FormEditDish({ idDish }: { idDish?: number | undefined }) {
+  const t = useTranslations("ManageDishes");
   const dishDetail = useGetDishDetailQuery({ id: idDish as number, enabled: Boolean(idDish) });
   const dataDishDetail = dishDetail.data?.payload.data;
   const listNameDishCategory = useGetListDishCategoryNameQuery();
@@ -221,13 +224,15 @@ export default function FormEditDish({ idDish }: { idDish?: number | undefined }
               <FormField
                 control={form.control}
                 name="name"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="name">Tên món ăn</Label>
+                      <Label htmlFor="name">{t("nameDish")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input id="name" className="w-full" {...field} />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.name?.message) && t(errors.name?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -236,10 +241,10 @@ export default function FormEditDish({ idDish }: { idDish?: number | undefined }
               <FormField
                 control={form.control}
                 name="price"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="price">Giá</Label>
+                      <Label htmlFor="price">{t("priceDish")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input
                           id="price"
@@ -248,7 +253,9 @@ export default function FormEditDish({ idDish }: { idDish?: number | undefined }
                           type="number"
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.price?.message) && t(errors.price?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -257,13 +264,15 @@ export default function FormEditDish({ idDish }: { idDish?: number | undefined }
               <FormField
                 control={form.control}
                 name="description"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="description">Mô tả sản phẩm</Label>
+                      <Label htmlFor="description">{t("descriptionDish")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Textarea id="description" className="w-full" {...field} />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.description?.message) && t(errors.description?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -273,10 +282,10 @@ export default function FormEditDish({ idDish }: { idDish?: number | undefined }
               <FormField
                 control={form.control}
                 name="categoryId"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="categoryId">Danh mục</Label>
+                      <Label htmlFor="categoryId">{t("category")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <SelectAntd
                           className="dark:bg-[#212121]! dark:border-gray-600! dark:text-white!"
@@ -290,7 +299,9 @@ export default function FormEditDish({ idDish }: { idDish?: number | undefined }
                             })),
                           ]}
                         />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.categoryId?.message) && t(errors.categoryId?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -303,7 +314,7 @@ export default function FormEditDish({ idDish }: { idDish?: number | undefined }
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="description">Trạng thái</Label>
+                      <Label htmlFor="description">{t("status")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <SelectAntd
                           className="dark:bg-[#212121]! dark:border-gray-600! dark:text-white! w-40!"
@@ -333,7 +344,7 @@ export default function FormEditDish({ idDish }: { idDish?: number | undefined }
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="dietaryTags">Phân loại món ăn</Label>
+                      <Label htmlFor="dietaryTags">{t("dietaryTags")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Textarea id="dietaryTags" className="w-full" {...field} />
                         <FormMessage />
@@ -346,10 +357,10 @@ export default function FormEditDish({ idDish }: { idDish?: number | undefined }
               <FormField
                 control={form.control}
                 name="preparationTime"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="preparationTime">Thời gian chuẩn bị</Label>
+                      <Label htmlFor="preparationTime">{t("preparationTime")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input
                           id="preparationTime"
@@ -358,7 +369,9 @@ export default function FormEditDish({ idDish }: { idDish?: number | undefined }
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.preparationTime?.message) && t(errors.preparationTime?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -371,7 +384,7 @@ export default function FormEditDish({ idDish }: { idDish?: number | undefined }
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="spicyLevel">Mức độ cay</Label>
+                      <Label htmlFor="spicyLevel">{t("spicyLevel")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <SelectAntd
                           className="dark:bg-[#212121]! dark:border-gray-600! dark:text-white! w-40!"
@@ -380,19 +393,19 @@ export default function FormEditDish({ idDish }: { idDish?: number | undefined }
                           onChange={(value) => field.onChange(Number(value))}
                           options={[
                             {
-                              label: "Không cay - 0",
+                              label: t("spicy0"),
                               value: "0",
                             },
                             {
-                              label: "Ít cay - 1",
+                              label: t("spicy1"),
                               value: "1",
                             },
                             {
-                              label: "Cay vừa - 2",
+                              label: t("spicy2"),
                               value: "2",
                             },
                             {
-                              label: "Rất cay - 3",
+                              label: t("spicy3"),
                               value: "3",
                             },
                           ]}
@@ -411,7 +424,7 @@ export default function FormEditDish({ idDish }: { idDish?: number | undefined }
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="searchKeywords">Từ khóa tìm kiếm</Label>
+                      <Label htmlFor="searchKeywords">{t("searchKeywords")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Textarea id="searchKeywords" className="w-full" {...field} />
                         <FormMessage />
@@ -425,13 +438,13 @@ export default function FormEditDish({ idDish }: { idDish?: number | undefined }
 
           <div className="flex items-center justify-end gap-2">
             <Button variant="destructive" type="button" onClick={() => setOpenDialog(true)}>
-              Xóa món ăn
+              {t("deleteDish")}
             </Button>
             <Button type="reset" form="edit-dish-form">
-              Hủy
+              {t("cancel")}
             </Button>
             <Button type="submit" form="edit-dish-form" className="bg-blue-500 hover:bg-blue-400 text-white">
-              Cập nhật
+              {t("update")}
             </Button>
           </div>
         </form>
@@ -440,14 +453,12 @@ export default function FormEditDish({ idDish }: { idDish?: number | undefined }
       <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Xóa món ăn?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Món ăn sẽ bị xóa vĩnh viễn khỏi hệ thống. Hành động này không thể hoàn tác.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("deleteDishTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("deleteDishDesc")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setOpenDialog(false)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteDish}>Continue</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setOpenDialog(false)}>{t("cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteDish}>{t("continue")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

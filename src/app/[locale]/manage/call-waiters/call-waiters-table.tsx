@@ -34,125 +34,135 @@ import { useAppStore } from "@/components/app-provider";
 import { useGetGuestCallListQuery, useUpdateStatusGuestCallMutation } from "@/queries/useGuestCall";
 import { GuestCallListResType } from "@/schemaValidations/guest-call.schema";
 import { string } from "zod";
+import { useTranslations } from "next-intl";
 
 const WaiterTableContext = createContext({
   changeStatus: (payload: { idGuestCall: string; status: GuestCallStatusType }) => {},
 });
 
 type GuestCallItem = GuestCallListResType["data"][0];
-const waiterTableColumns: ColumnDef<GuestCallItem>[] = [
-  {
-    accessorKey: "id",
-    header: "ID",
-    cell: ({ row }) => <div>#{row.getValue("id")}</div>,
-  },
-  {
-    accessorKey: "tableNumber",
-    header: "Bàn",
-    cell: ({ row }) => <div>{row.getValue("tableNumber")}</div>,
-    filterFn: (row, columnId, filterValue: string) => {
-      if (filterValue === undefined) return true;
-      return simpleMatchText(String(row.getValue(columnId)), String(filterValue));
+const getColumns = (t: any) => {
+  const waiterTableColumns: ColumnDef<GuestCallItem>[] = [
+    {
+      accessorKey: "id",
+      header: "ID",
+      cell: ({ row }) => <div>#{row.getValue("id")}</div>,
     },
-  },
-  {
-    id: "guestId",
-    header: "ID Khách",
-    cell: ({ row }) => <div>#{row.original.guestId}</div>,
-    filterFn: (row, columnId, filterValue: string) => {
-      if (filterValue === undefined) return true;
-      return simpleMatchText(String(row.original.guestId), String(filterValue));
+    {
+      accessorKey: "tableNumber",
+      header: t("tableNumber"),
+      cell: ({ row }) => <div>{row.getValue("tableNumber")}</div>,
+      filterFn: (row, columnId, filterValue: string) => {
+        if (filterValue === undefined) return true;
+        return simpleMatchText(String(row.getValue(columnId)), String(filterValue));
+      },
     },
-  },
-  {
-    id: "guestName",
-    header: "Tên Khách",
-    cell: ({ row }) => <div>{row.original.guest.name}</div>,
-  },
-  {
-    accessorKey: "status",
-    header: "Trạng thái",
-    cell: function Cell({ row }) {
-      return (
-        <div>
-          <Badge
-            variant={
-              row.getValue("status") === GuestCallStatus.Completed
-                ? "default"
-                : row.getValue("status") === GuestCallStatus.Rejected
-                  ? "destructive"
-                  : "secondary"
-            }
-          >
-            {getVietnameseGuestCallStatus(row.getValue("status"))}
-          </Badge>
+    {
+      id: "guestId",
+      header: t("guestId"),
+      cell: ({ row }) => <div>#{row.original.guestId}</div>,
+      filterFn: (row, columnId, filterValue: string) => {
+        if (filterValue === undefined) return true;
+        return simpleMatchText(String(row.original.guestId), String(filterValue));
+      },
+    },
+    {
+      id: "guestName",
+      header: t("guestName"),
+      cell: ({ row }) => <div>{row.original.guest.name}</div>,
+    },
+    {
+      accessorKey: "status",
+      header: t("status"),
+      cell: function Cell({ row }) {
+        return (
+          <div>
+            <Badge
+              variant={
+                row.getValue("status") === GuestCallStatus.Completed
+                  ? "default"
+                  : row.getValue("status") === GuestCallStatus.Rejected
+                    ? "destructive"
+                    : "secondary"
+              }
+            >
+              {getVietnameseGuestCallStatus(row.getValue("status"))}
+            </Badge>
+          </div>
+        );
+      },
+      filterFn: (row, columnId, filterValue: string) => {
+        if (filterValue === undefined) return true;
+        return row.getValue(columnId) === filterValue;
+      },
+    },
+    {
+      accessorKey: "accountId",
+      header: t("accountId"),
+      cell: ({ row }) => {
+        const accountId = row.getValue("accountId");
+        return <div>{accountId ? `${row.original.account?.name}` : t("notProcessed")}</div>;
+      },
+    },
+    {
+      accessorKey: "createdAt",
+      header: () => <div>{t("createdUpdatedAt")}</div>,
+      cell: ({ row }) => (
+        <div className="space-y-2 text-sm">
+          <div className="flex items-center space-x-4">
+            {formatDateTimeToLocaleString(row.getValue("createdAt"))}
+          </div>
+          <div className="flex items-center space-x-4">
+            {formatDateTimeToLocaleString(row.original.updatedAt as unknown as string)}
+          </div>
         </div>
-      );
+      ),
     },
-    filterFn: (row, columnId, filterValue: string) => {
-      if (filterValue === undefined) return true;
-      return row.getValue(columnId) === filterValue;
-    },
-  },
-  {
-    accessorKey: "accountId",
-    header: "Người xử lý",
-    cell: ({ row }) => {
-      const accountId = row.getValue("accountId");
-      return <div>{accountId ? `${row.original.account?.name}` : "Chưa xử lý"}</div>;
-    },
-  },
-  {
-    accessorKey: "createdAt",
-    header: () => <div>Tạo/Cập nhật</div>,
-    cell: ({ row }) => (
-      <div className="space-y-2 text-sm">
-        <div className="flex items-center space-x-4">
-          {formatDateTimeToLocaleString(row.getValue("createdAt"))}
-        </div>
-        <div className="flex items-center space-x-4">
-          {formatDateTimeToLocaleString(row.original.updatedAt as unknown as string)}
-        </div>
-      </div>
-    ),
-  },
-  {
-    id: "actions",
-    header: "Hành động",
-    cell: function Actions({ row }) {
-      const { changeStatus } = useContext(WaiterTableContext);
-      const openEditGuestCall = (valueStatus: string) => {
-        changeStatus({ idGuestCall: row.original.id.toString(), status: valueStatus as GuestCallStatusType });
-      };
+    {
+      id: "actions",
+      header: t("actions"),
+      cell: function Actions({ row }) {
+        const { changeStatus } = useContext(WaiterTableContext);
+        const openEditGuestCall = (valueStatus: string) => {
+          changeStatus({
+            idGuestCall: row.original.id.toString(),
+            status: valueStatus as GuestCallStatusType,
+          });
+        };
 
-      return (
-        <div className="flex gap-2">
-          <Button
-            size="sm"
-            disabled={row.original.status !== GuestCallStatus.Pending}
-            onClick={() => openEditGuestCall(GuestCallStatus.Completed)}
-            className="bg-blue-500 hover:bg-blue-400 text-white"
-          >
-            Xử lý
-          </Button>{" "}
-          <Button
-            size="sm"
-            disabled={row.original.status !== GuestCallStatus.Pending}
-            onClick={() => openEditGuestCall(GuestCallStatus.Rejected)}
-            className="bg-red-500 hover:bg-red-400 text-white"
-          >
-            Từ chối
-          </Button>
-        </div>
-      );
+        return (
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              disabled={row.original.status !== GuestCallStatus.Pending}
+              onClick={() => openEditGuestCall(GuestCallStatus.Completed)}
+              className="bg-blue-500 hover:bg-blue-400 text-white"
+            >
+              {t("process")}
+            </Button>{" "}
+            <Button
+              size="sm"
+              disabled={row.original.status !== GuestCallStatus.Pending}
+              onClick={() => openEditGuestCall(GuestCallStatus.Rejected)}
+              className="bg-red-500 hover:bg-red-400 text-white"
+            >
+              {t("reject")}
+            </Button>
+          </div>
+        );
+      },
     },
-  },
-];
+  ];
+  return waiterTableColumns;
+};
 
 const PAGE_SIZE = 10;
 const initFromDate = startOfDay(new Date());
 const initToDate = endOfDay(new Date());
 export default function CallWaitersTable() {
+  const t = useTranslations("ManageCallWaiters");
+  const columns = getColumns(t);
+
   const socket = useAppStore((state) => state.socket);
 
   const searchParam = useSearchParams();
@@ -182,7 +192,7 @@ export default function CallWaitersTable() {
 
   const table = useReactTable({
     data: guestCallList,
-    columns: waiterTableColumns,
+    columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -272,20 +282,20 @@ export default function CallWaitersTable() {
         <div className=" flex items-center">
           <div className="flex flex-wrap gap-2">
             <div className="flex items-center">
-              <span className="mr-2">Từ</span>
+              <span className="mr-2">{t("from")}</span>
               <Input
                 type="datetime-local"
-                placeholder="Từ ngày"
+                placeholder={t("fromDate")}
                 className="text-sm"
                 value={format(fromDate, "yyyy-MM-dd HH:mm").replace(" ", "T")}
                 onChange={(event) => setFromDate(new Date(event.target.value))}
               />
             </div>
             <div className="flex items-center">
-              <span className="mr-2">Đến</span>
+              <span className="mr-2">{t("to")}</span>
               <Input
                 type="datetime-local"
-                placeholder="Đến ngày"
+                placeholder={t("toDate")}
                 value={format(toDate, "yyyy-MM-dd HH:mm").replace(" ", "T")}
                 onChange={(event) => setToDate(new Date(event.target.value))}
               />
@@ -297,13 +307,13 @@ export default function CallWaitersTable() {
         </div>
         <div className="flex flex-wrap items-center gap-4 py-4">
           <Input
-            placeholder="ID Khách"
+            placeholder={t("filterGuestId")}
             value={(table.getColumn("guestId")?.getFilterValue() as string) ?? ""}
             onChange={(event) => table.getColumn("guestId")?.setFilterValue(event.target.value)}
             className="max-w-25"
           />
           <Input
-            placeholder="Số bàn"
+            placeholder={t("filterTableNumber")}
             value={(table.getColumn("tableNumber")?.getFilterValue() as string) ?? ""}
             onChange={(event) => table.getColumn("tableNumber")?.setFilterValue(event.target.value)}
             className="max-w-20"
@@ -320,7 +330,7 @@ export default function CallWaitersTable() {
                   ? getVietnameseGuestCallStatus(
                       table.getColumn("status")?.getFilterValue() as (typeof GuestCallValues)[number],
                     )
-                  : "Trạng thái"}
+                  : t("statusFilter")}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
@@ -392,7 +402,7 @@ export default function CallWaitersTable() {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={waiterTableColumns.length} className="h-24 text-center">
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
                     No results.
                   </TableCell>
                 </TableRow>
@@ -402,8 +412,10 @@ export default function CallWaitersTable() {
         </div>
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="text-xs text-muted-foreground py-4 flex-1 ">
-            Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong{" "}
-            <strong>{guestCallList.length}</strong> kết quả
+            {t("showingOf", {
+              count: table.getPaginationRowModel().rows.length,
+              total: guestCallList.length,
+            })}
           </div>
           <div className="flex items-center gap-2">
             <Button
@@ -412,7 +424,7 @@ export default function CallWaitersTable() {
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              Trước
+              {t("previous")}
             </Button>
             <Button
               variant="outline"
@@ -420,7 +432,7 @@ export default function CallWaitersTable() {
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              Sau
+              {t("next")}
             </Button>
           </div>
         </div>

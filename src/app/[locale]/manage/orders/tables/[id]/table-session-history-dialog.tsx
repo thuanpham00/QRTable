@@ -16,21 +16,22 @@ import {
 import { useContext, useState } from "react";
 import { intervalToDuration } from "date-fns";
 import { OrderByTableContext } from "@/app/[locale]/manage/orders/tables/[id]/page";
+import { useTranslations } from "next-intl";
 
-const getSessionStatusBadge = (status: string) => {
+const getSessionStatusBadge = (status: string, t: (key: string) => string) => {
   switch (status) {
     case "Completed":
-      return <Badge className="bg-blue-500 hover:bg-blue-600 text-white">Hoàn thành</Badge>;
+      return <Badge className="bg-blue-500 hover:bg-blue-600 text-white">{t("statusCompleted")}</Badge>;
     case "Cancelled":
-      return <Badge variant="destructive">Đã hủy</Badge>;
+      return <Badge variant="destructive">{t("statusCancelled")}</Badge>;
     default:
       return <Badge variant="outline">{status}</Badge>;
   }
 };
 
 // Helper function để format thời lượng
-const formatSessionDuration = (startTime: Date, endTime: Date | null) => {
-  if (!endTime) return "Đang phục vụ";
+const formatSessionDuration = (startTime: Date, endTime: Date | null, t: (key: string) => string) => {
+  if (!endTime) return t("serving");
 
   const duration = intervalToDuration({
     start: startTime,
@@ -44,15 +45,15 @@ const formatSessionDuration = (startTime: Date, endTime: Date | null) => {
   return parts.length > 0 ? parts.join(" ") : "< 1m";
 };
 
-const columns: ColumnDef<TableSessionSchemaType>[] = [
+const getColumns = (t: (key: string) => string): ColumnDef<TableSessionSchemaType>[] => [
   {
     id: "stt",
-    header: "STT",
+    header: t("sttHeader"),
     cell: ({ row }) => <div className="text-left">{row.original.id}</div>,
   },
   {
     accessorKey: "startTime",
-    header: "Thời gian bắt đầu",
+    header: t("startTimeHeader"),
     cell: ({ row }) => (
       <div className="whitespace-nowrap">{formatDateTimeToLocaleString(row.getValue("startTime"))}</div>
     ),
@@ -60,7 +61,7 @@ const columns: ColumnDef<TableSessionSchemaType>[] = [
   },
   {
     accessorKey: "endTime",
-    header: "Thời gian kết thúc",
+    header: t("endTimeHeader"),
     cell: ({ row }) => {
       const endTime = row.getValue("endTime") as Date | null;
       return (
@@ -73,44 +74,44 @@ const columns: ColumnDef<TableSessionSchemaType>[] = [
   },
   {
     id: "duration",
-    header: "Thời lượng",
+    header: t("durationHeader"),
     cell: ({ row }) => (
       <div className="whitespace-nowrap">
-        {formatSessionDuration(row.original.startTime, row.original.endTime)}
+        {formatSessionDuration(row.original.startTime, row.original.endTime, t)}
       </div>
     ),
   },
   {
     accessorKey: "status",
-    header: "Trạng thái",
-    cell: ({ row }) => getSessionStatusBadge(row.getValue("status")),
+    header: t("statusHeader"),
+    cell: ({ row }) => getSessionStatusBadge(row.getValue("status"), t),
   },
   {
     accessorKey: "guestCount",
-    header: () => <div className="text-center">Số khách</div>,
+    header: () => <div className="text-center">{t("guestCountHeader")}</div>,
     cell: ({ row }) => <div className="text-center">{row.original.guests.length}</div>,
   },
   {
     accessorKey: "orderCount",
-    header: () => <div className="text-center">Số món</div>,
+    header: () => <div className="text-center">{t("orderCountHeader")}</div>,
     cell: ({ row }) => <div className="text-center">{row.getValue("orderCount")}</div>,
   },
   {
     accessorKey: "totalRevenue",
-    header: () => <div className="text-right">Doanh thu</div>,
+    header: () => <div className="text-right">{t("revenueHeader")}</div>,
     cell: ({ row }) => (
       <div className="text-right font-medium">{formatCurrency(row.getValue("totalRevenue"))}</div>
     ),
   },
   {
     accessorKey: "Actions",
-    header: () => <div className="text-right">Hành động</div>,
+    header: () => <div className="text-right">{t("actionsHeader")}</div>,
     cell: function Action({ row }) {
       const { setTableSessionId } = useContext(OrderByTableContext);
       return (
         <div className="text-right">
           <Button variant="default" size="sm" onClick={() => setTableSessionId(row.original.id)}>
-            Chi tiết
+            {t("detailButton")}
           </Button>
         </div>
       );
@@ -125,6 +126,8 @@ export default function TableSessionHistoryDialog({
   showModalHistoryTableSession: number | null;
   setShowModalHistoryTableSession: (value: number | null) => void;
 }) {
+  const t = useTranslations("ManageOrders");
+  const columns = getColumns(t as (key: string) => string);
   const listTableSessionHistory = useGetListTableSessionHistoryQuery({
     tableNumber: Number(showModalHistoryTableSession),
     enable: Boolean(showModalHistoryTableSession),
@@ -158,7 +161,7 @@ export default function TableSessionHistoryDialog({
     >
       <DialogContent className="sm:max-w-7xl">
         <DialogHeader>
-          <DialogTitle>Lịch sử phiên bàn</DialogTitle>
+          <DialogTitle>{t("sessionHistoryTitle")}</DialogTitle>
         </DialogHeader>
         <div>
           <div className="w-full">
@@ -206,8 +209,7 @@ export default function TableSessionHistoryDialog({
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">
               <div className="text-xs text-muted-foreground py-4 flex-1 ">
-                Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong{" "}
-                <strong>{data.length}</strong> kết quả
+                {t("showingOf", { count: table.getPaginationRowModel().rows.length, total: data.length })}
               </div>
               <div className="space-x-2">
                 <Button
@@ -216,7 +218,7 @@ export default function TableSessionHistoryDialog({
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
                 >
-                  Trước
+                  {t("previous")}
                 </Button>
                 <Button
                   variant="outline"
@@ -224,7 +226,7 @@ export default function TableSessionHistoryDialog({
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
                 >
-                  Sau
+                  {t("next")}
                 </Button>
               </div>
             </div>

@@ -4,27 +4,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { DashboardIndicatorResType } from "@/schemaValidations/indicator.schema";
 import { formatCurrency } from "@/lib/utils";
-
-const chartConfig = {
-  totalRevenue: {
-    label: "Doanh thu",
-    color: "#f97316", // orange-500
-  },
-  sessionCount: {
-    label: "Số phiên",
-    color: "#3b82f6", // blue-500
-  },
-} satisfies ChartConfig;
+import { useTranslations } from "next-intl";
 
 export function TablePerformanceChart({
   topTables,
 }: {
   topTables: DashboardIndicatorResType["data"]["tablePerformance"]["topTables"];
 }) {
+  const t = useTranslations("ManageDashboard");
+
+  const chartConfig = {
+    totalRevenue: { label: t("revenueLabel"), color: "#f97316" },
+    sessionCount: { label: t("sessionCountLabel"), color: "#3b82f6" },
+  } satisfies ChartConfig;
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Top bàn</CardTitle>
+        <CardTitle>{t("topTablesChartTitle")}</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -42,22 +39,27 @@ export function TablePerformanceChart({
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => `Bàn ${value}`}
+              tickFormatter={(value) => t("tablePrefix", { number: value })}
             />
             <YAxis tickLine={false} axisLine={false} tickFormatter={(value) => formatCurrency(value)} />
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  labelFormatter={(value) => `Bàn ${value}`}
+                  labelFormatter={(value) => t("tablePrefix", { number: value })}
                   formatter={(value, name, props) => {
                     const data = props.payload;
                     if (name === "totalRevenue") {
                       return (
                         <div className="space-y-1">
-                          <div className="text-sm">Doanh thu: {formatCurrency(data.totalRevenue)}</div>
-                          <div className="text-sm">Số phiên: {data.sessionCount}</div>
                           <div className="text-sm">
-                            TL TB/phiên: {(data.avgSessionDuration / 60).toFixed(0)} phút
+                            {t("tooltipRevenue")} {formatCurrency(data.totalRevenue)}
+                          </div>
+                          <div className="text-sm">
+                            {t("sessionCountLabel")}: {data.sessionCount}
+                          </div>
+                          <div className="text-sm">
+                            {t("avgSessionDurationTooltip")} {(data.avgSessionDuration / 60).toFixed(0)}{" "}
+                            {t("minutes")}
                           </div>
                         </div>
                       );

@@ -13,12 +13,14 @@ import { endOfDay, endOfMonth, endOfYear, format, startOfDay, startOfMonth, star
 import { useDashboardIndicator } from "@/queries/useIndicators";
 import { formatCurrency } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 
 type DateRangeType = "date" | "month" | "year";
 
 const initFromDate = startOfDay(new Date());
 const initToDate = endOfDay(new Date());
 export default function DashboardMain() {
+  const t = useTranslations("ManageDashboard");
   const [dateRangeType, setDateRangeType] = useState<DateRangeType>("date");
 
   const [fromDate, setFromDate] = useState(initFromDate);
@@ -160,24 +162,24 @@ export default function DashboardMain() {
       {/* Filter Controls */}
       <div className="flex flex-wrap gap-2 items-end">
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">Loại thời gian</label>
+          <label className="text-sm font-medium">{t("dateRangeTypeLabel")}</label>
           <Select value={dateRangeType} onValueChange={handleDateRangeTypeChange}>
             <SelectTrigger className="w-35">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="date">Theo ngày</SelectItem>
-              <SelectItem value="month">Theo tháng</SelectItem>
-              <SelectItem value="year">Theo năm</SelectItem>
+              <SelectItem value="date">{t("byDate")}</SelectItem>
+              <SelectItem value="month">{t("byMonth")}</SelectItem>
+              <SelectItem value="year">{t("byYear")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="ml-4 flex items-center gap-2">
-          <label className="text-sm font-medium">Từ</label>
+          <label className="text-sm font-medium">{t("from")}</label>
           <Input
             type={getInputType()}
-            placeholder="Từ"
+            placeholder={t("from")}
             className="w-52"
             value={getInputValue(fromDate)}
             onChange={(e) => handleDateChange(e.target.value, true)}
@@ -186,10 +188,10 @@ export default function DashboardMain() {
         </div>
 
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">Đến</label>
+          <label className="text-sm font-medium">{t("to")}</label>
           <Input
             type={getInputType()}
-            placeholder="Đến"
+            placeholder={t("to")}
             className="w-52"
             value={getInputValue(toDate)}
             onChange={(e) => handleDateChange(e.target.value, false)}
@@ -206,7 +208,7 @@ export default function DashboardMain() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tổng doanh thu</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("totalRevenue")}</CardTitle>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -226,7 +228,7 @@ export default function DashboardMain() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Khách</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("guests")}</CardTitle>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -244,12 +246,12 @@ export default function DashboardMain() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{guestCount}</div>
-            <p className="text-xs text-muted-foreground">Gọi món</p>
+            <p className="text-xs text-muted-foreground">{t("orderedFood")}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Đơn hàng</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("orders")}</CardTitle>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -270,7 +272,7 @@ export default function DashboardMain() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Bàn đang phục vụ</CardTitle>
+            <CardTitle className="text-sm font-medium">{t("servingTables")}</CardTitle>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -295,16 +297,16 @@ export default function DashboardMain() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Tổng thanh toán</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("totalPayments")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{totalPayments}</div>
-              <p className="text-xs text-muted-foreground">Hóa đơn</p>
+              <p className="text-xs text-muted-foreground">{t("invoices")}</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Giá trị TB/hóa đơn</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("avgPaymentValue")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{formatCurrency(avgPaymentValue)}</div>
@@ -312,7 +314,7 @@ export default function DashboardMain() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Tỷ lệ thanh toán nhóm</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("groupPaymentRate")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{groupPaymentRate.toFixed(1)}%</div>
@@ -320,12 +322,12 @@ export default function DashboardMain() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Nhóm thanh toán</CardTitle>
+              <CardTitle className="text-sm font-medium">{t("paymentGroups")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{paymentGroupStats?.count ?? 0}</div>
               <p className="text-xs text-muted-foreground">
-                TB: {paymentGroupStats?.avgGuestsPerGroup.toFixed(1) ?? 0} khách/nhóm
+                {t("avgGuestsPerGroup", { value: paymentGroupStats?.avgGuestsPerGroup.toFixed(1) ?? 0 })}
               </p>
             </CardContent>
           </Card>
@@ -360,7 +362,7 @@ export default function DashboardMain() {
           {topDishesByQuantity.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Top món theo số lượng</CardTitle>
+                <CardTitle>{t("topDishesByQuantity")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -377,7 +379,7 @@ export default function DashboardMain() {
                       </div>
                       <div className="text-right">
                         <div className="font-semibold">{dish.successOrders}</div>
-                        <div className="text-xs text-muted-foreground">đơn</div>
+                        <div className="text-xs text-muted-foreground">{t("orderUnit")}</div>
                       </div>
                     </div>
                   ))}
@@ -388,7 +390,7 @@ export default function DashboardMain() {
           {topDishesByRevenue.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Top món theo doanh thu</CardTitle>
+                <CardTitle>{t("topDishesByRevenue")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -400,7 +402,9 @@ export default function DashboardMain() {
                         </div>
                         <div>
                           <div className="font-medium">{dish.name}</div>
-                          <div className="text-xs text-muted-foreground">{dish.successOrders} đơn</div>
+                          <div className="text-xs text-muted-foreground">
+                            {dish.successOrders} {t("orderUnit")}
+                          </div>
                         </div>
                       </div>
                       <div className="text-right">
@@ -420,31 +424,31 @@ export default function DashboardMain() {
         {guestAnalytics && (
           <Card>
             <CardHeader>
-              <CardTitle>Thống kê khách hàng</CardTitle>
+              <CardTitle>{t("guestStatsTitle")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Tổng khách:</span>
+                <span className="text-sm text-muted-foreground">{t("totalGuests")}</span>
                 <span className="font-semibold">{totalGuests}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">TB khách/phiên:</span>
+                <span className="text-sm text-muted-foreground">{t("avgGuestsPerSession")}</span>
                 <span className="font-semibold">{avgGuestsPerSession.toFixed(1)}</span>
               </div>
               {guestLoginStats && (
                 <>
                   <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Đăng nhập:</span>
+                    <span className="text-sm text-muted-foreground">{t("loggedIn")}</span>
                     <span className="font-semibold">{guestLoginStats.loggedIn}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Vãng lai:</span>
+                    <span className="text-sm text-muted-foreground">{t("walkIn")}</span>
                     <span className="font-semibold">{guestLoginStats.walkIn}</span>
                   </div>
                 </>
               )}
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Khách quay lại:</span>
+                <span className="text-sm text-muted-foreground">{t("returningGuests")}</span>
                 <span className="font-semibold">{returningGuests}</span>
               </div>
             </CardContent>
@@ -454,27 +458,27 @@ export default function DashboardMain() {
         {sessionStats && (
           <Card>
             <CardHeader>
-              <CardTitle>Thống kê phiên</CardTitle>
+              <CardTitle>{t("sessionStatsTitle")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Tổng phiên:</span>
+                <span className="text-sm text-muted-foreground">{t("totalSessions")}</span>
                 <span className="font-semibold">{sessionStats.totalSessions}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Đã hoàn thành:</span>
+                <span className="text-sm text-muted-foreground">{t("completedSessions")}</span>
                 <span className="font-semibold">{sessionStats.completedSessions}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Đang hoạt động:</span>
+                <span className="text-sm text-muted-foreground">{t("activeSessions")}</span>
                 <span className="font-semibold">{sessionStats.activeSessions}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">DT TB/phiên:</span>
+                <span className="text-sm text-muted-foreground">{t("avgRevenuePerSession")}</span>
                 <span className="font-semibold">{formatCurrency(sessionStats.avgRevenuePerSession)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">TB đơn/phiên:</span>
+                <span className="text-sm text-muted-foreground">{t("avgOrdersPerSession")}</span>
                 <span className="font-semibold">{sessionStats.avgOrdersPerSession.toFixed(1)}</span>
               </div>
             </CardContent>
@@ -484,27 +488,29 @@ export default function DashboardMain() {
         {tablePerformance && (
           <Card>
             <CardHeader>
-              <CardTitle>Hiệu suất bàn</CardTitle>
+              <CardTitle>{t("tablePerformanceTitle")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Tổng số bàn:</span>
+                <span className="text-sm text-muted-foreground">{t("totalTables")}</span>
                 <span className="font-semibold">{totalTables}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Tỷ lệ sử dụng:</span>
+                <span className="text-sm text-muted-foreground">{t("utilizationRate")}</span>
                 <span className="font-semibold">{utilizationRate.toFixed(1)}%</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">TB phiên/bàn:</span>
+                <span className="text-sm text-muted-foreground">{t("avgSessionsPerTable")}</span>
                 <span className="font-semibold">{avgSessionsPerTable.toFixed(1)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">TL TB phiên:</span>
-                <span className="font-semibold">{(avgSessionDuration / 60).toFixed(0)} phút</span>
+                <span className="text-sm text-muted-foreground">{t("avgSessionDuration")}</span>
+                <span className="font-semibold">
+                  {(avgSessionDuration / 60).toFixed(0)} {t("minutes")}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Tỷ lệ luân chuyển:</span>
+                <span className="text-sm text-muted-foreground">{t("turnoverRate")}</span>
                 <span className="font-semibold">{turnoverRate.toFixed(2)}</span>
               </div>
             </CardContent>

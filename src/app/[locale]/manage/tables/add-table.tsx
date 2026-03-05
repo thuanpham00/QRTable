@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,10 +22,12 @@ import { OrderModeType, OrderModeTypeValues, TableStatus, TableStatusValues } fr
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAddTableMutation } from "@/queries/useTable";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 import { Textarea } from "@/components/ui/textarea";
 
 export default function AddTable() {
   const addTableMutation = useAddTableMutation();
+  const t = useTranslations("ManageTables");
 
   const [open, setOpen] = useState(false);
   const form = useForm<CreateTableBodyType>({
@@ -74,7 +77,7 @@ export default function AddTable() {
       <DialogTrigger asChild>
         <Button size="sm" className="h-7 gap-1">
           <PlusCircle className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Thêm bàn</span>
+          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">{t("addTable")}</span>
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -82,7 +85,7 @@ export default function AddTable() {
         onCloseAutoFocus={() => form.reset()}
       >
         <DialogHeader>
-          <DialogTitle>Thêm bàn</DialogTitle>
+          <DialogTitle>{t("addTable")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -98,10 +101,10 @@ export default function AddTable() {
               <FormField
                 control={form.control}
                 name="number"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="name">Số hiệu bàn</Label>
+                      <Label htmlFor="name">{t("tableNumber")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input
                           id="number"
@@ -110,7 +113,9 @@ export default function AddTable() {
                           {...field}
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.number?.message) && t(errors.number?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -119,10 +124,10 @@ export default function AddTable() {
               <FormField
                 control={form.control}
                 name="capacity"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="price">Lượng khách cho phép</Label>
+                      <Label htmlFor="price">{t("capacity")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input
                           id="capacity"
@@ -131,7 +136,9 @@ export default function AddTable() {
                           type="number"
                           onChange={(e) => field.onChange(Number(e.target.value))}
                         />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.capacity?.message) && t(errors.capacity?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -143,12 +150,12 @@ export default function AddTable() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="description">Trạng thái</Label>
+                      <Label htmlFor="description">{t("status")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Chọn trạng thái" />
+                              <SelectValue placeholder={t("chooseStatus")} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -172,12 +179,12 @@ export default function AddTable() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="description">Loại mã QR</Label>
+                      <Label htmlFor="description">{t("qrType")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Chọn loại mã QR" />
+                              <SelectValue placeholder={t("chooseQrType")} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -198,13 +205,15 @@ export default function AddTable() {
               <FormField
                 control={form.control}
                 name="notes"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="notes">Ghi chú</Label>
+                      <Label htmlFor="notes">{t("notes")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Textarea id="notes" className="w-full" {...field} />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.notes?.message) && t(errors.notes?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -215,10 +224,10 @@ export default function AddTable() {
         </Form>
         <DialogFooter>
           <Button type="reset" form="add-table-form">
-            Xóa
+            {t("reset")}
           </Button>
           <Button type="submit" form="add-table-form" className="bg-blue-500 hover:bg-blue-400 text-white">
-            Thêm
+            {t("create")}
           </Button>
         </DialogFooter>
       </DialogContent>

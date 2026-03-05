@@ -61,15 +61,15 @@ export const DishListRes = z.object({
 export type DishListResType = z.TypeOf<typeof DishListRes>;
 
 export const CreateDishBody = z.object({
-  name: z.string().min(5).max(256),
-  price: z.number().min(1000),
-  description: z.string().max(10000).optional(),
-  image: z.string().url(),
+  name: z.string().min(5, { message: "nameTooShort" }).max(256, { message: "nameTooLong" }),
+  price: z.number().min(1000, { message: "priceTooLow" }),
+  description: z.string().max(10000, { message: "descriptionTooLong" }).optional(),
+  image: z.string().url({ message: "invalidUrl" }),
   status: z.enum(DishStatusValues).optional(),
-  categoryId: z.string(), // bắt buộc chọn
+  categoryId: z.string().min(1, { message: "categoryRequired" }),
 
   spicyLevel: z.number().min(0).max(3),
-  preparationTime: z.number().min(1),
+  preparationTime: z.number().min(1, { message: "preparationTimeRequired" }),
   popularity: z.number().optional(),
   dietaryTags: z.string().optional(),
   searchKeywords: z.string().optional(),
@@ -136,9 +136,9 @@ export type DishIngredientListResType = z.TypeOf<typeof DishIngredientListRes>;
 
 export const AddIngredientToDish = z.object({
   dishId: z.number(),
-  ingredientId: z.number(),
-  quantity: z.number().min(1),
-  unit: z.string().min(1),
+  ingredientId: z.number().min(1, { message: "ingredientRequired" }),
+  quantity: z.number().min(1, { message: "quantityMin" }),
+  unit: z.string().min(1, { message: "unitRequired" }),
   isOptional: z.boolean().optional(),
   isMain: z.boolean().optional(),
 });

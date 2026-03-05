@@ -1,6 +1,8 @@
+"use client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function CleanTableDialog({
   showModalCleaningTable,
@@ -17,6 +19,7 @@ export default function CleanTableDialog({
   guestCount?: number;
   isLoading?: boolean;
 }) {
+  const t = useTranslations("ManageOrders");
   return (
     <Dialog
       open={showModalCleaningTable}
@@ -31,9 +34,9 @@ export default function CleanTableDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl">
             <AlertTriangle className="h-6 w-6 text-orange-500" />
-            Xác nhận dọn dẹp bàn
+            {t("cleanTableTitle")}
           </DialogTitle>
-          <DialogDescription>Hành động này không thể hoàn tác</DialogDescription>
+          <DialogDescription>{t("cleanTableIrreversible")}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
@@ -41,38 +44,38 @@ export default function CleanTableDialog({
           <div className="bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900 rounded-lg p-4">
             <div className="space-y-2 text-sm">
               <p className="font-semibold text-orange-800 dark:text-orange-200">
-                Bạn đang chuẩn bị dọn dẹp bàn số {tableNumber}
+                {t("cleanTablePreparing", { number: tableNumber })}
               </p>
-              <p className="text-orange-700 dark:text-orange-300">Khi xác nhận, hệ thống sẽ thực hiện:</p>
+              <p className="text-orange-700 dark:text-orange-300">{t("cleanTableConfirmSubtitle")}</p>
               <ul className="list-disc list-inside space-y-1 text-orange-700 dark:text-orange-300 ml-2">
-                <li>Đăng xuất tất cả {guestCount || 0} khách thuộc phiên này</li>
-                <li>Đóng phiên bàn hiện tại</li>
-                <li>Đưa bàn về trạng thái sẵn sàng phục vụ khách mới</li>
+                <li>{t("cleanTableAction1", { count: guestCount || 0 })}</li>
+                <li>{t("cleanTableAction2")}</li>
+                <li>{t("cleanTableAction3")}</li>
               </ul>
             </div>
           </div>
 
           {/* Confirmation Question */}
           <div className="text-center">
-            <p className="text-sm font-medium text-foreground">Bạn có chắc chắn muốn tiếp tục?</p>
+            <p className="text-sm font-medium text-foreground">{t("cleanTableConfirmQuestion")}</p>
           </div>
         </div>
 
         {/* Action Buttons */}
         <div className="flex gap-3 justify-end">
           <Button variant="outline" onClick={() => setShowModalCleaningTable(false)} disabled={isLoading}>
-            Hủy
+            {t("cancel")}
           </Button>
           <Button variant="destructive" onClick={onConfirm} disabled={isLoading} className="gap-2">
             {isLoading ? (
               <>
                 <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                Đang xử lý...
+                {t("processing")}
               </>
             ) : (
               <>
                 <AlertTriangle className="h-4 w-4" />
-                Xác nhận dọn dẹp
+                {t("cleanTableConfirmButton")}
               </>
             )}
           </Button>

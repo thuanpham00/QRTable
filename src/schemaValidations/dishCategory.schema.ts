@@ -54,8 +54,8 @@ export const DishCategoryNameListRes = z.object({
 export type DishCategoryNameListResType = z.TypeOf<typeof DishCategoryNameListRes>;
 
 export const CreateDishCategoryBody = z.object({
-  name: z.string().min(5).max(256),
-  description: z.string().max(10000),
+  name: z.string().min(5, { message: "nameTooShort" }).max(256, { message: "nameTooLong" }),
+  description: z.string().max(10000, { message: "descriptionTooLong" }),
 });
 
 export type CreateDishCategoryBodyType = z.TypeOf<typeof CreateDishCategoryBody>;

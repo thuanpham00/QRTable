@@ -9,7 +9,7 @@ import { UpdateOrderBody, UpdateOrderBodyType } from "@/schemaValidations/order.
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { getVietnameseOrderStatus, handleErrorApi } from "@/lib/utils";
+import { handleErrorApi } from "@/lib/utils";
 import { OrderStatus, OrderStatusValues } from "@/constants/type";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DishesDialog } from "@/app/[locale]/manage/orders/dishes-dialog";
@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
 import { useGetOrderDetailQuery, useUpdateOrderMutation } from "@/queries/useOrder";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 export default function EditOrder({
   id,
@@ -25,6 +26,8 @@ export default function EditOrder({
   id?: number | undefined;
   setId: (value: number | undefined) => void;
 }) {
+  const t = useTranslations("ManageOrders");
+
   const updateOrderMutation = useUpdateOrderMutation();
   const orderDetail = useGetOrderDetailQuery({ id: id as number, enabled: Boolean(id) });
   const dataOrderDetail = orderDetail.data?.payload.data;
@@ -86,7 +89,7 @@ export default function EditOrder({
     >
       <DialogContent className="sm:max-w-150 max-h-screen overflow-auto">
         <DialogHeader>
-          <DialogTitle>Cập nhật đơn hàng</DialogTitle>
+          <DialogTitle>{t("editOrder")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -101,7 +104,7 @@ export default function EditOrder({
                 name="menuItemId"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-4 items-center justify-items-start gap-4">
-                    <FormLabel>Món ăn</FormLabel>
+                    <FormLabel>{t("dish")}</FormLabel>
                     <div className="flex items-center col-span-2 space-x-4">
                       <Avatar className="aspect-square w-30 h-30 rounded-md border-gray-500 border object-cover">
                         <AvatarImage src={selectedMenuItem?.image || selectedMenuItem?.dish?.image} />
@@ -128,7 +131,7 @@ export default function EditOrder({
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="quantity">Số lượng</Label>
+                      <Label htmlFor="quantity">{t("quantity")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input
                           id="quantity"
@@ -157,7 +160,7 @@ export default function EditOrder({
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <FormLabel>Trạng thái</FormLabel>
+                      <FormLabel>{t("status")}</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
@@ -168,13 +171,13 @@ export default function EditOrder({
                       >
                         <FormControl className="col-span-3">
                           <SelectTrigger className="w-50">
-                            <SelectValue placeholder="Trạng thái" />
+                            <SelectValue placeholder={t("status")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           {OrderStatusValues.map((status) => (
                             <SelectItem key={status} value={status}>
-                              {getVietnameseOrderStatus(status)}
+                              {t(status)}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -189,7 +192,7 @@ export default function EditOrder({
         </Form>
         <DialogFooter>
           <Button type="submit" form="edit-order-form">
-            Lưu
+            {t("save")}
           </Button>
         </DialogFooter>
       </DialogContent>

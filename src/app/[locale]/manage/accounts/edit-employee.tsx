@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/incompatible-library */
 "use client";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ import { handleErrorApi } from "@/lib/utils";
 import InputPassword from "@/app/[locale]/manage/setting/input-password";
 import { Role, RoleValues } from "@/constants/type";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 
 export default function EditEmployee({
   id,
@@ -34,6 +36,8 @@ export default function EditEmployee({
   id?: number | undefined;
   setId: (value: number | undefined) => void;
 }) {
+  const t = useTranslations("ManageAccounts");
+
   const accountDetail = useGetEmployeeDetailQuery({ id: id as number, enabled: Boolean(id) });
   const dataAccountDetail = accountDetail.data?.payload.data;
 
@@ -137,8 +141,8 @@ export default function EditEmployee({
     >
       <DialogContent className="sm:max-w-150 max-h-screen overflow-auto">
         <DialogHeader>
-          <DialogTitle>Cập nhật tài khoản</DialogTitle>
-          <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
+          <DialogTitle>{t("editAccount")}</DialogTitle>
+          <DialogDescription>{t("descriptionEdit")}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -186,12 +190,14 @@ export default function EditEmployee({
               <FormField
                 control={form.control}
                 name="name"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid gap-2">
-                      <Label htmlFor="name">Tên</Label>
+                      <Label htmlFor="name">{t("name")}</Label>
                       <Input id="name" className="w-full" {...field} />
-                      <FormMessage />
+                      <FormMessage>
+                        {Boolean(errors.name?.message) && t(errors.name?.message as any)}
+                      </FormMessage>
                     </div>
                   </FormItem>
                 )}
@@ -200,12 +206,17 @@ export default function EditEmployee({
               <FormField
                 control={form.control}
                 name="email"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid gap-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email">{t("email")}</Label>
                       <Input id="email" className="w-full" {...field} />
-                      <FormMessage />
+                      <FormMessage>
+                        {errors.email?.message &&
+                          (errors.email.type === "server"
+                            ? t("emailExisted") // Lỗi từ server → dịch key
+                            : t(errors.email.message as any))}{" "}
+                      </FormMessage>
                     </div>
                   </FormItem>
                 )}
@@ -214,10 +225,10 @@ export default function EditEmployee({
               <FormField
                 control={form.control}
                 name="role"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid gap-2">
-                      <Label htmlFor="role">Vai trò</Label>
+                      <Label htmlFor="role">{t("role")}</Label>
                       <div className="w-full">
                         <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                           <FormControl>
@@ -236,7 +247,9 @@ export default function EditEmployee({
                             })}
                           </SelectContent>
                         </Select>
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.role?.message) && t(errors.role?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -246,15 +259,18 @@ export default function EditEmployee({
               <FormField
                 control={form.control}
                 name="changePassword"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="flex items-center gap-2">
                       <Label htmlFor="email" className="shrink-0">
-                        Đổi mật khẩu
+                        {t("changePassword")}
                       </Label>
                       <div className="ml-1">
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.changePassword?.message) &&
+                            t(errors.changePassword?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -264,9 +280,15 @@ export default function EditEmployee({
                 <FormField
                   control={form.control}
                   name="password"
-                  render={({ field }) => (
+                  render={({ field, formState: { errors } }) => (
                     <FormItem>
-                      <InputPassword field={field} label="Mật khẩu" controlLabel="password" />
+                      <InputPassword
+                        field={field}
+                        label={t("password")}
+                        controlLabel="password"
+                        nameI18="ManageAccounts"
+                        fieldError={errors.password?.message}
+                      />
                     </FormItem>
                   )}
                 />
@@ -275,12 +297,14 @@ export default function EditEmployee({
                 <FormField
                   control={form.control}
                   name="confirmPassword"
-                  render={({ field }) => (
+                  render={({ field, formState: { errors } }) => (
                     <FormItem>
                       <InputPassword
                         field={field}
-                        label="Xác nhận mật khẩu mới"
+                        label={t("confirmPassword")}
                         controlLabel="confirmPassword"
+                        nameI18="ManageAccounts"
+                        fieldError={errors.confirmPassword?.message}
                       />
                     </FormItem>
                   )}
@@ -291,7 +315,7 @@ export default function EditEmployee({
         </Form>
         <DialogFooter>
           <Button type="submit" form="edit-employee-form">
-            Lưu
+            {t("save")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/incompatible-library */
 "use client";
 import { Button } from "@/components/ui/button";
@@ -25,8 +26,10 @@ import { toast } from "sonner";
 import { useUploadMutation } from "@/queries/useMedia";
 import { useAddIngredientMutation } from "@/queries/useIngredient";
 import { Switch } from "@/components/ui/switch";
+import { useTranslations } from "next-intl";
 
 export default function AddIngredient() {
+  const t = useTranslations("ManageIngredients");
   const uploadMutation = useUploadMutation();
   const addIngredientMutation = useAddIngredientMutation();
   const [file, setFile] = useState<File | null>(null);
@@ -112,12 +115,12 @@ export default function AddIngredient() {
       <DialogTrigger asChild>
         <Button size="sm" className="h-7 gap-1">
           <PlusCircle className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Thêm nguyên liệu</span>
+          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">{t("createIngredient")}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-150 max-h-screen overflow-auto">
         <DialogHeader>
-          <DialogTitle>Thêm nguyên liệu</DialogTitle>
+          <DialogTitle>{t("createIngredient")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -167,13 +170,15 @@ export default function AddIngredient() {
               <FormField
                 control={form.control}
                 name="name"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="name">Tên nguyên liệu</Label>
+                      <Label htmlFor="name">{t("nameIngredient")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input id="name" className="w-full" {...field} />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.name?.message) && t(errors.name?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -183,23 +188,25 @@ export default function AddIngredient() {
               <FormField
                 control={form.control}
                 name="category"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="category">Nhóm nguyên liệu</Label>
+                      <Label htmlFor="category">{t("categoryGroup")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                           <SelectTrigger>
-                            <SelectValue placeholder="Chọn nhóm nguyên liệu" />
+                            <SelectValue placeholder={t("chooseGroup")} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="rau-cu">Rau củ</SelectItem>
-                            <SelectItem value="thit-ca">Thịt cá</SelectItem>
-                            <SelectItem value="gia-vi">Gia vị</SelectItem>
-                            <SelectItem value="khac">Khác</SelectItem>
+                            <SelectItem value="rau-cu">{t("categoryVegetable")}</SelectItem>
+                            <SelectItem value="thit-ca">{t("categoryMeat")}</SelectItem>
+                            <SelectItem value="gia-vi">{t("categorySpice")}</SelectItem>
+                            <SelectItem value="khac">{t("categoryOther")}</SelectItem>
                           </SelectContent>
                         </Select>
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.category?.message) && t(errors.category?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -212,7 +219,7 @@ export default function AddIngredient() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="allergenType">Loại dị ứng</Label>
+                      <Label htmlFor="allergenType">{t("allergenType")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input id="allergenType" className="w-full" {...field} />
                         <FormMessage />
@@ -228,7 +235,7 @@ export default function AddIngredient() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="isVegetarian">Ăn chay</Label>
+                      <Label htmlFor="isVegetarian">{t("isVegetarian")}</Label>
                       <div className="col-span-3 w-full space-y-2 flex items-center gap-2">
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
                         <FormMessage />
@@ -244,7 +251,7 @@ export default function AddIngredient() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="isVegan">Thuần chay</Label>
+                      <Label htmlFor="isVegan">{t("isVegan")}</Label>
                       <div className="col-span-3 w-full space-y-2 flex items-center gap-2">
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
                         <FormMessage />
@@ -257,13 +264,15 @@ export default function AddIngredient() {
               <FormField
                 control={form.control}
                 name="description"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="description">Mô tả</Label>
+                      <Label htmlFor="description">{t("description2")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Textarea id="description" className="w-full" {...field} />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.description?.message) && t(errors.description?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -276,7 +285,7 @@ export default function AddIngredient() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="isActive">Trạng thái</Label>
+                      <Label htmlFor="isActive">{t("isActive")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
                         <FormMessage />
@@ -290,14 +299,14 @@ export default function AddIngredient() {
         </Form>
         <DialogFooter>
           <Button type="reset" form="add-ingredient-form">
-            Xóa
+            {t("cancel")}
           </Button>
           <Button
             type="submit"
             form="add-ingredient-form"
             className="bg-blue-500 hover:bg-blue-400 text-white"
           >
-            Thêm
+            {t("create")}
           </Button>
         </DialogFooter>
       </DialogContent>

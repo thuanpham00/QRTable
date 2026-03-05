@@ -59,7 +59,7 @@ export default function PopularDishes({ data }: { data: DishSuggestList }) {
               {data.map((dish, index) => (
                 <SwiperSlide key={dish.id}>
                   <div
-                    className="group relative backdrop-blur-sm rounded-2xl overflow-hidden transition-all duration-500 bg-gray-50 dark:bg-border border border-border shadow hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-2"
+                    className="group relative backdrop-blur-sm rounded-2xl overflow-hidden transition-all duration-500 bg-background dark:bg-border border-2 border-border hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-2"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     {/* Glow effect */}
@@ -96,7 +96,7 @@ export default function PopularDishes({ data }: { data: DishSuggestList }) {
                       </p>
 
                       <div className="flex items-center justify-between">
-                        <div className="text-sm font-bold text-white bg-linear-to-r from-orange-500 to-amber-500 inline-block px-3 py-1 rounded-lg shadow-lg">
+                        <div className="text-xl font-bold text-gray-800 dark:text-white rounded-lg">
                           {formatCurrency(dish.price)}
                         </div>
 

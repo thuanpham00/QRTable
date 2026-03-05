@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,8 +22,10 @@ import { toast } from "sonner";
 import revalidateApiRequests from "@/apiRequests/revalidate";
 import { useAddMenuMutation } from "@/queries/useMenu";
 import { CreateMenuBody, CreateMenuBodyType } from "@/schemaValidations/menu.schema";
+import { useTranslations } from "next-intl";
 
 export default function AddMenu() {
+  const t = useTranslations("ManageMenus");
   const addMenuMutation = useAddMenuMutation();
 
   const [open, setOpen] = useState(false);
@@ -76,12 +79,12 @@ export default function AddMenu() {
       <DialogTrigger asChild>
         <Button size="sm" className="h-7 gap-1">
           <PlusCircle className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Tạo menu</span>
+          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">{t("createMenu")}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-150 max-h-screen overflow-auto">
         <DialogHeader>
-          <DialogTitle>Tạo menu</DialogTitle>
+          <DialogTitle>{t("createMenu")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -97,13 +100,15 @@ export default function AddMenu() {
               <FormField
                 control={form.control}
                 name="name"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="name">Tên menu</Label>
+                      <Label htmlFor="name">{t("nameMenu")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input id="name" className="w-full" {...field} />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.name?.message) && t(errors.name?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -113,13 +118,15 @@ export default function AddMenu() {
               <FormField
                 control={form.control}
                 name="description"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="description">Mô tả menu</Label>
+                      <Label htmlFor="description">{t("descriptionMenu")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Textarea id="description" className="w-full" {...field} />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.description?.message) && t(errors.description?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -130,10 +137,10 @@ export default function AddMenu() {
         </Form>
         <DialogFooter>
           <Button type="reset" form="add-dish-form">
-            Xóa
+            {t("delete")}
           </Button>
           <Button type="submit" form="add-dish-form" className="bg-blue-500 hover:bg-blue-400 text-white">
-            Thêm
+            {t("create")}
           </Button>
         </DialogFooter>
       </DialogContent>

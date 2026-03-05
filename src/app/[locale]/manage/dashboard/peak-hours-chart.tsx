@@ -4,27 +4,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { DashboardIndicatorResType } from "@/schemaValidations/indicator.schema";
 import { formatCurrency } from "@/lib/utils";
-
-const chartConfig = {
-  sessionCount: {
-    label: "Số phiên",
-    color: "#8b5cf6", // purple-500
-  },
-  revenue: {
-    label: "Doanh thu",
-    color: "#f97316", // orange-500
-  },
-} satisfies ChartConfig;
+import { useTranslations } from "next-intl";
 
 export function PeakHoursChart({
   peakHours,
 }: {
   peakHours: DashboardIndicatorResType["data"]["timeAnalytics"]["peakHours"];
 }) {
+  const t = useTranslations("ManageDashboard");
+
+  const chartConfig = {
+    sessionCount: { label: t("sessionCountLabel"), color: "#8b5cf6" },
+    revenue: { label: t("revenueLabel"), color: "#f97316" },
+  } satisfies ChartConfig;
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Giờ cao điểm</CardTitle>
+        <CardTitle>{t("peakHoursChartTitle")}</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -58,7 +55,12 @@ export function PeakHoursChart({
                 />
               }
             />
-            <Bar dataKey="sessionCount" fill="var(--color-sessionCount)" radius={4} name="Số phiên" />
+            <Bar
+              dataKey="sessionCount"
+              fill="var(--color-sessionCount)"
+              radius={4}
+              name={t("sessionCountLabel")}
+            />
           </BarChart>
         </ChartContainer>
       </CardContent>

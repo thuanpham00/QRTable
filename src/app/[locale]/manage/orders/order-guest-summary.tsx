@@ -22,6 +22,7 @@ import { CreatePaymentResType } from "@/schemaValidations/payment.schema";
 import { useRouter } from "@/i18n/routing";
 import { useAppStore } from "@/components/app-provider";
 import { useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 /**
  * Nếu parent component đã là Client Component (có "use client"), thì tất cả child components tự động trở thành Client Components, không cần khai báo lại.
@@ -35,6 +36,7 @@ type Orders = GetOrdersResType["data"];
  * Dùng cho trang overview bàn /manage/orders/tables/[id]
  */
 export default function OrderGuestSummary({ guest, orders }: { guest: Guest; orders: Orders }) {
+  const t = useTranslations("ManageOrders");
   const socket = useAppStore((state) => state.socket);
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -303,11 +305,11 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
                 </Badge>
               </div>
               <div className="text-xs text-muted-foreground">
-                Đăng ký: {formatDateTimeToLocaleString(guest.createdAt)}
+                {t("register")}: {formatDateTimeToLocaleString(guest.createdAt)}
               </div>
             </div>
             <div className="text-right">
-              <div className="text-sm text-muted-foreground">Bàn số</div>
+              <div className="text-sm text-muted-foreground">{t("table")}</div>
               <div className="text-2xl font-bold">{guest.tableNumber}</div>
             </div>
           </div>
@@ -316,7 +318,9 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
       )}
 
       <div className="space-y-2">
-        <div className="font-semibold text-sm">Danh sách món ({orders.length}):</div>
+        <div className="font-semibold text-sm">
+          {t("dishList")} ({orders.length}):
+        </div>
         <div className="space-y-2 h-75 overflow-y-auto">
           {orders.map((order, index) => {
             return (
@@ -360,19 +364,23 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
                                 : "bg-red-100 text-red-800 border-red-300"
                       }`}
                     >
-                      {getVietnameseOrderStatus(order.status)}
+                      {t(order.status)}
                     </Badge>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span>SL: {order.quantity}</span>
-                      <span>Đơn giá: {formatCurrency(order.dishSnapshot.price)}</span>
+                      <span>
+                        {t("quantity")}: {order.quantity}
+                      </span>
+                      <span>
+                        {t("unitPrice")}: {formatCurrency(order.dishSnapshot.price)}
+                      </span>
                       <span className="font-semibold text-foreground">
-                        Tổng: {formatCurrency(order.quantity * order.dishSnapshot.price)}
+                        {t("totalPrice")}: {formatCurrency(order.quantity * order.dishSnapshot.price)}
                       </span>
                     </div>
                     <span className="text-xs text-black dark:text-white">
-                      {order.orderMode === OrderModeType.DINE_IN ? "Tại chỗ" : "Mang về"}
+                      {order.orderMode === OrderModeType.DINE_IN ? t("dineIn") : t("takeaway")}
                     </span>
                   </div>
                 </div>
@@ -386,14 +394,14 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1">
-          <div className="text-xs text-muted-foreground">Chưa thanh toán</div>
+          <div className="text-xs text-muted-foreground">{t("totalUnpaid")}</div>
           <div className="text-lg font-bold text-orange-600">{formatCurrency(totalUnpaid)}</div>
-          <div className="text-xs text-muted-foreground">{ordersFilterToPurchase.length} đơn</div>
+          <div className="text-xs text-muted-foreground">{ordersFilterToPurchase.length} {t("order")}</div>
         </div>
         <div className="space-y-1">
-          <div className="text-xs text-muted-foreground">Đã thanh toán</div>
+          <div className="text-xs text-muted-foreground">{t("totalPaid")}</div>
           <div className="text-lg font-bold text-green-600">{formatCurrency(totalPaid)}</div>
-          <div className="text-xs text-muted-foreground">{purchasedOrderFilter.length} đơn</div>
+          <div className="text-xs text-muted-foreground">{purchasedOrderFilter.length} {t("order")}</div>
         </div>
       </div>
 
@@ -406,7 +414,7 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
         disabled={ordersFilterToPurchase.length === 0 || payOrderMutation.isPending}
         onClick={handlePayGuest}
       >
-        💳 Thanh toán Guest này ({ordersFilterToPurchase.length} đơn)
+        💳 {t("payThisGuest")} ({ordersFilterToPurchase.length} {t("order")})
       </Button>
 
       <Dialog
@@ -423,9 +431,9 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
       >
         <DialogContent className="sm:max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle>Hóa đơn thanh toán</DialogTitle>
+            <DialogTitle>{t("invoiceTitle")}</DialogTitle>
             <DialogDescription>
-              Khách hàng: <span className="font-semibold">{guest?.name}</span> - Bàn số:{" "}
+              {t("customerLabel")} <span className="font-semibold">{guest?.name}</span> - {t("tableNumberLabel")}{" "}
               <span className="font-semibold">{guest?.tableNumber}</span>
             </DialogDescription>
           </DialogHeader>
@@ -436,11 +444,11 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
               <div className="text-center space-y-1 pb-3 border-b">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex-1"></div>
-                  <div className="text-lg font-bold">HÓA ĐƠN THANH TOÁN</div>
+                  <div className="text-lg font-bold">{t("invoiceHeading")}</div>
                   <div className="flex-1 flex justify-end">
                     <Button variant="outline" size="sm" onClick={handlePrintBill} className="gap-2">
                       <Printer className="h-4 w-4" />
-                      In hóa đơn
+                      {t("printInvoice")}
                     </Button>
                   </div>
                 </div>
@@ -449,13 +457,13 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
 
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Khách hàng:</span>
+                  <span className="text-muted-foreground">{t("customerLabel")}</span>
                   <span className="font-semibold">
                     {guest?.name} (#{guest?.id})
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Bàn số:</span>
+                  <span className="text-muted-foreground">{t("tableNumberLabel")}</span>
                   <span className="font-semibold">{guest?.tableNumber}</span>
                 </div>
               </div>
@@ -463,7 +471,7 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
               <Separator />
 
               <div className="space-y-2">
-                <div className="font-semibold text-sm">Chi tiết món ({ordersFilterToPurchase.length}):</div>
+                <div className="font-semibold text-sm">{t("dishDetails", { count: ordersFilterToPurchase.length })}</div>
                 <div className="space-y-2 max-h-60 overflow-y-auto">
                   {ordersFilterToPurchase.map((order, index) => (
                     <div
@@ -499,16 +507,16 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
 
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Tạm tính:</span>
+                  <span className="text-muted-foreground">{t("subtotal")}</span>
                   <span className="font-semibold">{formatCurrency(totalUnpaid)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Giảm giá:</span>
+                  <span className="text-muted-foreground">{t("discount")}</span>
                   <span className="font-semibold">0 ₫</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-lg font-bold">Tổng cộng:</span>
+                  <span className="text-lg font-bold">{t("grandTotal")}</span>
                   <span className="text-2xl font-bold text-orange-600">{formatCurrency(totalUnpaid)}</span>
                 </div>
               </div>
@@ -516,7 +524,7 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
 
             {/* Cột phải: Phương thức thanh toán */}
             <div className="col-span-1 space-y-4">
-              <div className="text-base font-semibold border-b pb-2">Phương thức thanh toán</div>
+              <div className="text-base font-semibold border-b pb-2">{t("paymentMethodTitle")}</div>
 
               {/* Option 1: Tiền mặt */}
               <div
@@ -535,8 +543,8 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
                 <div className="flex items-center gap-3 mb-3">
                   <div className="text-3xl">💵</div>
                   <div className="flex-1">
-                    <div className="font-semibold text-base">Tiền mặt</div>
-                    <div className="text-xs text-muted-foreground">Thanh toán trực tiếp</div>
+                    <div className="font-semibold text-base">{t("paymentCash")}</div>
+                    <div className="text-xs text-muted-foreground">{t("cashDirectPayment")}</div>
                   </div>
                   {selectedPaymentMethod === "CASH" && (
                     <div className="text-primary">
@@ -569,7 +577,7 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
                         htmlFor="cash-received"
                         className="text-sm font-medium cursor-pointer leading-tight"
                       >
-                        Xác nhận đã nhận tiền mặt từ khách
+                        {t("confirmCashReceived")}
                       </Label>
                     </div>
 
@@ -579,7 +587,7 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
                       onClick={handleConfirmCashPayment}
                       disabled={payOrderMutation.isPending || !cashReceived}
                     >
-                      {payOrderMutation.isPending ? "Đang xử lý..." : "💰 Xác nhận thanh toán"}
+                      {payOrderMutation.isPending ? t("processing") : `💰 ${t("confirmPayment")}`}
                     </Button>
                   </div>
                 )}
@@ -602,7 +610,7 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
                   <div className="text-3xl">🏦</div>
                   <div className="flex-1">
                     <div className="font-semibold text-base">SeePay</div>
-                    <div className="text-xs text-muted-foreground">Chuyển khoản ngân hàng</div>
+                    <div className="text-xs text-muted-foreground">{t("sepayBankTransfer")}</div>
                   </div>
                   {selectedPaymentMethod === "SEPAY" && (
                     <div className="text-primary">
@@ -629,7 +637,7 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
                       }}
                       disabled={payOrderMutation.isPending}
                     >
-                      {payOrderMutation.isPending ? "Đang xử lý..." : "🏦 Xác nhận thanh toán"}
+                      {payOrderMutation.isPending ? t("processing") : `🏦 ${t("confirmPayment")}`}
                     </Button>
                   </div>
                 )}
@@ -638,7 +646,7 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
               {/* Hint text */}
               {!selectedPaymentMethod && (
                 <div className="text-center text-sm text-muted-foreground py-4 border rounded-lg bg-muted/20">
-                  👆 Chọn phương thức thanh toán để tiếp tục
+                  👆 {t("selectPaymentHint")}
                 </div>
               )}
             </div>
@@ -658,7 +666,7 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
         <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="text-center text-xl">
-              Hướng dẫn thanh toán qua chuyển khoản ngân hàng
+              {t("bankTransferGuide")}
             </DialogTitle>
           </DialogHeader>
 
@@ -667,7 +675,7 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
               {/* Cột trái: QR Code */}
               <div className="space-y-4 flex flex-col items-center border-r pr-6">
                 <div className="text-center">
-                  <div className="font-semibold text-base mb-2">Cách 1: Mở app ngân hàng và quét mã QR</div>
+                  <div className="font-semibold text-base mb-2">{t("qrMethod")}</div>
                 </div>
 
                 {/* SeePay Logo */}
@@ -729,14 +737,14 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
                       d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                     />
                   </svg>
-                  Tải ảnh QR
+                  {t("downloadQr")}
                 </Button>
 
                 {/* Payment Status */}
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-muted-foreground">Trạng thái:</span>
+                  <span className="text-muted-foreground">{t("statusLabel")}</span>
                   <span className="font-medium text-orange-600 flex items-center gap-2">
-                    Chờ thanh toán...
+                    {t("awaitingPayment")}
                     <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                       <circle
                         className="opacity-25"
@@ -761,7 +769,7 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
                 <div className="space-y-4 pl-6">
                   <div className="text-center">
                     <div className="font-semibold text-base mb-4">
-                      Cách 2: Chuyển khoản thủ công theo thông tin
+                      {t("manualMethod")}
                     </div>
                   </div>
 
@@ -771,29 +779,29 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
                     <div className="font-bold text-lg">MB</div>
                   </div>
 
-                  <div className="text-center text-sm font-semibold mb-6">Ngân hàng MBBank</div>
+                  <div className="text-center text-sm font-semibold mb-6">{t("mbBankName")}</div>
 
                   {/* Bank Information */}
                   <div className="space-y-3 bg-muted/30 p-4 rounded-lg">
                     <div className="flex justify-between items-center py-2 border-b">
-                      <span className="text-sm text-muted-foreground">Chủ tài khoản:</span>
+                      <span className="text-sm text-muted-foreground">{t("accountHolder")}</span>
                       <span className="font-semibold">{paymentExists.bankInfo.accountName}</span>
                     </div>
 
                     <div className="flex justify-between items-center py-2 border-b">
-                      <span className="text-sm text-muted-foreground">Số TK:</span>
+                      <span className="text-sm text-muted-foreground">{t("accountNumber")}</span>
                       <span className="font-semibold">{paymentExists.bankInfo.accountNumber}</span>
                     </div>
 
                     <div className="flex justify-between items-center py-2 border-b">
-                      <span className="text-sm text-muted-foreground">Số tiền:</span>
+                      <span className="text-sm text-muted-foreground">{t("amountLabel")}</span>
                       <span className="font-semibold text-orange-600">
                         {formatCurrency(paymentExists.bankInfo.amount)}
                       </span>
                     </div>
 
                     <div className="flex justify-between items-center py-2">
-                      <span className="text-sm text-muted-foreground">Nội dung CK:</span>
+                      <span className="text-sm text-muted-foreground">{t("transferContent")}</span>
                       <span className="font-bold text-primary">{paymentExists.bankInfo.content}</span>
                     </div>
                   </div>
@@ -801,11 +809,10 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
                   {/* Important Notice */}
                   <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mt-4">
                     <div className="flex gap-2 text-xs text-amber-800">
-                      <span className="font-semibold shrink-0">Lưu ý:</span>
+                      <span className="font-semibold shrink-0">{t("bankNotice")}</span>
                       <span>
-                        Vui lòng giữ nguyên nội dung chuyển khoản{" "}
-                        <span className="font-bold">{paymentExists.bankInfo.content}</span> để hệ thống tự
-                        động xác nhận thanh toán
+                        {t("bankNoticeText1")}{" "}
+                        <span className="font-bold">{paymentExists.bankInfo.content}</span> {t("bankNoticeText2")}
                       </span>
                     </div>
                   </div>
@@ -822,26 +829,26 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
       >
         <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
-            <DialogTitle className="text-center text-xl">Thanh toán hoàn tất</DialogTitle>
+            <DialogTitle className="text-center text-xl">{t("paymentCompleteTitle")}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="text-center">
               <div className="text-3xl">✅</div>
-              <div className="text-lg font-semibold mt-2">Thanh toán thành công!</div>
+              <div className="text-lg font-semibold mt-2">{t("paymentSuccessMsg")}</div>
             </div>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span>Payment ID:</span>
+                <span>{t("paymentIdLabel")}</span>
                 <span className="font-medium">#{showModalPaymentSepayCompleted?.paymentId}</span>
               </div>
               <div className="flex justify-between">
-                <span>Số tiền:</span>
+                <span>{t("amountLabel")}</span>
                 <span className="font-medium text-orange-600">
                   {formatCurrency(Number(showModalPaymentSepayCompleted?.amount))}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span>Trạng thái:</span>
+                <span>{t("statusLabel")}</span>
                 <span className="font-medium text-green-600">{showModalPaymentSepayCompleted?.status}</span>
               </div>
             </div>
@@ -857,7 +864,7 @@ export default function OrderGuestSummary({ guest, orders }: { guest: Guest; ord
                   router.push("/manage/payments");
                 }}
               >
-                Quay về danh sách thanh toán
+                {t("backToPayments")}
               </Button>
             </div>
           </div>

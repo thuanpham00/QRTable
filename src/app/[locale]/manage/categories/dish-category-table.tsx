@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/incompatible-library */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
@@ -35,6 +36,7 @@ import { handleErrorApi } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem } from "@/components/ui/form";
+import { useTranslations } from "next-intl";
 
 type DishCategoryItem = DishCategoryListResType["data"][0];
 
@@ -51,19 +53,19 @@ const DishCategoryTableContext = createContext<{
   setDishCategoryDelete: (value: DishCategoryItem | null) => {},
 });
 
-export const columns: ColumnDef<DishCategoryItem>[] = [
+export const getColumns = (t: any): ColumnDef<DishCategoryItem>[] => [
   {
     accessorKey: "id",
-    header: "ID",
+    header: t("id"),
   },
   {
     accessorKey: "name",
-    header: "Tên",
+    header: t("name"),
     cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
   {
     accessorKey: "description",
-    header: "Mô tả",
+    header: t("description2"),
     cell: ({ row }) => (
       <div
         dangerouslySetInnerHTML={{ __html: row.getValue("description") }}
@@ -73,7 +75,7 @@ export const columns: ColumnDef<DishCategoryItem>[] = [
   },
   {
     accessorKey: "countDish",
-    header: "Số lượng món",
+    header: t("countDish"),
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         {row.getValue("countDish")}
@@ -85,7 +87,7 @@ export const columns: ColumnDef<DishCategoryItem>[] = [
   },
   {
     id: "actions",
-    header: "Hành động",
+    header: t("actions"),
     cell: function Actions({ row }) {
       const { setDishCategoryIdEdit, setDishCategoryDelete } = useContext(DishCategoryTableContext);
       const openEditDish = () => {
@@ -98,10 +100,10 @@ export const columns: ColumnDef<DishCategoryItem>[] = [
       return (
         <div className="flex items-center gap-2">
           <Button size="sm" onClick={openEditDish} className="bg-blue-500 hover:bg-blue-400 text-white">
-            Sửa
+            {t("edit")}
           </Button>
           <Button size="sm" onClick={openDeleteDish} className="bg-red-500 hover:bg-red-400 text-white">
-            Xóa
+            {t("delete")}
           </Button>
         </div>
       );
@@ -116,6 +118,7 @@ function AlertDialogDeleteDishCategory({
   dishCategoryDelete: DishCategoryItem | null;
   setDishCategoryDelete: (value: DishCategoryItem | null) => void;
 }) {
+  const t = useTranslations("ManageCategories");
   const deleteDishCategoryMutation = useDeleteDishCategoryMutation();
 
   const handleDelete = async () => {
@@ -147,24 +150,22 @@ function AlertDialogDeleteDishCategory({
     >
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Xóa danh mục?</AlertDialogTitle>
+          <AlertDialogTitle>{t("deleteCategoryTitle")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Danh mục{" "}
-            <span className="bg-foreground text-primary-foreground rounded px-1">
-              {dishCategoryDelete?.name}
-            </span>{" "}
-            sẽ bị xóa vĩnh viễn
+            {t("deleteCategoryDesc", { name: dishCategoryDelete?.name as string })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => setDishCategoryDelete(null)}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete}>Continue</AlertDialogAction>
+          <AlertDialogCancel onClick={() => setDishCategoryDelete(null)}>{t("cancel")}</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDelete}>{t("continue")}</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
 }
 export default function DishCategoryTable() {
+  const t = useTranslations("ManageCategories");
+  const columns = getColumns(t);
   const router = useRouter();
   const queryParams = useQueryParams();
 
@@ -257,7 +258,7 @@ export default function DishCategoryTable() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <Input placeholder="Lọc tên" className="max-w-sm" {...field} />
+                    <Input placeholder={t("filterName")} className="max-w-sm" {...field} />
                   </FormItem>
                 )}
               />
@@ -316,7 +317,7 @@ export default function DishCategoryTable() {
         </div>
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="text-xs text-muted-foreground py-4 flex-1 ">
-            Hiển thị <strong>{data.length}</strong> trong <strong>{total}</strong> kết quả
+            {t("showingOf", { count: data.length, total })}
           </div>
           <div>
             <AutoPagination

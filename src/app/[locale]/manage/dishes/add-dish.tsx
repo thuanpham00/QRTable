@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/incompatible-library */
 "use client";
 import { Button } from "@/components/ui/button";
@@ -26,8 +27,10 @@ import { toast } from "sonner";
 import { useUploadMutation } from "@/queries/useMedia";
 import { useAddDishMutation } from "@/queries/useDish";
 import { useGetListDishCategoryNameQuery } from "@/queries/useDishCategory";
+import { useTranslations } from "next-intl";
 
 export default function AddDish() {
+  const t = useTranslations("ManageDishes");
   const uploadMutation = useUploadMutation();
   const addDishMutation = useAddDishMutation();
   const listNameDishCategory = useGetListDishCategoryNameQuery();
@@ -44,7 +47,7 @@ export default function AddDish() {
       price: 0,
       status: DishStatus.Discontinued,
       image: undefined,
-      categoryId: undefined,
+      categoryId: "",
 
       spicyLevel: 0, // độ cay
       preparationTime: 0, // thời gian chuẩn bị
@@ -78,7 +81,6 @@ export default function AddDish() {
 
   const submit = async (values: CreateDishBodyType) => {
     if (addDishMutation.isPending) return;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let body: any = values;
     try {
       if (file) {
@@ -121,12 +123,12 @@ export default function AddDish() {
       <DialogTrigger asChild>
         <Button size="sm" className="h-7 gap-1">
           <PlusCircle className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Thêm món ăn</span>
+          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">{t("createDish")}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-300 max-h-screen overflow-auto">
         <DialogHeader>
-          <DialogTitle>Thêm món ăn</DialogTitle>
+          <DialogTitle>{t("createDish")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -177,13 +179,15 @@ export default function AddDish() {
                 <FormField
                   control={form.control}
                   name="name"
-                  render={({ field }) => (
+                  render={({ field, formState: { errors } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="name">Tên món ăn</Label>
+                        <Label htmlFor="name">{t("nameDish")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Input id="name" className="w-full" {...field} />
-                          <FormMessage />
+                          <FormMessage>
+                            {Boolean(errors.name?.message) && t(errors.name?.message as any)}
+                          </FormMessage>
                         </div>
                       </div>
                     </FormItem>
@@ -192,10 +196,10 @@ export default function AddDish() {
                 <FormField
                   control={form.control}
                   name="price"
-                  render={({ field }) => (
+                  render={({ field, formState: { errors } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="price">Giá</Label>
+                        <Label htmlFor="price">{t("priceDish")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Input
                             id="price"
@@ -204,7 +208,9 @@ export default function AddDish() {
                             type="number"
                             onChange={(e) => field.onChange(Number(e.target.value))}
                           />
-                          <FormMessage />
+                          <FormMessage>
+                            {Boolean(errors.price?.message) && t(errors.price?.message as any)}
+                          </FormMessage>
                         </div>
                       </div>
                     </FormItem>
@@ -214,13 +220,15 @@ export default function AddDish() {
                 <FormField
                   control={form.control}
                   name="description"
-                  render={({ field }) => (
+                  render={({ field, formState: { errors } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="description">Mô tả món ăn</Label>
+                        <Label htmlFor="description">{t("descriptionDish")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Textarea id="description" className="w-full" {...field} />
-                          <FormMessage />
+                          <FormMessage>
+                            {Boolean(errors.description?.message) && t(errors.description?.message as any)}
+                          </FormMessage>
                         </div>
                       </div>
                     </FormItem>
@@ -230,10 +238,10 @@ export default function AddDish() {
                 <FormField
                   control={form.control}
                   name="categoryId"
-                  render={({ field }) => (
+                  render={({ field, formState: { errors } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="categoryId">Danh mục</Label>
+                        <Label htmlFor="categoryId">{t("category")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Select
                             onValueChange={field.onChange}
@@ -242,7 +250,7 @@ export default function AddDish() {
                           >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Chọn danh mục" />
+                                <SelectValue placeholder={t("chooseCategory")} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -253,7 +261,9 @@ export default function AddDish() {
                               ))}
                             </SelectContent>
                           </Select>
-                          <FormMessage />
+                          <FormMessage>
+                            {Boolean(errors.categoryId?.message) && t(errors.categoryId?.message as any)}
+                          </FormMessage>
                         </div>
                       </div>
                     </FormItem>
@@ -266,7 +276,7 @@ export default function AddDish() {
                   render={({ field }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="status">Trạng thái</Label>
+                        <Label htmlFor="status">{t("status")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Select
                             onValueChange={field.onChange}
@@ -275,7 +285,7 @@ export default function AddDish() {
                           >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Chọn trạng thái" />
+                                <SelectValue placeholder={t("chooseStatus")} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -301,7 +311,7 @@ export default function AddDish() {
                   render={({ field }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="dietaryTags">Phân loại món ăn</Label>
+                        <Label htmlFor="dietaryTags">{t("dietaryTags")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Textarea id="dietaryTags" className="w-full" {...field} />
                           <FormMessage />
@@ -314,10 +324,10 @@ export default function AddDish() {
                 <FormField
                   control={form.control}
                   name="preparationTime"
-                  render={({ field }) => (
+                  render={({ field, formState: { errors } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="preparationTime">Thời gian chuẩn bị</Label>
+                        <Label htmlFor="preparationTime">{t("preparationTime")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Input
                             id="preparationTime"
@@ -326,7 +336,10 @@ export default function AddDish() {
                             {...field}
                             onChange={(e) => field.onChange(Number(e.target.value))}
                           />
-                          <FormMessage />
+                          <FormMessage>
+                            {Boolean(errors.preparationTime?.message) &&
+                              t(errors.preparationTime?.message as any)}
+                          </FormMessage>
                         </div>
                       </div>
                     </FormItem>
@@ -339,7 +352,7 @@ export default function AddDish() {
                   render={({ field }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="spicyLevel">Mức độ cay</Label>
+                        <Label htmlFor="spicyLevel">{t("spicyLevel")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Select
                             onValueChange={(value) => field.onChange(Number(value))}
@@ -348,14 +361,14 @@ export default function AddDish() {
                           >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Chọn mức độ cay" />
+                                <SelectValue placeholder={t("chooseSpicyLevel")} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value={"0"}>Không cay - 0</SelectItem>
-                              <SelectItem value={"1"}>Ít cay - 1</SelectItem>
-                              <SelectItem value={"2"}>Vừa cay - 2</SelectItem>
-                              <SelectItem value={"3"}>Rất cay - 3</SelectItem>
+                              <SelectItem value={"0"}>{t("spicy0")}</SelectItem>
+                              <SelectItem value={"1"}>{t("spicy1")}</SelectItem>
+                              <SelectItem value={"2"}>{t("spicy2")}</SelectItem>
+                              <SelectItem value={"3"}>{t("spicy3")}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -372,7 +385,7 @@ export default function AddDish() {
                   render={({ field }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="searchKeywords">Từ khóa tìm kiếm</Label>
+                        <Label htmlFor="searchKeywords">{t("searchKeywords")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Textarea id="searchKeywords" className="w-full" {...field} />
                           <FormMessage />
@@ -387,10 +400,10 @@ export default function AddDish() {
         </Form>
         <DialogFooter>
           <Button type="reset" form="add-dish-form">
-            Xóa
+            {t("reset")}
           </Button>
           <Button type="submit" form="add-dish-form" className="bg-blue-500 hover:bg-blue-400 text-white">
-            Thêm
+            {t("add")}
           </Button>
         </DialogFooter>
       </DialogContent>

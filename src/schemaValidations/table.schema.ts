@@ -18,10 +18,10 @@ export const TableQuery = BaseQuery.and(
 export type TableQueryType = z.TypeOf<typeof TableQuery>;
 
 export const CreateTableBody = z.object({
-  number: z.number().positive(),
-  capacity: z.number().positive(),
+  number: z.number().positive({ message: "numberPositive" }),
+  capacity: z.number().positive({ message: "capacityPositive" }),
   status: z.enum(TableStatusValues).optional(),
-  notes: z.string().max(500).optional(),
+  notes: z.string().max(500, { message: "notesTooLong" }).optional(),
   typeQR: z.enum(OrderModeTypeValues),
 });
 
@@ -55,9 +55,9 @@ export type TableListResType = z.TypeOf<typeof TableListRes>;
 
 export const UpdateTableBody = z.object({
   changeToken: z.boolean(),
-  capacity: z.number().positive(),
+  capacity: z.number().positive({ message: "capacityPositive" }),
   status: z.enum(TableStatusValues).optional(),
-  notes: z.string().max(500).optional(),
+  notes: z.string().max(500, { message: "notesTooLong" }).optional(),
   typeQR: z.enum(OrderModeTypeValues).optional(),
 });
 

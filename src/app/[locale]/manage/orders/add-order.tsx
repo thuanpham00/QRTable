@@ -24,7 +24,7 @@ import GuestsDialog from "@/app/[locale]/manage/orders/guests-dialog";
 import { CreateOrdersBodyType } from "@/schemaValidations/order.schema";
 import Quantity from "@/app/[locale]/guest/menu/quantity";
 import Image from "next/image";
-import { cn, formatCurrency, getVietnameseOrderModeStatus, handleErrorApi } from "@/lib/utils";
+import { cn, formatCurrency, handleErrorApi } from "@/lib/utils";
 import { useCreateOrderMutation } from "@/queries/useOrder";
 import { useCreateGuestMutation } from "@/queries/useAccount";
 import { toast } from "sonner";
@@ -32,8 +32,11 @@ import { useGetMenuActiveQuery } from "@/queries/useMenu";
 import { MenuActiveResType } from "@/schemaValidations/menu.schema";
 import { MenuItemStatus, OrderMode, OrderModeType, OrderModeTypeValues } from "@/constants/type";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 
 export default function AddOrder() {
+  const t = useTranslations("ManageOrders");
+
   const createOrderMutation = useCreateOrderMutation();
   const createGuestMutation = useCreateGuestMutation();
 
@@ -139,17 +142,17 @@ export default function AddOrder() {
       <DialogTrigger asChild>
         <Button size="sm" className="h-7 gap-1">
           <PlusCircle className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Tạo đơn hàng</span>
+          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">{t("createOrder")}</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-300 w-full max-h-screen overflow-auto">
         <DialogHeader>
-          <DialogTitle>Tạo đơn hàng</DialogTitle>
+          <DialogTitle>{t("createOrder")}</DialogTitle>
         </DialogHeader>
         <div className="flex items-start gap-4">
           <div className="w-[40%] flex flex-col gap-4">
             <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-              <Label htmlFor="isNewGuest">Khách hàng mới</Label>
+              <Label htmlFor="isNewGuest">{t("guestNew")}</Label>
               <div className="col-span-3 flex items-center justify-start">
                 <Switch id="isNewGuest" checked={isNewGuest} onCheckedChange={setIsNewGuest} />
               </div>
@@ -168,7 +171,7 @@ export default function AddOrder() {
                       render={({ field }) => (
                         <FormItem>
                           <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                            <Label htmlFor="name">Tên khách hàng</Label>
+                            <Label htmlFor="name">{t("guestName")}</Label>
                             <div className="col-span-3 w-full space-y-2">
                               <Input id="name" className="w-full" {...field} />
                               <FormMessage />
@@ -183,10 +186,10 @@ export default function AddOrder() {
                       render={({ field }) => (
                         <FormItem>
                           <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                            <Label htmlFor="tableNumber">Chọn bàn</Label>
+                            <Label htmlFor="tableNumber">{t("chooseTable")}</Label>
                             <div className="col-span-3 w-full space-y-2">
                               <div className="flex items-center gap-4">
-                                <div>{field.value}</div>
+                                <div>{t("table")} {field.value}</div>
                                 <TablesDialog
                                   onChoose={(table) => {
                                     field.onChange(table.number);
@@ -211,17 +214,17 @@ export default function AddOrder() {
             )}
             {!isNewGuest && selectedGuest && (
               <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                <Label htmlFor="selectedGuest">Khách đã chọn</Label>
+                <Label htmlFor="selectedGuest">{t("chooseGuest")}</Label>
                 <div className="col-span-3 w-full gap-4 flex items-center">
                   <div>
                     {selectedGuest.name} (#{selectedGuest.id})
                   </div>
-                  <div>Bàn: {selectedGuest.tableNumber}</div>
+                  <div>{t("table")}: {selectedGuest.tableNumber}</div>
                 </div>
               </div>
             )}
             <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-              <Label htmlFor="orderMode">Hình thức</Label>
+              <Label htmlFor="orderMode">{t("type")}</Label>
               <div className="col-span-3 flex items-center justify-start">
                 <Select
                   onValueChange={(val) => setOrderMode(val as OrderMode)}
@@ -234,7 +237,7 @@ export default function AddOrder() {
                   <SelectContent>
                     {OrderModeTypeValues.map((status) => (
                       <SelectItem key={status} value={status}>
-                        {getVietnameseOrderModeStatus(status)}
+                        {t(status)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -244,7 +247,7 @@ export default function AddOrder() {
           </div>
           <div className="w-[60%]">
             <Input
-              placeholder="Tên món ăn"
+              placeholder={t("searchDish")}
               value={searchDish}
               onChange={(event) => setSearchDish(event.target.value)}
               className="max-w-80 mb-4"
@@ -291,7 +294,7 @@ export default function AddOrder() {
 
             <DialogFooter>
               <Button className="w-full justify-between" onClick={handleOrder} disabled={orders.length === 0}>
-                <span>Đặt hàng · {orders.length} món</span>
+                <span>{t("orderSummary", { count: orders.length })}</span>
                 <span>{formatCurrency(totalPrice)}</span>
               </Button>
             </DialogFooter>

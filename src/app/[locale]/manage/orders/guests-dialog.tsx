@@ -20,13 +20,14 @@ import { Input } from "@/components/ui/input";
 import { GetListGuestsResType } from "@/schemaValidations/account.schema";
 import { endOfDay, format, startOfDay } from "date-fns";
 import { useGetGuestListQuery } from "@/queries/useAccount";
+import { useTranslations } from "next-intl";
 
 type GuestItem = GetListGuestsResType["data"][0];
 
-export const columns: ColumnDef<GuestItem>[] = [
+const getColumns = (t: (key: string) => string): ColumnDef<GuestItem>[] => [
   {
     accessorKey: "name",
-    header: "Tên",
+    header: t("nameHeader"),
     cell: ({ row }) => (
       <div className="capitalize">
         {row.getValue("name")} | (#{row.original.id})
@@ -39,7 +40,7 @@ export const columns: ColumnDef<GuestItem>[] = [
   },
   {
     accessorKey: "tableNumber",
-    header: "Số bàn",
+    header: t("tableNumberHeader"),
     cell: ({ row }) => <div className="capitalize">{row.getValue("tableNumber")}</div>,
     filterFn: (row, columnId, filterValue: string) => {
       if (filterValue === undefined) return true;
@@ -48,7 +49,7 @@ export const columns: ColumnDef<GuestItem>[] = [
   },
   {
     accessorKey: "createdAt",
-    header: () => <div>Tạo</div>,
+    header: () => <div>{t("createdAtHeader")}</div>,
     cell: ({ row }) => (
       <div className="flex items-center space-x-4 text-sm">
         {formatDateTimeToLocaleString(row.getValue("createdAt"))}
@@ -62,6 +63,8 @@ const initFromDate = startOfDay(new Date());
 const initToDate = endOfDay(new Date());
 
 export default function GuestsDialog({ onChoose }: { onChoose: (guest: GuestItem) => void }) {
+  const t = useTranslations("ManageOrders");
+  const columns = getColumns(t as (key: string) => string);
   const [open, setOpen] = useState(false);
 
   const [fromDate, setFromDate] = useState(initFromDate);
@@ -120,30 +123,30 @@ export default function GuestsDialog({ onChoose }: { onChoose: (guest: GuestItem
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Chọn khách</Button>
+        <Button variant="outline">{t("selectGuestButton")}</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-175 max-h-full overflow-auto">
         <DialogHeader>
-          <DialogTitle>Chọn khách hàng</DialogTitle>
+          <DialogTitle>{t("selectGuestTitle")}</DialogTitle>
         </DialogHeader>
         <div>
           <div className="w-full">
             <div className="flex flex-wrap gap-2">
               <div className="flex items-center">
-                <span className="mr-2">Từ</span>
+                <span className="mr-2">{t("fromLabel")}</span>
                 <Input
                   type="datetime-local"
-                  placeholder="Từ ngày"
+                  placeholder={t("fromDatePlaceholder")}
                   className="text-sm"
                   value={format(fromDate, "yyyy-MM-dd HH:mm").replace(" ", "T")}
                   onChange={(event) => setFromDate(new Date(event.target.value))}
                 />
               </div>
               <div className="flex items-center">
-                <span className="mr-2">Đến</span>
+                <span className="mr-2">{t("toLabel")}</span>
                 <Input
                   type="datetime-local"
-                  placeholder="Đến ngày"
+                  placeholder={t("toDatePlaceholder")}
                   value={format(toDate, "yyyy-MM-dd HH:mm").replace(" ", "T")}
                   onChange={(event) => setToDate(new Date(event.target.value))}
                 />
@@ -154,13 +157,13 @@ export default function GuestsDialog({ onChoose }: { onChoose: (guest: GuestItem
             </div>
             <div className="flex items-center py-4 gap-2">
               <Input
-                placeholder="Tên hoặc Id"
+                placeholder={t("filterNameId")}
                 value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
                 onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
                 className="w-42.5"
               />
               <Input
-                placeholder="Số bàn"
+                placeholder={t("filterTableNumber")}
                 value={(table.getColumn("tableNumber")?.getFilterValue() as string) ?? ""}
                 onChange={(event) => table.getColumn("tableNumber")?.setFilterValue(event.target.value)}
                 className="w-20"
@@ -213,8 +216,7 @@ export default function GuestsDialog({ onChoose }: { onChoose: (guest: GuestItem
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">
               <div className="text-xs text-muted-foreground py-4 flex-1 ">
-                Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong{" "}
-                <strong>{data.length}</strong> kết quả
+                {t("showingOf", { count: table.getPaginationRowModel().rows.length, total: data.length })}
               </div>
               <div className="space-x-2">
                 <Button
@@ -223,7 +225,7 @@ export default function GuestsDialog({ onChoose }: { onChoose: (guest: GuestItem
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
                 >
-                  Trước
+                  {t("previous")}
                 </Button>
                 <Button
                   variant="outline"
@@ -231,7 +233,7 @@ export default function GuestsDialog({ onChoose }: { onChoose: (guest: GuestItem
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
                 >
-                  Sau
+                  {t("next")}
                 </Button>
               </div>
             </div>

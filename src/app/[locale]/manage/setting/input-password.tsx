@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
 import { FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { ControllerRenderProps, FieldValues } from "react-hook-form";
 
@@ -11,11 +13,16 @@ export default function InputPassword<T extends FieldValues>({
   field,
   label,
   controlLabel,
+  nameI18,
+  fieldError,
 }: {
   field: ControllerRenderProps<T>;
   label: string;
   controlLabel: string;
+  nameI18: string;
+  fieldError: any;
 }) {
+  const t = useTranslations(nameI18);
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -40,7 +47,7 @@ export default function InputPassword<T extends FieldValues>({
           {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </Button>
       </div>
-      <FormMessage />
+      <FormMessage>{fieldError ? t(fieldError as any) : undefined}</FormMessage>
     </div>
   );
 }

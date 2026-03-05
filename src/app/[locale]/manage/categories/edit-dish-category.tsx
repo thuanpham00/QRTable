@@ -1,13 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useGetDishCategoryDetailQuery, useUpdateDishCategoryMutation } from "@/queries/useDishCategory";
 import { UpdateDishCategoryBody, UpdateDishCategoryBodyType } from "@/schemaValidations/dishCategory.schema";
+import { useTranslations } from "next-intl";
 
 export default function EditDishCategory({
   id,
@@ -27,6 +22,7 @@ export default function EditDishCategory({
   id?: number | undefined;
   setId: (value: number | undefined) => void;
 }) {
+  const t = useTranslations("ManageCategories");
   const dishCategoryDetail = useGetDishCategoryDetailQuery({ id: id as number, enabled: Boolean(id) });
   const dataDishCategoryDetail = dishCategoryDetail.data?.payload.data;
 
@@ -87,8 +83,7 @@ export default function EditDishCategory({
     >
       <DialogContent className="sm:max-w-150 max-h-screen overflow-auto">
         <DialogHeader>
-          <DialogTitle>Cập nhật danh mục </DialogTitle>
-          <DialogDescription>Các trường sau đây là bắt buộc: Tên</DialogDescription>
+          <DialogTitle>{t("editCategory")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -103,13 +98,15 @@ export default function EditDishCategory({
               <FormField
                 control={form.control}
                 name="name"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="name">Tên danh mục</Label>
+                      <Label htmlFor="name">{t("nameCategory")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input id="name" className="w-full" {...field} />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.name?.message) && t(errors.name?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -119,13 +116,15 @@ export default function EditDishCategory({
               <FormField
                 control={form.control}
                 name="description"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="description">Mô tả danh mục</Label>
+                      <Label htmlFor="description">{t("description2")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Textarea id="description" className="w-full" {...field} />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.description?.message) && t(errors.description?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>

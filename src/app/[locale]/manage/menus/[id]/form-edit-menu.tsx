@@ -25,8 +25,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "@/i18n/routing";
 import revalidateApiRequests from "@/apiRequests/revalidate";
+import { useTranslations } from "next-intl";
 
 export default function FormEditMenu({ idMenu }: { idMenu: number }) {
+  const t = useTranslations("ManageMenus");
   const menuDetail = useGetMenuDetailQuery({ id: Number(idMenu), enabled: Boolean(idMenu) });
   const dataMenuDetail = menuDetail.data?.payload.data;
 
@@ -114,13 +116,15 @@ export default function FormEditMenu({ idMenu }: { idMenu: number }) {
             <FormField
               control={form.control}
               name="name"
-              render={({ field }) => (
+              render={({ field, formState: { errors } }) => (
                 <FormItem>
                   <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                    <Label htmlFor="name">Tên Menu</Label>
+                    <Label htmlFor="name">{t("nameMenu")}</Label>
                     <div className="col-span-3 w-full space-y-2">
                       <Input id="name" className="w-full" {...field} />
-                      <FormMessage />
+                      <FormMessage>
+                        {Boolean(errors.name?.message) && t(errors.name?.message as any)}
+                      </FormMessage>
                     </div>
                   </div>
                 </FormItem>
@@ -130,13 +134,15 @@ export default function FormEditMenu({ idMenu }: { idMenu: number }) {
             <FormField
               control={form.control}
               name="description"
-              render={({ field }) => (
+              render={({ field, formState: { errors } }) => (
                 <FormItem>
                   <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                    <Label htmlFor="description">Mô tả Menu</Label>
+                    <Label htmlFor="description">{t("descriptionMenu")}</Label>
                     <div className="col-span-3 w-full space-y-2">
                       <Textarea id="description" className="w-full" {...field} />
-                      <FormMessage />
+                      <FormMessage>
+                        {Boolean(errors.description?.message) && t(errors.description?.message as any)}
+                      </FormMessage>
                     </div>
                   </div>
                 </FormItem>
@@ -146,13 +152,15 @@ export default function FormEditMenu({ idMenu }: { idMenu: number }) {
             <FormField
               control={form.control}
               name="version"
-              render={({ field }) => (
+              render={({ field, formState: { errors } }) => (
                 <FormItem>
                   <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                    <Label htmlFor="version">Phiên bản</Label>
+                    <Label htmlFor="version">{t("versionMenu")}</Label>
                     <div className="col-span-3 w-full space-y-2">
                       <Input type="number" id="version" className="w-full" {...field} disabled />
-                      <FormMessage />
+                      <FormMessage>
+                        {Boolean(errors.version?.message) && t(errors.version?.message as any)}
+                      </FormMessage>
                     </div>
                   </div>
                 </FormItem>
@@ -165,7 +173,7 @@ export default function FormEditMenu({ idMenu }: { idMenu: number }) {
               render={({ field }) => (
                 <FormItem>
                   <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                    <Label htmlFor="isActive">Trạng thái</Label>
+                    <Label htmlFor="isActive">{t("statusMenu")}</Label>
                     <div className="col-span-3 w-full space-y-2">
                       <Switch id="isActive" checked={field.value} onCheckedChange={field.onChange} />
                       <FormMessage />
@@ -179,13 +187,13 @@ export default function FormEditMenu({ idMenu }: { idMenu: number }) {
 
         <div className="flex items-center justify-end gap-2">
           <Button variant="destructive" onClick={() => setOpenDialog(true)}>
-            Xóa menu
+            {t("deleteMenu")}
           </Button>
           <Button type="reset" form="edit-menu-form">
-            Hủy
+            {t("cancel")}
           </Button>
           <Button type="submit" form="edit-menu-form" className="bg-blue-500 hover:bg-blue-400 text-white">
-            Cập nhật
+            {t("update")}
           </Button>
         </div>
       </Form>
@@ -193,14 +201,12 @@ export default function FormEditMenu({ idMenu }: { idMenu: number }) {
       <AlertDialog open={openDialog} onOpenChange={setOpenDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Xóa menu?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Menu sẽ bị xóa vĩnh viễn khỏi hệ thống. Hành động này không thể hoàn tác.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("deleteMenuTitle")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("deleteMenuDesc")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setOpenDialog(false)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteMenu}>Continue</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setOpenDialog(false)}>{t("cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteMenu}>{t("continue")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

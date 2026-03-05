@@ -217,15 +217,27 @@ export const getVietnameseGuestCallStatus = (
 };
 
 export const getTableLink = ({
+  locale,
   token,
   tableNumber,
   type,
 }: {
+  locale: string;
   token: string;
   tableNumber: number;
   type: string;
 }) => {
-  return envConfig.NEXT_PUBLIC_URL + "/tables/" + tableNumber + "?token=" + token + "&typeQR=" + type;
+  return (
+    envConfig.NEXT_PUBLIC_URL +
+    "/" +
+    locale +
+    "/tables/" +
+    tableNumber +
+    "?token=" +
+    token +
+    "&typeQR=" +
+    type
+  );
 };
 
 export const decodeToken = (token: string) => {

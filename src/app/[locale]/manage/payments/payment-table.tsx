@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/incompatible-library */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
@@ -27,6 +28,7 @@ import { useRouter } from "@/i18n/routing";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslations } from "next-intl";
 
 type PaymentItem = PaymentListResType["data"][0];
 
@@ -37,9 +39,9 @@ const getPaymentStatusColor = (status: string) => {
     case "Pending":
       return "bg-yellow-100 text-yellow-800 border-yellow-300";
     case "Failed":
-      return "bg-red-100 text-red-800 border-red-300";
+      return "bg-red-400 text-red-800 border-red-300";
     case "Cancelled":
-      return "bg-gray-100 text-gray-800 border-gray-300";
+      return "bg-red-500 text-white border-red-300";
     default:
       return "bg-gray-100 text-gray-800 border-gray-300";
   }
@@ -60,12 +62,12 @@ const getVietnamesePaymentStatus = (status: string) => {
   }
 };
 
-const getPaymentMethodLabel = (method: string) => {
+const getPaymentMethodLabel = (method: string, t: any) => {
   switch (method) {
     case "CASH":
-      return "💵 Tiền mặt";
+      return `${t("cash")}`;
     case "SEPAY":
-      return "🏦 SeePay";
+      return `${t("sepay")}`;
     default:
       return method;
   }
@@ -95,149 +97,153 @@ const PaymentTableContext = createContext<{
   paymentIdEdit: undefined,
 });
 
-export const columns: ColumnDef<PaymentItem>[] = [
-  {
-    accessorKey: "id",
-    header: "ID",
-    cell: ({ row }) => {
-      const paymentGroup = row.original.paymentGroup;
-      return (
-        <div className="flex items-center gap-2">
-          <div className="font-mono">#{row.getValue("id")}</div>
-          {paymentGroup && (
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5">
-              Bill chung #{paymentGroup.id}
-            </Badge>
-          )}
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "tableNumber",
-    header: "Bàn / Khách",
-    cell: ({ row }) => {
-      const tableNumber = row.original.tableNumber;
-      const guest = row.original.guest;
-
-      if (tableNumber) {
+export const getColumns = (t: any) => {
+  const columns: ColumnDef<PaymentItem>[] = [
+    {
+      accessorKey: "id",
+      header: "ID",
+      cell: ({ row }) => {
+        const paymentGroup = row.original.paymentGroup;
         return (
-          <div className="space-y-1">
-            <div className="font-semibold">Bàn {tableNumber}</div>
-            {guest && (
-              <div className="text-xs text-muted-foreground">
-                {guest.name}{" "}
-                <Badge variant="outline" className="text-xs">
-                  #{guest.id}
-                </Badge>
-              </div>
+          <div className="flex items-center gap-2">
+            <div className="font-mono">#{row.getValue("id")}</div>
+            {paymentGroup && (
+              <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5">
+                {t("sharedBill", { id: paymentGroup.id })}
+              </Badge>
             )}
           </div>
         );
-      }
+      },
+    },
+    {
+      accessorKey: "tableNumber",
+      header: t("tableGuest"),
+      cell: ({ row }) => {
+        const tableNumber = row.original.tableNumber;
+        const guest = row.original.guest;
 
-      if (guest) {
+        if (tableNumber) {
+          return (
+            <div className="space-y-1">
+              <div className="font-semibold">{t("tableLabel", { number: tableNumber })}</div>
+              {guest && (
+                <div className="text-xs text-muted-foreground">
+                  {guest.name}{" "}
+                  <Badge variant="outline" className="text-xs">
+                    #{guest.id}
+                  </Badge>
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        if (guest) {
+          return (
+            <div className="space-y-1">
+              <div className="font-semibold">{guest.name}</div>
+              <Badge variant="outline" className="text-xs">
+                #{guest.id}
+              </Badge>
+            </div>
+          );
+        }
+
+        return <span className="text-muted-foreground">-</span>;
+      },
+    },
+    {
+      accessorKey: "totalAmount",
+      header: t("totalAmount"),
+      cell: ({ row }) => (
+        <div className="font-semibold text-orange-600">{formatCurrency(row.getValue("totalAmount"))}</div>
+      ),
+    },
+    {
+      accessorKey: "paymentMethod",
+      header: t("paymentMethod"),
+      cell: ({ row }) => (
+        <div className="text-sm">{getPaymentMethodLabel(row.getValue("paymentMethod"), t)}</div>
+      ),
+    },
+    {
+      accessorKey: "status",
+      header: t("status"),
+      cell: ({ row }) => {
+        const status = row.getValue("status") as string;
+        return <Badge className={getPaymentStatusColor(status)}>{getVietnamesePaymentStatus(status)}</Badge>;
+      },
+    },
+    {
+      accessorKey: "orders",
+      header: t("orders"),
+      cell: ({ row }) => {
+        const orders = row.original.orders;
+        const totalQuantity = orders.reduce((acc, order) => acc + order.quantity, 0);
         return (
-          <div className="space-y-1">
-            <div className="font-semibold">{guest.name}</div>
-            <Badge variant="outline" className="text-xs">
-              #{guest.id}
-            </Badge>
+          <div className="text-center">
+            <div className="font-semibold">{t("orderCount", { count: orders.length })}</div>
+            <div className="text-xs text-muted-foreground">{t("itemCount", { count: totalQuantity })}</div>
           </div>
         );
-      }
-
-      return <span className="text-muted-foreground">-</span>;
+      },
     },
-  },
-  {
-    accessorKey: "totalAmount",
-    header: "Tổng tiền",
-    cell: ({ row }) => (
-      <div className="font-semibold text-orange-600">{formatCurrency(row.getValue("totalAmount"))}</div>
-    ),
-  },
-  {
-    accessorKey: "paymentMethod",
-    header: "Phương thức",
-    cell: ({ row }) => <div className="text-sm">{getPaymentMethodLabel(row.getValue("paymentMethod"))}</div>,
-  },
-  {
-    accessorKey: "status",
-    header: "Trạng thái",
-    cell: ({ row }) => {
-      const status = row.getValue("status") as string;
-      return (
-        <Badge variant="outline" className={getPaymentStatusColor(status)}>
-          {getVietnamesePaymentStatus(status)}
-        </Badge>
-      );
+    {
+      accessorKey: "createdBy",
+      header: t("createdBy"),
+      cell: ({ row }) => {
+        const createdBy = row.original.createdBy;
+        return (
+          <div className="text-sm">
+            <div>{createdBy.name}</div>
+            <div className="text-xs text-muted-foreground">#{createdBy.id}</div>
+          </div>
+        );
+      },
     },
-  },
-  {
-    accessorKey: "orders",
-    header: "Đơn hàng",
-    cell: ({ row }) => {
-      const orders = row.original.orders;
-      const totalQuantity = orders.reduce((acc, order) => acc + order.quantity, 0);
-      return (
-        <div className="text-center">
-          <div className="font-semibold">{orders.length} đơn</div>
-          <div className="text-xs text-muted-foreground">{totalQuantity} món</div>
+    {
+      accessorKey: "createdAt",
+      header: t("createdAt"),
+      cell: ({ row }) => (
+        <div className="text-xs whitespace-nowrap">
+          {formatDateTimeToLocaleString(row.getValue("createdAt"))}
         </div>
-      );
+      ),
     },
-  },
-  {
-    accessorKey: "createdBy",
-    header: "Người tạo",
-    cell: ({ row }) => {
-      const createdBy = row.original.createdBy;
-      return (
-        <div className="text-sm">
-          <div>{createdBy.name}</div>
-          <div className="text-xs text-muted-foreground">#{createdBy.id}</div>
-        </div>
-      );
+    {
+      accessorKey: "note",
+      header: t("note"),
+      cell: ({ row }) => {
+        const note = row.getValue("note") as string | null;
+        return <div className="max-w-50 truncate text-xs text-muted-foreground">{note || "-"}</div>;
+      },
     },
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Thời gian",
-    cell: ({ row }) => (
-      <div className="text-xs whitespace-nowrap">
-        {formatDateTimeToLocaleString(row.getValue("createdAt"))}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "note",
-    header: "Ghi chú",
-    cell: ({ row }) => {
-      const note = row.getValue("note") as string | null;
-      return <div className="max-w-50 truncate text-xs text-muted-foreground">{note || "-"}</div>;
+    {
+      id: "actions",
+      header: t("actions"),
+      cell: function Actions({ row }) {
+        const { setPaymentIdEdit } = useContext(PaymentTableContext);
+        return (
+          <div>
+            <button
+              onClick={() => setPaymentIdEdit(row.original.id)}
+              className="bg-blue-500 px-2 py-1 rounded-lg hover:bg-blue-400 text-white text-sm"
+            >
+              {t("detail")}
+            </button>
+          </div>
+        );
+      },
     },
-  },
-  {
-    id: "actions",
-    header: "Hành động",
-    cell: function Actions({ row }) {
-      const { setPaymentIdEdit } = useContext(PaymentTableContext);
-      return (
-        <div>
-          <button
-            onClick={() => setPaymentIdEdit(row.original.id)}
-            className="bg-blue-500 px-2 py-1 rounded-lg hover:bg-blue-400 text-white text-sm"
-          >
-            Chi tiết
-          </button>
-        </div>
-      );
-    },
-  },
-];
+  ];
+  return columns;
+};
 
 export default function PaymentTable() {
+  const t = useTranslations("ManagePayments");
+  const columns = getColumns(t);
+
   const router = useRouter();
   const queryParams = useQueryParams();
 
@@ -302,12 +308,12 @@ export default function PaymentTable() {
   const invalidSubmit = (err: FieldErrors<SearchPaymentType>) => {
     console.log(err);
     if (err.fromDate) {
-      toast.error(err.fromDate.message || "Ngày tháng không hợp lệ", {
+      toast.error(err.fromDate.message || t("invalidDate"), {
         duration: 4000,
       });
     }
     if (err.toDate) {
-      toast.error(err.toDate.message || "Ngày tháng không hợp lệ", {
+      toast.error(err.toDate.message || t("invalidDate"), {
         duration: 4000,
       });
     }
@@ -371,10 +377,10 @@ export default function PaymentTable() {
                     render={({ field }) => (
                       <FormItem>
                         <div className="flex items-center">
-                          <span className="mr-2 text-sm">Từ</span>
+                          <span className="mr-2 text-sm">{t("from")}</span>
                           <Input
                             type="datetime-local"
-                            placeholder="Từ ngày"
+                            placeholder={t("fromDate")}
                             className="text-sm"
                             value={field.value ? format(new Date(field.value), "yyyy-MM-dd'T'HH:mm") : ""}
                             onChange={(event) =>
@@ -391,10 +397,10 @@ export default function PaymentTable() {
                     render={({ field }) => (
                       <FormItem>
                         <div className="flex items-center">
-                          <span className="mr-2 text-sm">Đến</span>
+                          <span className="mr-2 text-sm">{t("to")}</span>
                           <Input
                             type="datetime-local"
-                            placeholder="Đến ngày"
+                            placeholder={t("toDate")}
                             className="text-sm"
                             value={field.value ? format(new Date(field.value), "yyyy-MM-dd'T'HH:mm") : ""}
                             onChange={(event) =>
@@ -413,7 +419,7 @@ export default function PaymentTable() {
                     render={({ field }) => (
                       <FormItem>
                         <div className="flex items-center">
-                          <span className="mr-2 text-sm">Phương thức thanh toán</span>
+                          <span className="mr-2 text-sm">{t("paymentMethodLabel")}</span>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}
@@ -421,12 +427,12 @@ export default function PaymentTable() {
                           >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Chọn mục" />
+                                <SelectValue placeholder={t("chooseOption")} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="CASH">💵 Tiền mặt</SelectItem>
-                              <SelectItem value="SEPAY">💳 Sepay</SelectItem>
+                              <SelectItem value="CASH">{t("cash")}</SelectItem>
+                              <SelectItem value="SEPAY">{t("sepay")}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -439,7 +445,7 @@ export default function PaymentTable() {
                     render={({ field }) => (
                       <FormItem>
                         <div className="flex items-center">
-                          <span className="mr-2 text-sm">Số bàn</span>
+                          <span className="mr-2 text-sm">{t("tableNumberLabel")}</span>
                           <Input
                             type="number"
                             value={field.value ?? ""}
@@ -518,7 +524,7 @@ export default function PaymentTable() {
         </div>
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="text-xs text-muted-foreground py-4 flex-1 ">
-            Hiển thị <strong>{data.length}</strong> trong <strong>{total}</strong> kết quả
+            {t("showingOf", { count: data.length, total })}
           </div>
           <div>
             <AutoPagination

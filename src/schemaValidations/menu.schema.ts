@@ -50,9 +50,9 @@ export const MenuParams = z.object({
 export type MenuParamsType = z.TypeOf<typeof MenuParams>;
 
 export const CreateMenuBody = z.object({
-  name: z.string().min(5).max(256),
-  description: z.string().max(10000),
-  version: z.number().min(1),
+  name: z.string().min(5, { message: "nameTooShort" }).max(256, { message: "nameTooLong" }),
+  description: z.string().max(10000, { message: "descriptionTooLong" }),
+  version: z.number().min(1, { message: "versionMin" }),
   isActive: z.boolean(),
 });
 
@@ -99,9 +99,9 @@ export const MenuItemSuggestRes = z.object({
 export type MenuItemSuggestResType = z.TypeOf<typeof MenuItemSuggestRes>;
 
 export const AddDishToMenu = z.object({
-  dishId: z.number(),
-  price: z.number().min(1),
-  notes: z.string().max(1000).optional(),
+  dishId: z.number().min(1, { message: "dishIdRequired" }),
+  price: z.number().min(1000, { message: "priceTooLow" }),
+  notes: z.string().max(1000, { message: "notesTooLong" }).optional(),
   status: z.enum(MenuItemStatusValues),
 });
 

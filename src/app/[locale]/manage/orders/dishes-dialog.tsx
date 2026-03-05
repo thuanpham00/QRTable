@@ -15,23 +15,25 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { formatCurrency, simpleMatchText } from "@/lib/utils";
+import { cn, formatCurrency, simpleMatchText } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { MenuItemStatus } from "@/constants/type";
 import { useGetMenuActiveQuery } from "@/queries/useMenu";
 import { MenuItemResType } from "@/schemaValidations/menu.schema";
+import { useTranslations } from "next-intl";
 
 export type MenuItem = MenuItemResType["data"];
-export const columns: ColumnDef<MenuItem>[] = [
+
+const getColumns = (t: (key: string) => string): ColumnDef<MenuItem>[] => [
   {
     id: "stt",
-    header: "STT",
+    header: t("sttHeader"),
     cell: ({ row }) => <div className="font-medium">#{row.index + 1}</div>,
   },
   {
     id: "dishName",
-    header: "Món ăn",
+    header: t("dishNameHeader"),
     cell: ({ row }) => (
       <div className="flex items-center space-x-4">
         <Image
@@ -51,18 +53,22 @@ export const columns: ColumnDef<MenuItem>[] = [
   },
   {
     accessorKey: "price",
-    header: "Giá cả",
+    header: t("priceHeader"),
     cell: ({ row }) => <div className="capitalize">{formatCurrency(row.getValue("price"))}</div>,
   },
   {
     accessorKey: "status",
-    header: "Trạng thái",
-    cell: ({ row }) => <div>{row.original.status === MenuItemStatus.AVAILABLE ? "Có sẵn" : "Hết hàng"}</div>,
+    header: t("statusHeader"),
+    cell: ({ row }) => (
+      <div>{row.original.status === MenuItemStatus.AVAILABLE ? t("availableStatus") : t("outOfStock")}</div>
+    ),
   },
 ];
 
 const PAGE_SIZE = 10;
 export function DishesDialog({ onChoose }: { onChoose: (menuItem: MenuItem) => void }) {
+  const t = useTranslations("ManageOrders");
+  const columns = getColumns(t as (key: string) => string);
   const [open, setOpen] = useState(false);
 
   const menuActiveQuery = useGetMenuActiveQuery();
@@ -117,17 +123,17 @@ export function DishesDialog({ onChoose }: { onChoose: (menuItem: MenuItem) => v
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Thay đổi</Button>
+        <Button variant="outline">{t("Change")}</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-150">
         <DialogHeader>
-          <DialogTitle>Chọn món ăn</DialogTitle>
+          <DialogTitle>{t("selectDish")}</DialogTitle>
         </DialogHeader>
         <div>
           <div className="w-full">
             <div className="flex items-center py-4">
               <Input
-                placeholder="Lọc tên"
+                placeholder={t("searchDish")}
                 value={(table.getColumn("dishName")?.getFilterValue() as string) ?? ""}
                 onChange={(event) => table.getColumn("dishName")?.setFilterValue(event.target.value)}
                 className="max-w-sm"
@@ -156,8 +162,15 @@ export function DishesDialog({ onChoose }: { onChoose: (menuItem: MenuItem) => v
                       <TableRow
                         key={row.id}
                         data-state={row.getIsSelected() && "selected"}
-                        onClick={() => choose(row.original)}
-                        className="cursor-pointer"
+                        onClick={() => {
+                          if (row.original.status === MenuItemStatus.AVAILABLE) {
+                            choose(row.original);
+                          }
+                        }}
+                        className={cn({
+                          "cursor-pointer": row.original.status === MenuItemStatus.AVAILABLE,
+                          "cursor-not-allowed": row.original.status === MenuItemStatus.OUT_OF_STOCK,
+                        })}
                       >
                         {row.getVisibleCells().map((cell) => (
                           <TableCell key={cell.id}>
@@ -178,8 +191,7 @@ export function DishesDialog({ onChoose }: { onChoose: (menuItem: MenuItem) => v
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">
               <div className="text-xs text-muted-foreground py-4 flex-1 ">
-                Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong{" "}
-                <strong>{data.length}</strong> kết quả
+                {t("showingOf", { count: table.getPaginationRowModel().rows.length, total: data.length })}
               </div>
               <div className="space-x-2">
                 <Button
@@ -188,7 +200,7 @@ export function DishesDialog({ onChoose }: { onChoose: (menuItem: MenuItem) => v
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
                 >
-                  Trước
+                  {t("previous")}
                 </Button>
                 <Button
                   variant="outline"
@@ -196,7 +208,7 @@ export function DishesDialog({ onChoose }: { onChoose: (menuItem: MenuItem) => v
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
                 >
-                  Sau
+                  {t("next")}
                 </Button>
               </div>
             </div>

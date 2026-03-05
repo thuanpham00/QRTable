@@ -1,14 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/incompatible-library */
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,6 +19,7 @@ import { useGetIngredientDetailQuery, useUpdateIngredientMutation } from "@/quer
 import { UpdateIngredientBody, UpdateIngredientBodyType } from "@/schemaValidations/ingredient.schema";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
+import { useTranslations } from "next-intl";
 
 export default function EditIngredient({
   id,
@@ -33,6 +28,7 @@ export default function EditIngredient({
   id?: number | undefined;
   setId: (value: number | undefined) => void;
 }) {
+  const t = useTranslations("ManageIngredients");
   const ingredientDetail = useGetIngredientDetailQuery({ id: id as number, enabled: Boolean(id) });
   const dataIngredientDetail = ingredientDetail.data?.payload.data;
   const uploadMutation = useUploadMutation();
@@ -135,8 +131,7 @@ export default function EditIngredient({
     >
       <DialogContent className="sm:max-w-150 max-h-screen overflow-auto">
         <DialogHeader>
-          <DialogTitle>Cập nhật nguyên liệu</DialogTitle>
-          <DialogDescription>Các trường sau đây là bắt buộc: Tên, ảnh</DialogDescription>
+          <DialogTitle>{t("updateIngredient")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -185,13 +180,15 @@ export default function EditIngredient({
               <FormField
                 control={form.control}
                 name="name"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="name">Tên nguyên liệu</Label>
+                      <Label htmlFor="name">{t("name")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input id="name" className="w-full" {...field} />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.name?.message) && t(errors.name?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -201,23 +198,25 @@ export default function EditIngredient({
               <FormField
                 control={form.control}
                 name="category"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="category">Nhóm nguyên liệu</Label>
+                      <Label htmlFor="category">{t("categoryGroup")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
                           <SelectTrigger>
-                            <SelectValue placeholder="Chọn nhóm nguyên liệu" />
+                            <SelectValue placeholder={t("chooseGroup")} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="rau-cu">Rau củ</SelectItem>
-                            <SelectItem value="thit-ca">Thịt cá</SelectItem>
-                            <SelectItem value="gia-vi">Gia vị</SelectItem>
-                            <SelectItem value="khac">Khác</SelectItem>
+                            <SelectItem value="rau-cu">{t("categoryVegetable")}</SelectItem>
+                            <SelectItem value="thit-ca">{t("categoryMeat")}</SelectItem>
+                            <SelectItem value="gia-vi">{t("categorySpice")}</SelectItem>
+                            <SelectItem value="khac">{t("categoryOther")}</SelectItem>
                           </SelectContent>
                         </Select>
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.category?.message) && t(errors.category?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -230,7 +229,7 @@ export default function EditIngredient({
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="allergenType">Loại dị ứng</Label>
+                      <Label htmlFor="allergenType">{t("allergenType")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Input id="allergenType" className="w-full" {...field} />
                         <FormMessage />
@@ -246,7 +245,7 @@ export default function EditIngredient({
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="isVegetarian">Ăn chay</Label>
+                      <Label htmlFor="isVegetarian">{t("vegetarianLabel")}</Label>
                       <div className="col-span-3 w-full space-y-2 flex items-center gap-2">
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
                         <FormMessage />
@@ -262,7 +261,7 @@ export default function EditIngredient({
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="isVegan">Thuần chay</Label>
+                      <Label htmlFor="isVegan">{t("veganLabel")}</Label>
                       <div className="col-span-3 w-full space-y-2 flex items-center gap-2">
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
                         <FormMessage />
@@ -275,13 +274,15 @@ export default function EditIngredient({
               <FormField
                 control={form.control}
                 name="description"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="description">Mô tả</Label>
+                      <Label htmlFor="description">{t("description2")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Textarea id="description" className="w-full" {...field} />
-                        <FormMessage />
+                        <FormMessage>
+                          {Boolean(errors.description?.message) && t(errors.description?.message as any)}
+                        </FormMessage>
                       </div>
                     </div>
                   </FormItem>
@@ -294,7 +295,7 @@ export default function EditIngredient({
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                      <Label htmlFor="isActive">Trạng thái</Label>
+                      <Label htmlFor="isActive">{t("isActive")}</Label>
                       <div className="col-span-3 w-full space-y-2">
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
                         <FormMessage />
@@ -308,7 +309,7 @@ export default function EditIngredient({
         </Form>
         <DialogFooter>
           <Button type="submit" form="edit-ingredient-form">
-            Lưu
+            {t("save")}
           </Button>
         </DialogFooter>
       </DialogContent>

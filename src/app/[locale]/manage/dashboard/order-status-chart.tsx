@@ -4,33 +4,7 @@ import { Cell, Legend, Pie, PieChart } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { DashboardIndicatorResType } from "@/schemaValidations/indicator.schema";
-
-const chartConfig = {
-  Paid: {
-    label: "Đã thanh toán",
-    color: "#22c55e", // green-500
-  },
-  Delivered: {
-    label: "Đã giao",
-    color: "#3b82f6", // blue-500
-  },
-  Processing: {
-    label: "Đang xử lý",
-    color: "#f59e0b", // amber-500
-  },
-  Pending: {
-    label: "Chờ xử lý",
-    color: "#eab308", // yellow-500
-  },
-  Cancelled: {
-    label: "Đã hủy",
-    color: "#6b7280", // gray-500
-  },
-  Rejected: {
-    label: "Bị từ chối",
-    color: "#ef4444", // red-500
-  },
-} satisfies ChartConfig;
+import { useTranslations } from "next-intl";
 
 const COLORS = ["#22c55e", "#3b82f6", "#f59e0b", "#eab308", "#6b7280", "#ef4444"];
 
@@ -39,13 +13,24 @@ export function OrderStatusChart({
 }: {
   orderStatusBreakdown: DashboardIndicatorResType["data"]["orderAnalytics"]["orderStatusBreakdown"];
 }) {
+  const t = useTranslations("ManageDashboard");
+
+  const chartConfig = {
+    Paid: { label: t("statusPaid"), color: "#22c55e" },
+    Delivered: { label: t("statusDelivered"), color: "#3b82f6" },
+    Processing: { label: t("statusProcessing"), color: "#f59e0b" },
+    Pending: { label: t("statusPending"), color: "#eab308" },
+    Cancelled: { label: t("statusCancelled"), color: "#6b7280" },
+    Rejected: { label: t("statusRejected"), color: "#ef4444" },
+  } satisfies ChartConfig;
+
   const chartData = [
-    { name: "Đã thanh toán", value: orderStatusBreakdown.Paid, status: "Paid" },
-    { name: "Đã giao", value: orderStatusBreakdown.Delivered, status: "Delivered" },
-    { name: "Đang xử lý", value: orderStatusBreakdown.Processing, status: "Processing" },
-    { name: "Chờ xử lý", value: orderStatusBreakdown.Pending, status: "Pending" },
-    { name: "Đã hủy", value: orderStatusBreakdown.Cancelled, status: "Cancelled" },
-    { name: "Bị từ chối", value: orderStatusBreakdown.Rejected, status: "Rejected" },
+    { name: t("statusPaid"), value: orderStatusBreakdown.Paid, status: "Paid" },
+    { name: t("statusDelivered"), value: orderStatusBreakdown.Delivered, status: "Delivered" },
+    { name: t("statusProcessing"), value: orderStatusBreakdown.Processing, status: "Processing" },
+    { name: t("statusPending"), value: orderStatusBreakdown.Pending, status: "Pending" },
+    { name: t("statusCancelled"), value: orderStatusBreakdown.Cancelled, status: "Cancelled" },
+    { name: t("statusRejected"), value: orderStatusBreakdown.Rejected, status: "Rejected" },
   ].filter((item) => item.value > 0);
 
   const total = chartData.reduce((sum, item) => sum + item.value, 0);
@@ -53,7 +38,7 @@ export function OrderStatusChart({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Trạng thái đơn hàng</CardTitle>
+        <CardTitle>{t("orderStatusChartTitle")}</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="mx-auto aspect-square h-64">
@@ -68,8 +53,12 @@ export function OrderStatusChart({
                       return (
                         <div className="space-y-1">
                           <div className="font-semibold">{data.name}</div>
-                          <div className="text-sm">Số lượng: {data.value}</div>
-                          <div className="text-sm">Tỷ lệ: {percentage}%</div>
+                          <div className="text-sm">
+                            {t("tooltipQuantity")} {data.value}
+                          </div>
+                          <div className="text-sm">
+                            {t("tooltipRate")} {percentage}%
+                          </div>
                         </div>
                       );
                     }

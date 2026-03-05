@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency, formatDateTimeToLocaleString } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function FormPaymentDetail({
   id,
@@ -16,6 +17,9 @@ export default function FormPaymentDetail({
 }) {
   const payment = useGetDetailPayment({ id: id as number, enabled: Boolean(id) });
   const dataPaymentDetail = payment.data?.payload.data;
+  const t = useTranslations("ManagePayments");
+
+  if (!id) return null;
 
   return (
     <Dialog
@@ -26,7 +30,7 @@ export default function FormPaymentDetail({
     >
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">Chi tiết thanh toán #{id}</DialogTitle>
+          <DialogTitle className="text-xl font-bold">{t("paymentDetailTitle", { id })}</DialogTitle>
         </DialogHeader>
 
         {payment.isLoading ? (
@@ -34,13 +38,13 @@ export default function FormPaymentDetail({
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         ) : payment.isError ? (
-          <div className="text-center py-8 text-destructive">Không thể tải thông tin thanh toán</div>
+          <div className="text-center py-8 text-destructive">{t("loadingError")}</div>
         ) : dataPaymentDetail ? (
           <div className="space-y-6 py-4">
             {/* Thông tin chính */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Trạng thái:</span>
+                <span className="text-sm text-muted-foreground">{t("statusLabel")}</span>
                 <Badge
                   variant={dataPaymentDetail.status === "Paid" ? "default" : "secondary"}
                   className={
@@ -49,19 +53,19 @@ export default function FormPaymentDetail({
                       : "bg-yellow-100 text-yellow-800 border-yellow-300"
                   }
                 >
-                  {dataPaymentDetail.status === "Paid" ? "✓ Đã thanh toán" : "⏳ Chờ thanh toán"}
+                  {dataPaymentDetail.status === "Paid" ? t("paid") : t("pendingPay")}
                 </Badge>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Phương thức:</span>
+                <span className="text-sm text-muted-foreground">{t("methodLabel")}</span>
                 <span className="font-semibold">
-                  {dataPaymentDetail.paymentMethod === "CASH" ? "💵 Tiền mặt" : "🏦 Chuyển khoản"}
+                  {dataPaymentDetail.paymentMethod === "CASH" ? t("cash") : t("transfer")}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Tổng tiền:</span>
+                <span className="text-sm text-muted-foreground">{t("totalAmountLabel")}</span>
                 <span className="text-xl font-bold text-orange-600">
                   {formatCurrency(dataPaymentDetail.totalAmount)}
                 </span>
@@ -72,11 +76,11 @@ export default function FormPaymentDetail({
 
             {/* Thông tin khách hàng & bàn */}
             <div className="space-y-3">
-              <h3 className="font-semibold text-sm">Thông tin đơn hàng</h3>
+              <h3 className="font-semibold text-sm">{t("orderInfoTitle")}</h3>
 
               {dataPaymentDetail.guest && (
                 <div className="flex items-center justify-between bg-muted/30 p-3 rounded-lg">
-                  <span className="text-sm text-muted-foreground">Khách hàng:</span>
+                  <span className="text-sm text-muted-foreground">{t("customer")}</span>
                   <span className="font-medium">
                     {dataPaymentDetail.guest.name}{" "}
                     <span className="text-xs text-muted-foreground">#{dataPaymentDetail.guestId}</span>
@@ -86,15 +90,17 @@ export default function FormPaymentDetail({
 
               {dataPaymentDetail.table && (
                 <div className="flex items-center justify-between bg-muted/30 p-3 rounded-lg">
-                  <span className="text-sm text-muted-foreground">Bàn số:</span>
+                  <span className="text-sm text-muted-foreground">{t("tableNo")}</span>
                   <span className="font-bold text-lg">{dataPaymentDetail.table.number}</span>
                 </div>
               )}
 
               {dataPaymentDetail.orders && dataPaymentDetail.orders.length > 0 && (
                 <div className="flex items-center justify-between bg-muted/30 p-3 rounded-lg">
-                  <span className="text-sm text-muted-foreground">Số lượng đơn:</span>
-                  <span className="font-medium">{dataPaymentDetail.orders.length} đơn</span>
+                  <span className="text-sm text-muted-foreground">{t("orderQuantity")}</span>
+                  <span className="font-medium">
+                    {t("orderCount", { count: dataPaymentDetail.orders.length })}
+                  </span>
                 </div>
               )}
             </div>
@@ -105,7 +111,7 @@ export default function FormPaymentDetail({
             {dataPaymentDetail.paymentMethod === "SEPAY" && dataPaymentDetail.sepayTransactionId && (
               <>
                 <div className="space-y-3">
-                  <h3 className="font-semibold text-sm">Thông tin giao dịch</h3>
+                  <h3 className="font-semibold text-sm">{t("transactionInfoTitle")}</h3>
 
                   <div className="space-y-2 bg-blue-50 dark:bg-blue-950 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
                     <div className="flex items-center justify-between">
@@ -117,7 +123,7 @@ export default function FormPaymentDetail({
 
                     {dataPaymentDetail.sepayReferenceCode && (
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">Mã tham chiếu:</span>
+                        <span className="text-xs text-muted-foreground">{t("referenceCode")}</span>
                         <span className="font-mono text-sm font-medium">
                           {dataPaymentDetail.sepayReferenceCode}
                         </span>
@@ -126,14 +132,14 @@ export default function FormPaymentDetail({
 
                     {dataPaymentDetail.sepayGateway && (
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">Ngân hàng:</span>
+                        <span className="text-xs text-muted-foreground">{t("bank")}</span>
                         <span className="font-semibold text-sm">{dataPaymentDetail.sepayGateway}</span>
                       </div>
                     )}
 
                     {dataPaymentDetail.sepayTransactionDate && (
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">Thời gian GD:</span>
+                        <span className="text-xs text-muted-foreground">{t("transactionTime")}</span>
                         <span className="text-sm">
                           {formatDateTimeToLocaleString(dataPaymentDetail.sepayTransactionDate)}
                         </span>
@@ -143,7 +149,7 @@ export default function FormPaymentDetail({
                     {dataPaymentDetail.sepayContent && (
                       <div className="pt-2 border-t">
                         <span className="text-xs text-muted-foreground block mb-1">
-                          Nội dung chuyển khoản:
+                          {t("transferContent")}
                         </span>
                         <span className="text-xs font-mono bg-white dark:bg-gray-900 p-2 rounded block">
                           {dataPaymentDetail.sepayContent}
@@ -159,28 +165,28 @@ export default function FormPaymentDetail({
 
             {/* Thông tin hệ thống */}
             <div className="space-y-3">
-              <h3 className="font-semibold text-sm">Thông tin hệ thống</h3>
+              <h3 className="font-semibold text-sm">{t("systemInfoTitle")}</h3>
 
               {dataPaymentDetail.createdBy && (
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Người tạo:</span>
+                  <span className="text-xs text-muted-foreground">{t("createdByLabel")}</span>
                   <span className="text-sm font-medium">{dataPaymentDetail.createdBy.name}</span>
                 </div>
               )}
 
               <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Ngày tạo:</span>
+                <span className="text-xs text-muted-foreground">{t("createdAtLabel")}</span>
                 <span className="text-sm">{formatDateTimeToLocaleString(dataPaymentDetail.createdAt)}</span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Cập nhật lần cuối:</span>
+                <span className="text-xs text-muted-foreground">{t("lastUpdated")}</span>
                 <span className="text-sm">{formatDateTimeToLocaleString(dataPaymentDetail.updatedAt)}</span>
               </div>
 
               {dataPaymentDetail.note && (
                 <div className="pt-2">
-                  <span className="text-xs text-muted-foreground block mb-1">Ghi chú:</span>
+                  <span className="text-xs text-muted-foreground block mb-1">{t("noteLabel")}</span>
                   <span className="text-sm bg-muted/50 p-2 rounded block">{dataPaymentDetail.note}</span>
                 </div>
               )}

@@ -4,27 +4,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { DashboardIndicatorResType } from "@/schemaValidations/indicator.schema";
 import { formatCurrency } from "@/lib/utils";
-
-const chartConfig = {
-  revenue: {
-    label: "Doanh thu",
-    color: "#f97316", // orange-500
-  },
-  orderCount: {
-    label: "Số đơn",
-    color: "#3b82f6", // blue-500
-  },
-} satisfies ChartConfig;
+import { useTranslations } from "next-intl";
 
 export function CategoryPerformanceChart({
   categoryPerformance,
 }: {
   categoryPerformance: DashboardIndicatorResType["data"]["categoryPerformance"];
 }) {
+  const t = useTranslations("ManageDashboard");
+
+  const chartConfig = {
+    revenue: { label: t("revenueLabel"), color: "#f97316" },
+    orderCount: { label: t("tooltipOrderCount"), color: "#3b82f6" },
+  } satisfies ChartConfig;
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Hiệu suất danh mục</CardTitle>
+        <CardTitle>{t("categoryChartTitle")}</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -56,10 +53,18 @@ export function CategoryPerformanceChart({
                       return (
                         <div className="space-y-1">
                           <div className="font-semibold">{data.categoryName}</div>
-                          <div className="text-sm">Doanh thu: {formatCurrency(data.revenue)}</div>
-                          <div className="text-sm">Số đơn: {data.orderCount}</div>
-                          <div className="text-sm">Số món: {data.dishCount}</div>
-                          <div className="text-sm">Tỷ lệ: {data.percentage.toFixed(1)}%</div>
+                          <div className="text-sm">
+                            {t("tooltipRevenue")} {formatCurrency(data.revenue)}
+                          </div>
+                          <div className="text-sm">
+                            {t("tooltipOrderCount")} {data.orderCount}
+                          </div>
+                          <div className="text-sm">
+                            {t("tooltipDishCount")} {data.dishCount}
+                          </div>
+                          <div className="text-sm">
+                            {t("tooltipRate")} {data.percentage.toFixed(1)}%
+                          </div>
                         </div>
                       );
                     }

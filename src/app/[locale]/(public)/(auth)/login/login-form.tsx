@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,6 +44,7 @@ export default function LoginForm() {
       Gọi là dùng `Next.js Server` làm `proxy trung gian`
    */
   const t = useTranslations("Login");
+
   const setIsRole = useAppStore((state) => state.setIsRole);
   const setSocket = useAppStore((state) => state.setSocket);
 
@@ -105,12 +107,14 @@ export default function LoginForm() {
               <FormField
                 control={form.control}
                 name="email"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid gap-2">
                       <Label htmlFor="email">Email</Label>
                       <Input id="email" type="email" placeholder="m@example.com" required {...field} />
-                      <FormMessage />
+                      <FormMessage>
+                        {Boolean(errors.email?.message) && t(errors.email?.message as any)}
+                      </FormMessage>
                     </div>
                   </FormItem>
                 )}
@@ -118,7 +122,7 @@ export default function LoginForm() {
               <FormField
                 control={form.control}
                 name="password"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <div className="grid gap-2">
                       <div className="flex items-center">
@@ -137,7 +141,10 @@ export default function LoginForm() {
                           {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
                       </div>
-                      <FormMessage />
+                      <FormMessage>
+                        {Boolean(errors.password?.message) &&
+                          t(errors.password?.message as any)}
+                      </FormMessage>
                     </div>
                   </FormItem>
                 )}

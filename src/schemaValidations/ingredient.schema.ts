@@ -19,14 +19,14 @@ export const IngredientQuery = BaseQuery.and(
 export type IngredientQueryType = z.TypeOf<typeof IngredientQuery>;
 
 export const CreateIngredientBody = z.object({
-  name: z.string().min(1).max(256),
-  description: z.string().max(10000).optional(),
+  name: z.string().min(1, { message: "nameRequired" }).max(256, { message: "nameTooLong" }),
+  description: z.string().max(10000, { message: "descriptionTooLong" }).optional(),
   allergenType: z.string().optional(),
   isVegetarian: z.boolean().optional(),
   isVegan: z.boolean().optional(),
-  category: z.string().min(1),
+  category: z.string().min(1, { message: "categoryRequired" }),
   isActive: z.boolean(),
-  image: z.string().url(),
+  image: z.string().url({ message: "invalidUrl" }),
 });
 
 export type CreateIngredientBodyType = z.TypeOf<typeof CreateIngredientBody>;

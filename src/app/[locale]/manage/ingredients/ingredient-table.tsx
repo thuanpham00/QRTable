@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/incompatible-library */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
@@ -38,6 +39,7 @@ import { Search, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem } from "@/components/ui/form";
+import { useTranslations } from "next-intl";
 
 type IngredientItem = IngredientListResType["data"][0];
 
@@ -67,116 +69,127 @@ const IngredientTableContext = createContext<{
   setIngredientDelete: (value: IngredientItem | null) => {},
 });
 
-export const columns: ColumnDef<IngredientItem>[] = [
-  {
-    accessorKey: "id",
-    header: "ID",
-  },
-  {
-    accessorKey: "image",
-    header: "Ảnh",
-    cell: ({ row }) => {
-      const src = row.getValue("image") as string;
-      return (
-        <Avatar className="aspect-square w-16 h-16 rounded-md object-cover">
-          {src ? <AvatarImage src={src} /> : null}
-          <AvatarFallback className="rounded-none">{row.original.name}</AvatarFallback>
-        </Avatar>
-      );
+export const getColumns = (t: any) => {
+  const columns: ColumnDef<IngredientItem>[] = [
+    {
+      accessorKey: "id",
+      header: "ID",
     },
-  },
-  {
-    accessorKey: "name",
-    header: "Tên nguyên liệu",
-    cell: ({ row }) => <div className="capitalize font-semibold">{row.getValue("name")}</div>,
-  },
-  {
-    accessorKey: "category",
-    header: "Danh mục",
-    cell: ({ row }) => (
-      <div className="capitalize underline font-medium">
-        {getValuesCategory(row.original.category as string) || "—"}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "allergenType",
-    header: "Loại dị ứng",
-    cell: ({ row }) => <div>{row.getValue("allergenType") || "—"}</div>,
-  },
-  {
-    accessorKey: "isVegetarian",
-    header: "Ăn chay",
-    cell: ({ row }) =>
-      row.getValue("isVegetarian") ? (
-        <Badge className="bg-green-500 text-white">Có</Badge>
-      ) : (
-        <Badge variant="outline">Không</Badge>
-      ),
-  },
-  {
-    accessorKey: "isVegan",
-    header: "Thuần chay",
-    cell: ({ row }) =>
-      row.getValue("isVegan") ? (
-        <Badge className="bg-green-500 text-white">Có</Badge>
-      ) : (
-        <Badge variant="outline">Không</Badge>
-      ),
-  },
-  {
-    accessorKey: "isActive",
-    header: "Trạng thái",
-    cell: ({ row }) =>
-      row.getValue("isActive") ? (
-        <Badge className="bg-blue-500 text-white">Còn</Badge>
-      ) : (
-        <Badge variant="destructive">Hết</Badge>
-      ),
-  },
-  {
-    accessorKey: "description",
-    header: "Mô tả",
-    cell: ({ row }) => (
-      <div className="whitespace-pre-line max-w-60 text-xs text-muted-foreground">
-        {row.getValue("description") || "—"}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "countDishUsed",
-    header: "Món ăn sử dụng",
-    cell: ({ row }) => (
-      <div className="whitespace-pre-line max-w-15 text-center text-white">
-        {typeof row.original.countDishUsed === "number" ? row.original.countDishUsed : "—"}
-      </div>
-    ),
-  },
-  {
-    id: "actions",
-    header: "Hành động",
-    cell: function Actions({ row }) {
-      const { setIngredientIdEdit, setIngredientDelete } = useContext(IngredientTableContext);
-      const openEditIngredient = () => {
-        setIngredientIdEdit(row.original.id);
-      };
-
-      const openDeleteIngredient = () => {
-        setIngredientDelete(row.original);
-      };
-      return (
-        <div className="flex items-center gap-2">
-          <Button size="sm" onClick={openEditIngredient} className="bg-blue-500 hover:bg-blue-400 text-white">
-            Sửa
-          </Button>
-          <Button size="sm" onClick={openDeleteIngredient} className="bg-red-500 hover:bg-red-400 text-white">
-            Xóa
-          </Button>
+    {
+      accessorKey: "image",
+      header: t("image"),
+      cell: ({ row }) => {
+        const src = row.getValue("image") as string;
+        return (
+          <Avatar className="aspect-square w-16 h-16 rounded-md object-cover">
+            {src ? <AvatarImage src={src} /> : null}
+            <AvatarFallback className="rounded-none">{row.original.name}</AvatarFallback>
+          </Avatar>
+        );
+      },
+    },
+    {
+      accessorKey: "name",
+      header: t("name"),
+      cell: ({ row }) => <div className="capitalize font-semibold">{row.getValue("name")}</div>,
+    },
+    {
+      accessorKey: "category",
+      header: t("category"),
+      cell: ({ row }) => (
+        <div className="capitalize underline font-medium">
+          {getValuesCategory(row.original.category as string) || "—"}
         </div>
-      );
+      ),
     },
-  },
-];
+    {
+      accessorKey: "allergenType",
+      header: t("allergenType"),
+      cell: ({ row }) => <div>{row.getValue("allergenType") || "—"}</div>,
+    },
+    {
+      accessorKey: "isVegetarian",
+      header: t("isVegetarian"),
+      cell: ({ row }) =>
+        row.getValue("isVegetarian") ? (
+          <Badge className="bg-green-500 text-white">Có</Badge>
+        ) : (
+          <Badge variant="outline">Không</Badge>
+        ),
+    },
+    {
+      accessorKey: "isVegan",
+      header: t("isVegan"),
+      cell: ({ row }) =>
+        row.getValue("isVegan") ? (
+          <Badge className="bg-green-500 text-white">Có</Badge>
+        ) : (
+          <Badge variant="outline">Không</Badge>
+        ),
+    },
+    {
+      accessorKey: "isActive",
+      header: t("isActive"),
+      cell: ({ row }) =>
+        row.getValue("isActive") ? (
+          <Badge className="bg-blue-500 text-white">Còn</Badge>
+        ) : (
+          <Badge variant="destructive">Hết</Badge>
+        ),
+    },
+    {
+      accessorKey: "description",
+      header: t("description"),
+      cell: ({ row }) => (
+        <div className="whitespace-pre-line max-w-60 text-xs text-muted-foreground">
+          {row.getValue("description") || "—"}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "countDishUsed",
+      header: t("countDishUsed"),
+      cell: ({ row }) => (
+        <div className="whitespace-pre-line max-w-15 text-center text-white">
+          {typeof row.original.countDishUsed === "number" ? row.original.countDishUsed : "—"}
+        </div>
+      ),
+    },
+    {
+      id: "actions",
+      header: t("actions"),
+      cell: function Actions({ row }) {
+        const { setIngredientIdEdit, setIngredientDelete } = useContext(IngredientTableContext);
+        const openEditIngredient = () => {
+          setIngredientIdEdit(row.original.id);
+        };
+
+        const openDeleteIngredient = () => {
+          setIngredientDelete(row.original);
+        };
+        return (
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              onClick={openEditIngredient}
+              className="bg-blue-500 hover:bg-blue-400 text-white"
+            >
+              {t("edit")}
+            </Button>
+            <Button
+              size="sm"
+              onClick={openDeleteIngredient}
+              className="bg-red-500 hover:bg-red-400 text-white"
+            >
+              {t("delete")}
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
+  return columns;
+};
 
 function AlertDialogDeleteIngredient({
   ingredientDelete,
@@ -185,6 +198,7 @@ function AlertDialogDeleteIngredient({
   ingredientDelete: IngredientItem | null;
   setIngredientDelete: (value: IngredientItem | null) => void;
 }) {
+  const t = useTranslations("ManageIngredients");
   const deleteIngredientMutation = useDeleteIngredientMutation();
 
   const handleDelete = async () => {
@@ -214,13 +228,13 @@ function AlertDialogDeleteIngredient({
     >
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Xóa nguyên liệu?</AlertDialogTitle>
+          <AlertDialogTitle>{t("deleteIngredient")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Nguyên liệu{" "}
+            {t("deleteIngredientDesc")}{" "}
             <span className="bg-foreground text-primary-foreground rounded px-1">
               {ingredientDelete?.name}
             </span>{" "}
-            sẽ bị xóa vĩnh viễn
+            {t("deleteIngredientDesc2")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -233,9 +247,10 @@ function AlertDialogDeleteIngredient({
 }
 
 export default function IngredientTable() {
+  const t = useTranslations("ManageIngredients");
   const router = useRouter();
   const queryParams = useQueryParams();
-
+  const columns = getColumns(t);
   const limit = queryParams.limit ? Number(queryParams.limit) : 10;
   const page = queryParams.page ? Number(queryParams.page) : 1;
 
@@ -318,13 +333,11 @@ export default function IngredientTable() {
         />
 
         <div className="mb-4 p-3 rounded bg-yellow-50 border border-yellow-300 text-yellow-900 text-sm">
-          <strong>Lưu ý:</strong> <br />
-          <span className="font-semibold">Ăn chay</span> (Vegetarian): Không ăn thịt động vật nhưng vẫn có thể
-          dùng các sản phẩm từ động vật như trứng, sữa, mật ong...
+          <strong>{t("note")}:</strong> <br />
+          <span className="font-semibold">{t("vegetarianLabel")}</span> (Vegetarian): {t("vegetarianNote")}
           <br />
-          <span className="font-semibold">Thuần chay</span> (Vegan): Không ăn thịt và{" "}
-          <span className="underline">không sử dụng bất kỳ sản phẩm nào có nguồn gốc từ động vật</span> (bao
-          gồm trứng, sữa, mật ong, gelatin, v.v.).
+          <span className="font-semibold">{t("veganLabel")}</span> (Vegan): {t("veganNote")}{" "}
+          <span className="underline">{t("veganNoteHighlight")}</span>
         </div>
 
         <div className="flex items-center gap-2 py-4">
@@ -342,7 +355,7 @@ export default function IngredientTable() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <Input placeholder="Lọc tên" className="max-w-sm" {...field} />
+                    <Input placeholder={t("filterName")} className="max-w-sm" {...field} />
                   </FormItem>
                 )}
               />
@@ -359,13 +372,13 @@ export default function IngredientTable() {
                       value={field.value}
                     >
                       <SelectTrigger className="w-52">
-                        <SelectValue placeholder="Chọn nhóm nguyên liệu" />
+                        <SelectValue placeholder={t("filterCategory")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="rau-cu">Rau củ</SelectItem>
-                        <SelectItem value="thit-ca">Thịt cá</SelectItem>
-                        <SelectItem value="gia-vi">Gia vị</SelectItem>
-                        <SelectItem value="khac">Khác</SelectItem>
+                        <SelectItem value="rau-cu">{t("categoryVegetable")}</SelectItem>
+                        <SelectItem value="thit-ca">{t("categoryMeat")}</SelectItem>
+                        <SelectItem value="gia-vi">{t("categorySpice")}</SelectItem>
+                        <SelectItem value="khac">{t("categoryOther")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormItem>

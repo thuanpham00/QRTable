@@ -17,7 +17,7 @@ export default function NavLinks() {
 
   return (
     <TooltipProvider>
-      <aside className="fixed inset-y-0 left-0 z-10 hidden sm:w-50 border-r bg-background sm:flex flex-col">
+      <aside className="fixed inset-y-0 left-0 z-10 hidden sm:w-50 border-r dark:bg-background bg-[#ddd] sm:flex flex-col">
         <nav className="flex flex-col items-center gap-4 px-2 py-4">
           <Link
             href="/"

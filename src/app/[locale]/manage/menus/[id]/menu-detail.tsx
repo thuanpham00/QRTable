@@ -44,6 +44,7 @@ import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui
 import { useGetListDishCategoryNameQuery } from "@/queries/useDishCategory";
 import { useAppStore } from "@/components/app-provider";
 import revalidateApiRequests from "@/apiRequests/revalidate";
+import { useTranslations } from "next-intl";
 
 // sử dụng trong phạm vị component AccountTable và các component con của nó
 const MenuTableContext = createContext<{
@@ -59,144 +60,147 @@ const MenuTableContext = createContext<{
 });
 
 type MenuItem = MenuItemListResType["data"]["itemList"][0];
-const columns: ColumnDef<MenuItem>[] = [
-  {
-    accessorKey: "id",
-    header: "ID",
-    cell: ({ row }) => <div className="font-medium">#{row.getValue("id")}</div>,
-  },
-  {
-    id: "dishImage",
-    header: () => <div className="text-center">Hình ảnh</div>,
-    cell: ({ row }) => {
-      const dish = row.original.dish;
-      return (
-        <div className="flex justify-center">
-          <Image
-            src={dish.image}
-            alt={dish.name}
-            width={60}
-            height={60}
-            className="rounded-md object-cover w-15 h-15"
-          />
-        </div>
-      );
+const getColumns = (t: any) => {
+  const columns: ColumnDef<MenuItem>[] = [
+    {
+      accessorKey: "id",
+      header: "ID",
+      cell: ({ row }) => <div className="font-medium">#{row.getValue("id")}</div>,
     },
-  },
-  {
-    id: "dishName",
-    header: "Tên món ăn",
-    cell: ({ row }) => {
-      const dish = row.original.dish;
-      return (
-        <div>
-          <div className="font-medium">{dish.name}</div>
-          <p className="text-sm text-muted-foreground max-w-75 whitespace-normal">{dish.description}</p>
-        </div>
-      );
+    {
+      id: "dishImage",
+      header: () => <div className="text-center">{t("image")}</div>,
+      cell: ({ row }) => {
+        const dish = row.original.dish;
+        return (
+          <div className="flex justify-center">
+            <Image
+              src={dish.image}
+              alt={dish.name}
+              width={60}
+              height={60}
+              className="rounded-md object-cover w-15 h-15"
+            />
+          </div>
+        );
+      },
     },
-    filterFn: (row, columnId, filterValue: string) => {
-      if (!filterValue) return true;
-      const dishName = row.original.dish.name.toLowerCase();
-      return dishName.includes(filterValue.toLowerCase());
+    {
+      id: "dishName",
+      header: t("nameDish"),
+      cell: ({ row }) => {
+        const dish = row.original.dish;
+        return (
+          <div>
+            <div className="font-medium">{dish.name}</div>
+            <p className="text-sm text-muted-foreground max-w-75 whitespace-normal">{dish.description}</p>
+          </div>
+        );
+      },
+      filterFn: (row, columnId, filterValue: string) => {
+        if (!filterValue) return true;
+        const dishName = row.original.dish.name.toLowerCase();
+        return dishName.includes(filterValue.toLowerCase());
+      },
     },
-  },
-  {
-    id: "price",
-    header: "Giá menu",
-    cell: ({ row }) => {
-      const menuItemPrice = row.original.price;
+    {
+      id: "price",
+      header: t("menuPrice"),
+      cell: ({ row }) => {
+        const menuItemPrice = row.original.price;
 
-      return (
-        <div className="space-y-1">
-          <div className={`font-medium text-orange-500 text-lg`}>{formatCurrency(menuItemPrice)}</div>
-        </div>
-      );
+        return (
+          <div className="space-y-1">
+            <div className={`font-medium text-orange-500 text-lg`}>{formatCurrency(menuItemPrice)}</div>
+          </div>
+        );
+      },
     },
-  },
-  {
-    id: "price_base",
-    header: "Giá gốc",
-    cell: ({ row }) => {
-      const dishPrice = row.original.dish.price;
+    {
+      id: "price_base",
+      header: t("basePrice"),
+      cell: ({ row }) => {
+        const dishPrice = row.original.dish.price;
 
-      return (
-        <div className="space-y-1">
-          <div className={`font-medium }`}>{formatCurrency(dishPrice)}</div>
-        </div>
-      );
+        return (
+          <div className="space-y-1">
+            <div className={`font-medium }`}>{formatCurrency(dishPrice)}</div>
+          </div>
+        );
+      },
     },
-  },
-  {
-    accessorKey: "category",
-    header: "Danh mục",
-    cell: ({ row }) => {
-      const dish = row.original.dish;
-      return <div className="underline font-semibold">{dish.category.name}</div>;
+    {
+      accessorKey: "category",
+      header: t("category"),
+      cell: ({ row }) => {
+        const dish = row.original.dish;
+        return <div className="underline font-semibold">{dish.category.name}</div>;
+      },
+      filterFn: (row, columnId, filterValue) => {
+        // row.original.dish.category.id là số, filterValue là string
+        return filterValue ? row.original.dish.category.id.toString() === filterValue : true;
+      },
     },
-    filterFn: (row, columnId, filterValue) => {
-      // row.original.dish.category.id là số, filterValue là string
-      return filterValue ? row.original.dish.category.id.toString() === filterValue : true;
-    },
-  },
-  {
-    accessorKey: "status",
-    header: () => <div className="text-center">Trạng thái</div>,
-    cell: ({ row }) => {
-      const status = row.getValue("status") as string;
-      const statusMap: Record<string, { label: string; variant: string }> = {
-        Available: { label: "Có sẵn", variant: "default" },
-        OutOfStock: { label: "Hết hàng", variant: "destructive" },
-        Hidden: { label: "Ẩn", variant: "secondary" },
-      };
-      const statusInfo = statusMap[status] || { label: status, variant: "default" };
+    {
+      accessorKey: "status",
+      header: () => <div className="text-center">{t("status")}</div>,
+      cell: ({ row }) => {
+        const status = row.getValue("status") as string;
+        const statusMap: Record<string, { label: string; variant: string }> = {
+          Available: { label: t("available"), variant: "default" },
+          OutOfStock: { label: t("outOfStock"), variant: "destructive" },
+          Hidden: { label: t("hidden"), variant: "secondary" },
+        };
+        const statusInfo = statusMap[status] || { label: status, variant: "default" };
 
-      return (
-        <div className="flex justify-center">
-          <Badge variant={statusInfo.variant as any}>{statusInfo.label}</Badge>
-        </div>
-      );
+        return (
+          <div className="flex justify-center">
+            <Badge variant={statusInfo.variant as any}>{statusInfo.label}</Badge>
+          </div>
+        );
+      },
     },
-  },
-  {
-    id: "notes",
-    header: "Ghi chú",
-    cell: ({ row }) => {
-      const notes = row.original.notes;
-      return <div className="max-w-50 truncate">{notes || "-"}</div>;
+    {
+      id: "notes",
+      header: t("notes"),
+      cell: ({ row }) => {
+        const notes = row.original.notes;
+        return <div className="max-w-50 truncate">{notes || "-"}</div>;
+      },
     },
-  },
-  {
-    accessorKey: "createdAt",
-    header: "Ngày tạo",
-    cell: ({ row }) => (
-      <div className="text-sm">{formatDateTimeToLocaleString(row.getValue("createdAt"))}</div>
-    ),
-  },
-  {
-    id: "actions",
-    header: () => <div className="text-center">Hành động</div>,
-    cell: function Actions({ row }) {
-      const { setMenuItemIdEdit, setMenuItemDelete } = useContext(MenuTableContext);
-      const openEditMenuItem = () => {
-        setMenuItemIdEdit(row.original.id);
-      };
-      const openDeleteMenuItem = () => {
-        setMenuItemDelete(row.original);
-      };
-      return (
-        <div className="flex justify-center gap-2">
-          <Button size="sm" className="bg-red-500 hover:bg-red-400 text-white" onClick={openDeleteMenuItem}>
-            Xóa khỏi menu
-          </Button>
-          <Button size="sm" className="bg-blue-500 hover:bg-blue-400 text-white" onClick={openEditMenuItem}>
-            Sửa
-          </Button>
-        </div>
-      );
+    {
+      accessorKey: "createdAt",
+      header: t("createdAt"),
+      cell: ({ row }) => (
+        <div className="text-sm">{formatDateTimeToLocaleString(row.getValue("createdAt"))}</div>
+      ),
     },
-  },
-];
+    {
+      id: "actions",
+      header: () => <div className="text-center">{t("actions")}</div>,
+      cell: function Actions({ row }) {
+        const { setMenuItemIdEdit, setMenuItemDelete } = useContext(MenuTableContext);
+        const openEditMenuItem = () => {
+          setMenuItemIdEdit(row.original.id);
+        };
+        const openDeleteMenuItem = () => {
+          setMenuItemDelete(row.original);
+        };
+        return (
+          <div className="flex justify-center gap-2">
+            <Button size="sm" className="bg-red-500 hover:bg-red-400 text-white" onClick={openDeleteMenuItem}>
+              {t("removeFromMenu")}
+            </Button>
+            <Button size="sm" className="bg-blue-500 hover:bg-blue-400 text-white" onClick={openEditMenuItem}>
+              {t("edit")}
+            </Button>
+          </div>
+        );
+      },
+    },
+  ];
+  return columns;
+};
 
 function AlertDialogDeleteMenuItem({
   menuItemDelete,
@@ -205,6 +209,7 @@ function AlertDialogDeleteMenuItem({
   menuItemDelete: MenuItem | null;
   setMenuItemDelete: (value: MenuItem | null) => void;
 }) {
+  const t = useTranslations("ManageMenus");
   const deleteMenuItemMutation = useDeleteMenuItemMutation();
 
   const handleDelete = async () => {
@@ -231,18 +236,17 @@ function AlertDialogDeleteMenuItem({
     >
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Xóa món ăn khỏi menu?</AlertDialogTitle>
+          <AlertDialogTitle>{t("deleteMenuItemTitle")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Món{" "}
-            <span className="bg-foreground text-primary-foreground rounded px-1">
-              {menuItemDelete?.dish.name}
-            </span>{" "}
-            sẽ bị xóa vĩnh viễn khỏi menu {menuItemDelete?.menuId}.
+            {t("deleteMenuItemDesc", {
+              name: menuItemDelete?.dish.name as string,
+              menuId: menuItemDelete?.menuId as number,
+            })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => setMenuItemDelete(null)}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete}>Continue</AlertDialogAction>
+          <AlertDialogCancel onClick={() => setMenuItemDelete(null)}>{t("cancel")}</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDelete}>{t("continue")}</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -252,6 +256,8 @@ function AlertDialogDeleteMenuItem({
 const PAGE_SIZE = 10;
 const pageIndex = 0;
 export default function MenuDetail() {
+  const t = useTranslations("ManageMenus");
+  const columns = getColumns(t);
   const socket = useAppStore((state) => state.socket);
   const params = useParams();
   const id = params.id as string;
@@ -300,13 +306,13 @@ export default function MenuDetail() {
     if (!socket) return;
     function updateMenuItemListener() {
       listMenuItemQuery.refetch();
-      toast.success("Menu món ăn đã được cập nhật từ hệ thống", { duration: 2000 });
+      toast.success(t("menuItemUpdated"), { duration: 2000 });
     }
     socket.on("update-menu-item", updateMenuItemListener);
     return () => {
       socket.off("update-menu-item", updateMenuItemListener);
     };
-  }, [socket, listMenuItemQuery]);
+  }, [socket, listMenuItemQuery, t]);
 
   return (
     <MenuTableContext.Provider
@@ -319,14 +325,18 @@ export default function MenuDetail() {
       <div>
         <div className="w-full h-px bg-[#2e2f2f] my-8"></div>
         <div className="flex items-center mb-6">
-          <div className="text-lg font-semibold">Danh sách món ăn trong menu - ({data.length} món)</div>
+          <div className="text-lg font-semibold">
+            {t("nameListDish", {
+              length: data.length,
+            })}
+          </div>
           <div className="ml-auto">
             <AddDishToMenuForm idMenu={Number(id)} dataMenuItemsCurrent={data} />
           </div>
         </div>
 
         <Input
-          placeholder="Tên món ăn"
+          placeholder={t("filterNameDish")}
           value={(table.getColumn("dishName")?.getFilterValue() as string) ?? ""}
           onChange={(event) => table.getColumn("dishName")?.setFilterValue(event.target.value)}
           className="max-w-80 mb-4 mr-2"
@@ -342,7 +352,7 @@ export default function MenuDetail() {
             >
               {(() => {
                 const filterValue = table.getColumn("category")?.getFilterValue();
-                if (!filterValue) return "Danh mục";
+                if (!filterValue) return t("categoryFilter");
                 const found = dishCategories.find((cat) => cat.id.toString() === String(filterValue));
                 return found ? found.name : String(filterValue);
               })()}
@@ -425,8 +435,7 @@ export default function MenuDetail() {
         </div>
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="text-xs text-muted-foreground py-4 flex-1 ">
-            Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong{" "}
-            <strong>{data.length}</strong> kết quả
+            {t("showingOf", { count: table.getPaginationRowModel().rows.length, total: data.length })}
           </div>
           <div className="space-x-2">
             <Button
@@ -435,7 +444,7 @@ export default function MenuDetail() {
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              Trước
+              {t("previous")}
             </Button>
             <Button
               variant="outline"
@@ -443,7 +452,7 @@ export default function MenuDetail() {
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              Sau
+              {t("next")}
             </Button>
           </div>
         </div>

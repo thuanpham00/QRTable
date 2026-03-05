@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { getTableLink, getVietnameseTableStatus } from "@/lib/utils";
+import { getTableLink, getVietnameseTableStatus, handleErrorApi } from "@/lib/utils";
 import { useRouter } from "@/i18n/routing";
 import AutoPagination from "@/components/auto-pagination";
 import {
@@ -35,8 +35,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem } from "@/components/ui/form";
 import { Search, X } from "lucide-react";
-import { useAppStore } from "@/components/app-provider";
-import { GuestCreateOrdersResType } from "@/schemaValidations/guest.schema";
+import { useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 
 type TableItem = TableListResType["data"][0];
 
@@ -73,16 +73,23 @@ function AlertDialogDeleteTable({
   setTableDelete: (value: TableItem | null) => void;
 }) {
   const deleteTableMutation = useDeleteTableMutation();
+  const t = useTranslations("ManageTables");
 
   const handleDelete = async () => {
-    if (tableDelete) {
-      const {
-        payload: { message },
-      } = await deleteTableMutation.mutateAsync(tableDelete.number);
-      toast.success(message, {
-        duration: 2000,
+    try {
+      if (tableDelete) {
+        const {
+          payload: { message },
+        } = await deleteTableMutation.mutateAsync(tableDelete.number);
+        toast.success(message, {
+          duration: 2000,
+        });
+        setTableDelete(null);
+      }
+    } catch (error) {
+      handleErrorApi({
+        errors: error,
       });
-      setTableDelete(null);
     }
   };
 
@@ -97,16 +104,14 @@ function AlertDialogDeleteTable({
     >
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Xóa bàn ăn?</AlertDialogTitle>
+          <AlertDialogTitle>{t("deleteTableTitle")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Bàn{" "}
-            <span className="bg-foreground text-primary-foreground rounded px-1">{tableDelete?.number}</span>{" "}
-            sẽ bị xóa vĩnh viễn
+            {t("deleteTableDesc", { number: tableDelete?.number as number })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => setTableDelete(null)}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete}>Continue</AlertDialogAction>
+          <AlertDialogCancel onClick={() => setTableDelete(null)}>{t("cancel")}</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDelete}>{t("continue")}</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -114,9 +119,10 @@ function AlertDialogDeleteTable({
 }
 
 export default function TableTable() {
-  const socket = useAppStore((state) => state.socket);
+  const t = useTranslations("ManageTables");
   const router = useRouter();
   const queryParams = useQueryParams();
+  const { locale } = useParams();
 
   const limit = queryParams.limit ? Number(queryParams.limit) : 10;
   const page = queryParams.page ? Number(queryParams.page) : 1;
@@ -195,7 +201,7 @@ export default function TableTable() {
                 name="number"
                 render={({ field }) => (
                   <FormItem>
-                    <Input placeholder="Lọc số bàn" className="max-w-sm" {...field} />
+                    <Input placeholder={t("filterNumber")} className="max-w-sm" {...field} />
                   </FormItem>
                 )}
               />
@@ -221,7 +227,9 @@ export default function TableTable() {
                 <div className="col-span-1 border rounded-md" key={item.number}>
                   <div className="flex flex-col items-start p-4 space-y-1">
                     <span className="text-lg font-semibold">
-                      {item.typeQR === OrderModeType.DINE_IN ? `Bàn ${item.number}` : `Bàn mang đi`}
+                      {item.typeQR === OrderModeType.DINE_IN
+                        ? t("tableLabel", { number: item.number })
+                        : t("takeawayTableLabel")}
                     </span>
                     <QrCodeTable
                       token={item.token}
@@ -230,35 +238,37 @@ export default function TableTable() {
                       type={item.typeQR}
                     />
                     <span className="mt-1 block text-sm">
-                      Sức chứa: <strong className="text-orange-500">{item.capacity}</strong> chỗ
+                      {t("capacityLabel")} <strong className="text-orange-500">{item.capacity}</strong>{" "}
+                      {t("seats")}
                     </span>
                     <div className="mt-1 flex items-center gap-2 text-sm">
-                      <span>Trạng thái:</span>
+                      <span>{t("statusLabel")}</span>
                       <Badge variant="outline" className={getTableStatusColor(item.status)}>
                         {getVietnameseTableStatus(item.status)}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-2 mt-1">
-                      <span>Loại bàn: </span>
+                      <span>{t("tableTypeLabel")} </span>
                       <span
                         className={`text-sm ${item.typeQR === OrderModeType.DINE_IN ? "text-green-500" : "text-yellow-500"}`}
                       >
-                        {item.typeQR === OrderModeType.DINE_IN ? "Ăn tại chỗ" : "Mang đi"}
+                        {item.typeQR === OrderModeType.DINE_IN ? t("dineIn") : t("takeaway")}
                       </span>
                     </div>
                     <span className="mt-1 block text-sm h-10 line-clamp-2">
-                      Ghi chú: {item.notes ? item.notes : "Không có ghi chú"}
+                      {t("notesLabel")} {item.notes ? item.notes : t("noNotes")}
                     </span>
                     <span className="mt-1 flex items-center gap-2 text-sm">
-                      <span> Ngày tạo:</span>
+                      <span>{t("createdAtLabel")}</span>
                       <strong className="text-orange-500">
                         {new Date(item.createdAt).toLocaleDateString("vi-VN")}
                       </strong>
                     </span>
                     <span className="mt-1 flex flex-col gap-1 text-sm">
-                      <span>Link bàn:</span>
+                      <span>{t("tableLinkLabel")}</span>
                       <span className="text-orange-200 break-all">
                         {getTableLink({
+                          locale: locale as string,
                           token: item.token as string,
                           tableNumber: item.number as number,
                           type: item.typeQR as string,
@@ -271,14 +281,14 @@ export default function TableTable() {
                         onClick={() => openEditTable(item.number)}
                         className="bg-blue-500 hover:bg-blue-400 text-white"
                       >
-                        Sửa
+                        {t("edit")}
                       </Button>
                       <Button
                         size="sm"
                         onClick={() => openDeleteTable(item)}
                         className="bg-red-500 hover:bg-red-400 text-white"
                       >
-                        Xóa
+                        {t("delete")}
                       </Button>
                     </div>
                   </div>
@@ -289,7 +299,7 @@ export default function TableTable() {
         </div>
         <div className="flex items-center justify-end space-x-2 py-4">
           <div className="text-xs text-muted-foreground py-4 flex-1 ">
-            Hiển thị <strong>{data.length}</strong> trong <strong>{total}</strong> kết quả
+            {t("showingOf", { count: data.length, total })}
           </div>
           <div>
             <AutoPagination

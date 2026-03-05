@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/incompatible-library */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
@@ -31,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useGetListDishCategoryNameQuery } from "@/queries/useDishCategory";
+import { useTranslations } from "next-intl";
 
 type DishItem = DishListResType["data"][0];
 
@@ -58,92 +60,99 @@ const DishTableContext = createContext<{
   setDishDelete: (value: DishItem | null) => {},
 });
 
-export const columns: ColumnDef<DishItem>[] = [
-  {
-    accessorKey: "id",
-    header: "ID",
-  },
-  {
-    accessorKey: "image",
-    header: "Ảnh",
-    cell: ({ row }) => (
-      <div>
-        <Avatar className="aspect-square w-28 h-25 rounded-md object-cover">
-          <AvatarImage src={row.getValue("image")} />
-          <AvatarFallback className="rounded-none">{row.original.name}</AvatarFallback>
-        </Avatar>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "name",
-    header: "Tên",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
-  },
-  {
-    accessorKey: "category",
-    header: "Danh mục",
-    cell: ({ row }) => {
-      const category = row.getValue("category") as { name: string };
-      return <div className="capitalize underline font-semibold">{category.name}</div>;
+export const getColumns = (t: any) => {
+  const columns: ColumnDef<DishItem>[] = [
+    {
+      accessorKey: "id",
+      header: "ID",
     },
-  },
-  {
-    accessorKey: "price",
-    header: "Giá gốc",
-    cell: ({ row }) => <div className="capitalize">{formatCurrency(row.getValue("price"))}</div>,
-  },
-  {
-    accessorKey: "preparationTime",
-    header: "Thời gian chuẩn bị",
-    cell: ({ row }) => <div className="capitalize text-center">{row.getValue("preparationTime")} phút</div>,
-  },
-  {
-    accessorKey: "popularity",
-    header: "Độ phổ biến",
-    cell: ({ row }) => <div className="capitalize text-center">{row.getValue("popularity")}</div>,
-  },
-  {
-    accessorKey: "status",
-    header: "Trạng thái",
-    cell: ({ row }) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const status = row.getValue("status") as any;
-      return <Badge className={getDishStatusColor(status)}>{getVietnameseDishStatus(status)}</Badge>;
-    },
-  },
-  {
-    accessorKey: "description",
-    header: "Mô tả",
-    cell: ({ row }) => (
-      <div
-        dangerouslySetInnerHTML={{ __html: row.getValue("description") }}
-        className="whitespace-pre-line w-full max-w-75"
-      />
-    ),
-  },
-  {
-    id: "actions",
-    header: "Hành động",
-    cell: function Actions({ row }) {
-      return (
+    {
+      accessorKey: "image",
+      header: t("image"),
+      cell: ({ row }) => (
         <div>
-          <Link
-            href={`/manage/dishes/${row.original.id}`}
-            className="bg-blue-500 px-2 py-1 rounded-lg hover:bg-blue-400 text-white"
-          >
-            Chi tiết
-          </Link>
+          <Avatar className="aspect-square w-28 h-25 rounded-md object-cover">
+            <AvatarImage src={row.getValue("image")} />
+            <AvatarFallback className="rounded-none">{row.original.name}</AvatarFallback>
+          </Avatar>
         </div>
-      );
+      ),
     },
-  },
-];
+    {
+      accessorKey: "name",
+      header: t("name"),
+      cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
+    },
+    {
+      accessorKey: "category",
+      header: t("category"),
+      cell: ({ row }) => {
+        const category = row.getValue("category") as { name: string };
+        return <div className="capitalize underline font-semibold">{category.name}</div>;
+      },
+    },
+    {
+      accessorKey: "price",
+      header: t("price"),
+      cell: ({ row }) => <div className="capitalize">{formatCurrency(row.getValue("price"))}</div>,
+    },
+    {
+      accessorKey: "preparationTime",
+      header: t("preparationTime"),
+      cell: ({ row }) => (
+        <div className="capitalize text-center">
+          {row.getValue("preparationTime")} {t("preparationTimeUnit")}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "popularity",
+      header: t("popularity"),
+      cell: ({ row }) => <div className="capitalize text-center">{row.getValue("popularity")}</div>,
+    },
+    {
+      accessorKey: "status",
+      header: t("status"),
+      cell: ({ row }) => {
+        const status = row.getValue("status") as any;
+        return <Badge className={getDishStatusColor(status)}>{getVietnameseDishStatus(status)}</Badge>;
+      },
+    },
+    {
+      accessorKey: "description",
+      header: t("description2"),
+      cell: ({ row }) => (
+        <div
+          dangerouslySetInnerHTML={{ __html: row.getValue("description") }}
+          className="whitespace-pre-line w-full max-w-75"
+        />
+      ),
+    },
+    {
+      id: "actions",
+      header: t("actions"),
+      cell: function Actions({ row }) {
+        return (
+          <div>
+            <Link
+              href={`/manage/dishes/${row.original.id}`}
+              className="bg-blue-500 px-2 py-1 rounded-lg hover:bg-blue-400 text-white"
+            >
+              {t("detail")}
+            </Link>
+          </div>
+        );
+      },
+    },
+  ];
+  return columns;
+};
 
 export default function DishTable() {
   const router = useRouter();
   const queryParams = useQueryParams();
-
+  const t = useTranslations("ManageDishes");
+  const columns = getColumns(t);
   const page = queryParams.page ? Number(queryParams.page) : 1;
   const limit = queryParams.limit ? Number(queryParams.limit) : 5;
 
@@ -232,7 +241,7 @@ export default function DishTable() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <Input placeholder="Lọc tên" className="max-w-sm" {...field} />
+                    <Input placeholder={t("filterName")} className="max-w-sm" {...field} />
                   </FormItem>
                 )}
               />
@@ -249,11 +258,11 @@ export default function DishTable() {
                       value={field.value}
                     >
                       <SelectTrigger className="w-45">
-                        <SelectValue placeholder="Chọn danh mục" />
+                        <SelectValue placeholder={t("chooseCategory")} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          <SelectLabel>Danh mục</SelectLabel>
+                          <SelectLabel>{t("category")}</SelectLabel>
                           {dishCategories.map((category) => (
                             <SelectItem key={category.id} value={category.id.toString()}>
                               {category.name}

@@ -20,13 +20,14 @@ import { Input } from "@/components/ui/input";
 import { TableListResType } from "@/schemaValidations/table.schema";
 import { OrderModeType, TableStatus } from "@/constants/type";
 import { useGetListTableQuery } from "@/queries/useTable";
+import { useTranslations } from "next-intl";
 
 type TableItem = TableListResType["data"][0];
 
-export const columns: ColumnDef<TableItem>[] = [
+const getColumns = (t: (key: string) => string): ColumnDef<TableItem>[] => [
   {
     accessorKey: "number",
-    header: "Số bàn",
+    header: t("tableNumberHeader"),
     cell: ({ row }) => <div className="capitalize">{row.getValue("number")}</div>,
     filterFn: (row, columnId, filterValue: string) => {
       if (filterValue === undefined) return true;
@@ -35,21 +36,21 @@ export const columns: ColumnDef<TableItem>[] = [
   },
   {
     accessorKey: "capacity",
-    header: "Sức chứa",
+    header: t("capacityHeader"),
     cell: ({ row }) => <div className="capitalize">{row.getValue("capacity")}</div>,
   },
   {
     accessorKey: "typeQR",
-    header: "Loại QR",
+    header: t("qrTypeHeader"),
     cell: ({ row }) => (
       <div className="capitalize">
-        {row.getValue("typeQR") === OrderModeType.DINE_IN ? "Ăn tại bàn" : "Mang đi"}
+        {row.getValue("typeQR") === OrderModeType.DINE_IN ? t("dineIn") : t("takeOut")}
       </div>
     ),
   },
   {
     accessorKey: "status",
-    header: "Trạng thái",
+    header: t("statusHeader"),
     cell: ({ row }) => <div>{getVietnameseTableStatus(row.getValue("status"))}</div>,
   },
 ];
@@ -57,6 +58,8 @@ export const columns: ColumnDef<TableItem>[] = [
 const PAGE_SIZE = 10;
 
 export function TablesDialog({ onChoose }: { onChoose: (table: TableItem) => void }) {
+  const t = useTranslations("ManageOrders");
+  const columns = getColumns(t as (key: string) => string);
   const [open, setOpen] = useState(false);
   const listTableQuery = useGetListTableQuery({
     page: 1,
@@ -122,17 +125,17 @@ export function TablesDialog({ onChoose }: { onChoose: (table: TableItem) => voi
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Thay đổi</Button>
+        <Button variant="outline">{t("changeButton")}</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-150 max-h-full overflow-auto">
         <DialogHeader>
-          <DialogTitle>Chọn bàn</DialogTitle>
+          <DialogTitle>{t("chooseTable")}</DialogTitle>
         </DialogHeader>
         <div>
           <div className="w-full">
             <div className="flex items-center py-4">
               <Input
-                placeholder="Số bàn"
+                placeholder={t("filterTableNumber")}
                 value={(table.getColumn("number")?.getFilterValue() as string) ?? ""}
                 onChange={(event) => table.getColumn("number")?.setFilterValue(event.target.value)}
                 className="w-20"
@@ -195,8 +198,10 @@ export function TablesDialog({ onChoose }: { onChoose: (table: TableItem) => voi
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">
               <div className="text-xs text-muted-foreground py-4 flex-1 ">
-                Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong{" "}
-                <strong>{dataFiltered.length}</strong> kết quả
+                {t("showingOf", {
+                  count: table.getPaginationRowModel().rows.length,
+                  total: dataFiltered.length,
+                })}
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -205,7 +210,7 @@ export function TablesDialog({ onChoose }: { onChoose: (table: TableItem) => voi
                   onClick={() => table.previousPage()}
                   disabled={!table.getCanPreviousPage()}
                 >
-                  Trước
+                  {t("previous")}
                 </Button>
                 <Button
                   variant="outline"
@@ -213,7 +218,7 @@ export function TablesDialog({ onChoose }: { onChoose: (table: TableItem) => voi
                   onClick={() => table.nextPage()}
                   disabled={!table.getCanNextPage()}
                 >
-                  Sau
+                  {t("next")}
                 </Button>
               </div>
             </div>

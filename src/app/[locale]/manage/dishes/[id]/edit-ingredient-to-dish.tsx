@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import IngredientsMenuDialog, {
   IngredientItem,
@@ -18,6 +19,7 @@ import {
   UpdateIngredientInDishType,
 } from "@/schemaValidations/dish.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -31,6 +33,7 @@ export default function EditIngredientToDishForm({
   setId: (value: number | undefined) => void;
   dataIngredientForDishCurrent: DishIngredientListResType["data"];
 }) {
+  const t = useTranslations("ManageDishes");
   const dishIngredientDetail = useGetDishIngredientItem({
     id: id as number,
     enabled: !!id,
@@ -78,7 +81,7 @@ export default function EditIngredientToDishForm({
   const submit = async (values: UpdateIngredientInDishType) => {
     try {
       if (!selectIngredient) {
-        toast.error("Vui lòng chọn món ăn.", { duration: 2000 });
+        toast.error(t("ingredientRequired"), { duration: 2000 });
         return;
       }
 
@@ -112,7 +115,7 @@ export default function EditIngredientToDishForm({
       >
         <DialogContent className="sm:max-w-150">
           <DialogHeader>
-            <DialogTitle>Chỉnh sửa món ăn</DialogTitle>
+            <DialogTitle>{t("editIngredientFromDish")}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
@@ -128,10 +131,10 @@ export default function EditIngredientToDishForm({
                 <FormField
                   control={form.control}
                   name="ingredientId"
-                  render={({ field }) => (
+                  render={({ field, formState: { errors } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="dishId">Tên nguyên liệu</Label>
+                        <Label htmlFor="dishId">{t("nameIngredient")}</Label>
                         <div className="col-span-3 w-full space-y-2 flex items-start gap-6">
                           <div className="flex items-start gap-2">
                             <Avatar className="aspect-square w-12.5 h-12.5 rounded-md object-cover flex flex-col">
@@ -152,7 +155,9 @@ export default function EditIngredientToDishForm({
                               setSelectedIngredient(ingredient);
                             }}
                           />
-                          <FormMessage />
+                          <FormMessage>
+                            {Boolean(errors.ingredientId?.message) && t(errors.ingredientId?.message as any)}
+                          </FormMessage>
                         </div>
                       </div>
                     </FormItem>
@@ -162,10 +167,10 @@ export default function EditIngredientToDishForm({
                 <FormField
                   control={form.control}
                   name="quantity"
-                  render={({ field }) => (
+                  render={({ field, formState: { errors } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="quantity">Số lượng</Label>
+                        <Label htmlFor="quantity">{t("quantity")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Input
                             id="quantity"
@@ -174,7 +179,9 @@ export default function EditIngredientToDishForm({
                             {...field}
                             onChange={(e) => field.onChange(Number(e.target.value))}
                           />
-                          <FormMessage />
+                          <FormMessage>
+                            {Boolean(errors.quantity?.message) && t(errors.quantity?.message as any)}
+                          </FormMessage>
                         </div>
                       </div>
                     </FormItem>
@@ -186,7 +193,7 @@ export default function EditIngredientToDishForm({
                 <FormField
                   control={form.control}
                   name="unit"
-                  render={({ field }) => {
+                  render={({ field, formState: { errors } }) => {
                     const units = [
                       "gam",
                       "kg",
@@ -210,12 +217,12 @@ export default function EditIngredientToDishForm({
                     return (
                       <FormItem>
                         <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                          <Label htmlFor="unit">Đơn vị</Label>
+                          <Label htmlFor="unit">{t("unit")}</Label>
                           <div className="col-span-3 w-full space-y-2">
                             <Select onValueChange={field.onChange} value={field.value}>
                               <FormControl>
                                 <SelectTrigger>
-                                  <SelectValue placeholder="Chọn đơn vị" />
+                                  <SelectValue placeholder={t("chooseUnit")} />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
@@ -226,7 +233,10 @@ export default function EditIngredientToDishForm({
                                 ))}
                               </SelectContent>
                             </Select>
-                            <FormMessage />
+                            <FormMessage>
+                              {Boolean(errors.unit?.message) &&
+                                t(errors.unit?.message as any)}
+                            </FormMessage>
                           </div>
                         </div>
                       </FormItem>
@@ -240,7 +250,7 @@ export default function EditIngredientToDishForm({
                   render={({ field }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="isMain">Nguyên liệu chính</Label>
+                        <Label htmlFor="isMain">{t("isMain")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Switch checked={field.value} onCheckedChange={field.onChange} />
                           <FormMessage />
@@ -256,7 +266,7 @@ export default function EditIngredientToDishForm({
                   render={({ field }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="isOptional">Tùy chọn</Label>
+                        <Label htmlFor="isOptional">{t("optional")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Switch checked={field.value} onCheckedChange={field.onChange} />
                           <FormMessage />
@@ -270,7 +280,7 @@ export default function EditIngredientToDishForm({
 
             <div className="flex items-center justify-end gap-2">
               <Button type="submit" form="add-dish-to-menu-form">
-                Lưu
+                {t("save")}
               </Button>
             </div>
           </Form>

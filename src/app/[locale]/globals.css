@@ -51,7 +51,7 @@
   /* softened background/card to reduce glare */
   --background: #fff7f7;
   --foreground: oklch(0.145 0 0);
-  --card: oklch(96% 0 0);
+  --card: #fff7f7;
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);

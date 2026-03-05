@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import revalidateApiRequests from "@/apiRequests/revalidate";
 import DishesMenuDialog, { DishItem } from "@/app/[locale]/manage/menus/[id]/dishes-menu-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,6 +15,7 @@ import { useAddMenuItemMutation } from "@/queries/useMenu";
 import { AddDishToMenu, AddDishToMenuType, MenuItemListResType } from "@/schemaValidations/menu.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -25,6 +27,7 @@ export default function AddDishToMenuForm({
   idMenu: number;
   dataMenuItemsCurrent: MenuItemListResType["data"]["itemList"];
 }) {
+  const t = useTranslations("ManageMenus");
   const addMenuItemMutation = useAddMenuItemMutation();
   const listIdDish = dataMenuItemsCurrent.map((item) => item.dishId);
 
@@ -48,11 +51,11 @@ export default function AddDishToMenuForm({
   const submit = async (values: AddDishToMenuType) => {
     try {
       if (!selectedDish) {
-        toast.error("Vui lòng chọn món ăn.", { duration: 2000 });
+        toast.error(t("chooseDishRequired"), { duration: 2000 });
         return;
       }
       if (selectedDish && selectedDish?.price >= values.price) {
-        toast.error("Giá menu phải cao hơn giá món ăn.", { duration: 2000 });
+        toast.error(t("menuPriceHigher"), { duration: 2000 });
         return;
       }
       const body = {
@@ -87,12 +90,12 @@ export default function AddDishToMenuForm({
         <DialogTrigger asChild>
           <Button size="sm" className="h-7 gap-1">
             <PlusCircle className="h-3.5 w-3.5" />
-            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Thêm món ăn vào menu</span>
+            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">{t("addDishToMenu")}</span>
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-150">
           <DialogHeader>
-            <DialogTitle>Thêm món ăn vào menu</DialogTitle>
+            <DialogTitle>{t("addDishToMenu")}</DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form
@@ -108,10 +111,10 @@ export default function AddDishToMenuForm({
                 <FormField
                   control={form.control}
                   name="dishId"
-                  render={({ field }) => (
+                  render={({ field, formState: { errors } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="dishId">Tên món ăn</Label>
+                        <Label htmlFor="dishId">{t("nameDish")}</Label>
                         <div className="col-span-3 w-full space-y-2 flex items-start gap-6">
                           <div className="flex items-start gap-2">
                             <Avatar className="aspect-square w-12.5 h-12.5 rounded-md object-cover flex flex-col">
@@ -131,7 +134,9 @@ export default function AddDishToMenuForm({
                               setSelectedDish(dish);
                             }}
                           />
-                          <FormMessage />
+                          <FormMessage>
+                            {Boolean(errors.dishId?.message) && t(errors.dishId?.message as any)}
+                          </FormMessage>
                         </div>
                       </div>
                     </FormItem>
@@ -141,10 +146,10 @@ export default function AddDishToMenuForm({
                 <FormField
                   control={form.control}
                   name="price"
-                  render={({ field }) => (
+                  render={({ field, formState: { errors } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="price">Giá Menu</Label>
+                        <Label htmlFor="price">{t("menuPrice")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Input
                             id="price"
@@ -153,7 +158,9 @@ export default function AddDishToMenuForm({
                             {...field}
                             onChange={(e) => field.onChange(Number(e.target.value))}
                           />
-                          <FormMessage />
+                          <FormMessage>
+                            {Boolean(errors.price?.message) && t(errors.price?.message as any)}
+                          </FormMessage>
                         </div>
                       </div>
                     </FormItem>
@@ -163,13 +170,15 @@ export default function AddDishToMenuForm({
                 <FormField
                   control={form.control}
                   name="notes"
-                  render={({ field }) => (
+                  render={({ field, formState: { errors } }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="notes">Ghi chú</Label>
+                        <Label htmlFor="notes">{t("notes")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Textarea id="notes" className="w-full" {...field} />
-                          <FormMessage />
+                          <FormMessage>
+                            {Boolean(errors.notes?.message) && t(errors.notes?.message as any)}
+                          </FormMessage>
                         </div>
                       </div>
                     </FormItem>
@@ -182,7 +191,7 @@ export default function AddDishToMenuForm({
                   render={({ field }) => (
                     <FormItem>
                       <div className="grid grid-cols-4 items-center justify-items-start gap-4">
-                        <Label htmlFor="status">Trạng thái</Label>
+                        <Label htmlFor="status">{t("status")}</Label>
                         <div className="col-span-3 w-full space-y-2">
                           <Select
                             onValueChange={field.onChange}
@@ -191,7 +200,7 @@ export default function AddDishToMenuForm({
                           >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Chọn trạng thái" />
+                                <SelectValue placeholder={t("chooseStatus")} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
@@ -213,14 +222,14 @@ export default function AddDishToMenuForm({
 
             <div className="flex items-center justify-end gap-2">
               <Button type="reset" form="add-dish-to-menu-form">
-                Hủy
+                {t("cancel")}
               </Button>
               <Button
                 type="submit"
                 form="add-dish-to-menu-form"
                 className="bg-blue-500 hover:bg-blue-400 text-white"
               >
-                Thêm
+                {t("create")}
               </Button>
             </div>
           </Form>
