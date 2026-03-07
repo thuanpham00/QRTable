@@ -25,6 +25,7 @@ import { useAppStore } from "@/components/app-provider";
 import { Check, House, Truck } from "lucide-react";
 import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
+import Chatbot from "@/app/[locale]/guest/menu/chatbot";
 
 type OrderList = (GuestCreateOrdersBodyType["listOrder"][number] & {
   price: number;
@@ -193,6 +194,8 @@ export default function MenuOrder() {
     return a.localeCompare(b);
   });
 
+  const [showChatbot, setShowChatbot] = useState(false);
+
   return (
     <div>
       <h1 className="text-center text-xl font-bold">
@@ -280,7 +283,7 @@ export default function MenuOrder() {
             <div className="p-2 rounded bg-red-500 text-white">{t("takeawayModeNotice")}</div>
           )}
       </div>
-      <div className="grid grid-cols-6 gap-2">
+      <div className="grid grid-cols-6 gap-3">
         <div className="col-span-2 lg:col-span-1">
           {listSortCategory.map((categoryName, index) => {
             return (
@@ -288,7 +291,7 @@ export default function MenuOrder() {
                 key={categoryName}
                 onClick={() => setSelectedCategory(categoryName)}
                 className={cn(
-                  "uppercase tracking-wide w-full text-left! justify-start py-6 dark:bg-card! dark:text-foreground bg-card text-foreground border-b border-gray-300 dark:border-white/60 hover:bg-background rounded-none",
+                  "uppercase tracking-wide w-full text-left! justify-start py-6 dark:bg-card! dark:text-foreground bg-gray-200 text-foreground border-b border-gray-300 dark:border-white/60 hover:bg-background rounded-none",
                   {
                     "rounded-t-sm!": index === 0,
                     "rounded-b-sm! border-b-0": index === listSortCategory.length - 1,
@@ -314,7 +317,7 @@ export default function MenuOrder() {
             <div className="flex flex-col gap-2">
               <Button
                 className="flex-1 block text-center bg-green-500 hover:bg-green-600 text-white"
-                onClick={() => toast.info("Chức năng đang phát triển")}
+                onClick={() => setShowChatbot(true)}
               >
                 <span>{t("Chatbot")}</span>
               </Button>
@@ -329,12 +332,12 @@ export default function MenuOrder() {
         </div>
         <div className="col-span-4 lg:col-span-5">
           <div className="flex flex-col h-[calc(100vh-210px)] overflow-y-auto gap-6 pb-2 mb-2">
-            <div className="space-y-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="space-y-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
               {listDishInSelectedCategory.map((item) => {
                 const dish = item.dish;
                 const isOutOfStock = item.status === MenuItemStatus.OUT_OF_STOCK;
                 return (
-                  <div key={dish.id} className="flex flex-col rounded-md">
+                  <div key={dish.id} className="flex flex-col rounded-md border-2 border-border">
                     <div className="shrink-0 relative w-full h-62.5">
                       <Image
                         src={dish.image}
@@ -353,7 +356,7 @@ export default function MenuOrder() {
                         </div>
                       )}
                     </div>
-                    <div className="px-3 pt-2 pb-4 bg-gray-100 dark:bg-border rounded-bl-md rounded-br-md">
+                    <div className="px-3 pt-2 pb-4 bg-background dark:bg-border  border-t-0 rounded-bl-md rounded-br-md">
                       <h3 className="text-[15px] font-semibold line-clamp-1">{dish.name}</h3>
                       <p className="text-xs text-muted-foreground line-clamp-2 h-10">{dish.description}</p>
                       <div className="flex justify-between items-center">
@@ -451,6 +454,8 @@ export default function MenuOrder() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Chatbot showModal={showChatbot} setShowModal={setShowChatbot} />
     </div>
   );
 }

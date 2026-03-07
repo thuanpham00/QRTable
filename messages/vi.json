@@ -1,7 +1,7 @@
 {
   "Brand": {
-    "title": "Nhà hàng Big Boy",
-    "defaultTitle": "Big Boy"
+    "title": "QRTable",
+    "defaultTitle": "QRTable - Không chỉ là món ăn, mà là trải nghiệm cảm xúc!"
   },
   "HomePage": {
     "hello": "Chào mừng bạn mới đến với QRTable!",
@@ -32,12 +32,30 @@
     "discoverAllDishes": "Khám phá tất cả món ăn"
   },
   "DishDetail": {
-    "notFound": "Món ăn không tồn tại"
+    "notFound": "Món ăn không tồn tại",
+    "description": "Mô tả",
+    "prepTime": "Thời gian",
+    "minutes": "{value} phút",
+    "spicyLevel": "Độ cay",
+    "spicyNone": "Không cay",
+    "spicyMild": "Ít cay",
+    "spicyMedium": "Cay vừa",
+    "spicyHot": "Rất cay",
+    "popularity": "Lượt gọi món",
+    "mainIngredients": "Nguyên liệu chính",
+    "searchKeywords": "Từ khóa tìm kiếm:",
+    "lastUpdated": "Cập nhật lần cuối:",
+    "statusAvailable": "Còn hàng",
+    "statusOutOfStock": "Hết hàng",
+    "statusHidden": "Ẩn",
+    "dishStatusActive": "Đang bán",
+    "dishStatusInactive": "Ngừng bán"
   },
   "LoginGuest": {
     "title": "Đăng nhập để gọi món",
     "nameGuest": "Tên khách hàng",
-    "buttonLogin": "Đăng nhập"
+    "buttonLogin": "Đăng nhập",
+    "description": "Nhập thông tin đăng nhập để đặt hàng"
   },
   "Login": {
     "title": "Đăng nhập",
@@ -52,6 +70,10 @@
   "GuestMenu": {
     "title": "Thực đơn",
     "description": "Chọn món ăn yêu thích của bạn"
+  },
+  "GuestOrders": {
+    "title": "Đơn hàng của tôi",
+    "description": "Theo dõi trạng thái và chi tiết đơn hàng của bạn"
   },
   "ManageAccounts": {
     "title": "Tài khoản",
@@ -751,6 +773,7 @@
   },
   "AboutPage": {
     "title": "Về nhà hàng QRTable",
+    "description": "Chúng tôi cam kết tối đa hóa việc bảo vệ thông tin cá nhân của bạn khi sử dụng các dịch vụ của QRTable. Chính sách này giải thích chi tiết cách chúng tôi thu thập, sử dụng, lưu trữ, bảo vệ và chia sẻ dữ liệu của bạn, cũng như các quyền và lựa chọn của bạn liên quan đến thông tin cá nhân của bạn.",
     "address": "Địa chỉ: 123 HV HCM City",
     "storyTitle": "Câu chuyện của chúng tôi",
     "storyContent": "Big Boy được thành lập vào năm 2010 với một sứ mệnh đơn giản: phục vụ món ăn ngon, chất lượng cao để gắn kết mọi người lại với nhau. Niềm đam mê của chúng tôi đối với nguyên liệu đặc biệt và công thức sáng tạo đã đưa chúng tôi trở thành một tổ chức địa phương được yêu thích, nổi tiếng với cam kết tạo ra những bữa ăn nuôi dưỡng cơ thể và tâm hồn.",
@@ -801,6 +824,8 @@
     "seenDetail": "Xem chi tiết"
   },
   "MenuPage": {
+    "title": "Menu",
+    "description": "Khám phá thực đơn hấp dẫn của chúng tôi và gọi món ăn yêu thích của bạn.",
     "NoMenuActive": "Chưa có menu nào được kích hoạt"
   },
   "GuestOrderPage": {

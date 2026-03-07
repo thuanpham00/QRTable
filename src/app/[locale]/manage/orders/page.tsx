@@ -1,6 +1,34 @@
 import OrderTableSession from "@/app/[locale]/manage/orders/order-table-session";
-import { setRequestLocale } from "next-intl/server";
+import { envConfig, Locale } from "@/utils/config";
+import { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
+
+type Props = {
+  params: Promise<{ locale: Locale }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
+  const t = await getTranslations({
+    locale: params.locale,
+    namespace: "ManageOrders",
+  });
+
+  const url = envConfig.NEXT_PUBLIC_URL + `/${params.locale}/manage/orders`;
+
+  return {
+    title: t("title"),
+    description: t("description"),
+    alternates: {
+      canonical: url,
+    },
+    robots: {
+      index: false, // chặn trạng này không được index bởi công cụ tìm kiếm (là google không index trang này vào kết quả tìm kiếm)
+    },
+  };
+}
 
 export default async function OrdersPage({ params }: { params: Promise<{ locale: string }> }) {
   const locale = (await params).locale;

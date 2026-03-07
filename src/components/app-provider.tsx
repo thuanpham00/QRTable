@@ -6,6 +6,7 @@ import {
   decodeToken,
   generateSocket,
   getAccessTokenFromLocalStorage,
+  getNameGuestFromLocalStorage,
   getOrderTypeQRFromLocalStorage,
   getTableNumberFromLocalStorage,
   getTableTypeQRFromLocalStorage,
@@ -22,6 +23,7 @@ import { useCountOrderTodayQuery } from "@/queries/useOrder";
 import { useQueryClient } from "@tanstack/react-query";
 
 type InfoGuestType = {
+  name: string;
   tokenGuestId: string;
   tableNumber: string;
   orderTypeQR: OrderMode;
@@ -116,6 +118,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     const tableNumber = getTableNumberFromLocalStorage();
     const orderTypeQR = getOrderTypeQRFromLocalStorage();
     const tableTypeQR = getTableTypeQRFromLocalStorage();
+    const nameGuest = getNameGuestFromLocalStorage();
     if (accessToken) {
       const { role } = decodeToken(accessToken);
       setIsRole(role);
@@ -124,6 +127,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       if (tableNumber && orderTypeQR) {
         // nếu có tableNumber thì mới set
         setInfoGuest({
+          name: nameGuest as string,
           tableNumber: tableNumber,
           tokenGuestId: accessToken,
           orderTypeQR: orderTypeQR as OrderMode, // type order có thể đổi

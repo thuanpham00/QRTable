@@ -1,16 +1,59 @@
-import { OrderModeTypeValues, Role } from "@/constants/type";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { AllergenValues, DietaryPreferenceValues, OrderModeTypeValues, Role } from "@/constants/type";
 import { OrderSchema } from "@/schemaValidations/order.schema";
 import z from "zod";
+
+// Helper để validate comma-separated string hoặc array
+const dietaryPreferencesSchema = z
+  .union([
+    z.array(z.enum(DietaryPreferenceValues)), // Array: ["vegetarian", "vegan"]
+    z.string().refine(
+      (val) => {
+        if (!val) return true;
+        const items = val.split(",").map((s) => s.trim());
+        return items.every((item) => DietaryPreferenceValues.includes(item as any));
+      },
+      { message: "Invalid dietary preference value" },
+    ), // String: "vegetarian,vegan"
+  ])
+  .optional()
+  .transform((val) => {
+    // Chuyển array thành string để lưu DB
+    if (Array.isArray(val)) return val.join(",");
+    return val;
+  });
+
+const allergyInfoSchema = z
+  .union([
+    z.array(z.enum(AllergenValues)), // Array: ["shellfish", "dairy"]
+    z.string().refine(
+      (val) => {
+        if (!val) return true;
+        const items = val.split(",").map((s) => s.trim());
+        return items.every((item) => AllergenValues.includes(item as any));
+      },
+      { message: "Invalid allergen value" },
+    ), // String: "shellfish,dairy"
+  ])
+  .optional()
+  .transform((val) => {
+    // Chuyển array thành string để lưu DB
+    if (Array.isArray(val)) return val.join(",");
+    return val;
+  });
 
 export const GuestLoginBody = z
   .object({
     name: z.string().min(2).max(50),
     tableNumber: z.number(),
     token: z.string(),
+    dietaryPreferences: dietaryPreferencesSchema,
+    allergyInfo: allergyInfoSchema,
   })
   .strict();
 
-export type GuestLoginBodyType = z.TypeOf<typeof GuestLoginBody>;
+export type GuestLoginBodyType = z.output<typeof GuestLoginBody>;
+export type GuestLoginBodyInputType = z.input<typeof GuestLoginBody>;
 
 export const GuestLoginRes = z.object({
   data: z.object({

@@ -3,19 +3,20 @@ import Image from "next/image";
 import { Clock, Flame, TrendingUp } from "lucide-react";
 import { format } from "date-fns";
 import { MenuItemResType } from "@/schemaValidations/menu.schema";
+import { getTranslations } from "next-intl/server";
 
-const getSpicy = (value: number) => {
+const getSpicy = (value: number, t: (key: string) => string) => {
   switch (value) {
     case 0:
-      return "Không cay";
+      return t("spicyNone");
     case 1:
-      return "Ít cay";
+      return t("spicyMild");
     case 2:
-      return "Cay vừa";
+      return t("spicyMedium");
     case 3:
-      return "Rất cay";
+      return t("spicyHot");
     default:
-      return "Không cay";
+      return t("spicyNone");
   }
 };
 
@@ -25,24 +26,25 @@ const getSpicyLevel = (level: number) => {
   ));
 };
 
-const getStatusBadge = (status: string) => {
+const getStatusBadge = (status: string, t: (key: string) => string) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const variants: Record<string, { variant: any; label: string }> = {
-    Available: { variant: "default", label: "Còn hàng" },
-    OutOfStock: { variant: "destructive", label: "Hết hàng" },
-    Hidden: { variant: "secondary", label: "Ẩn" },
+    Available: { variant: "default", label: t("statusAvailable") },
+    OutOfStock: { variant: "destructive", label: t("statusOutOfStock") },
+    Hidden: { variant: "secondary", label: t("statusHidden") },
   };
   return variants[status] || { variant: "secondary", label: status };
 };
 
-const getDishStatusBadge = (status: string) => {
+const getDishStatusBadge = (status: string, t: (key: string) => string) => {
   return status === "Active"
-    ? { variant: "default" as const, label: "Đang bán" }
-    : { variant: "secondary" as const, label: "Ngừng bán" };
+    ? { variant: "default" as const, label: t("dishStatusActive") }
+    : { variant: "secondary" as const, label: t("dishStatusInactive") };
 };
 
-export default function DishDetail({ dish }: { dish: MenuItemResType["data"] }) {
+export default async function DishDetail({ dish }: { dish: MenuItemResType["data"] }) {
   const { dish: dishData, price, status } = dish;
+  const t = await getTranslations("DishDetail");
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-5xl">
@@ -51,10 +53,11 @@ export default function DishDetail({ dish }: { dish: MenuItemResType["data"] }) 
           <Image
             src={dishData.image}
             alt={dishData.name}
-            width={400}
-            height={400}
+            width={800}
+            height={800}
             className="object-cover w-full h-full"
             priority
+            title={dishData.name}
           />
         </div>
 
@@ -64,8 +67,8 @@ export default function DishDetail({ dish }: { dish: MenuItemResType["data"] }) 
               <Badge variant="outline" className="bg-orange-500 px-4 py-1">
                 {dishData.category.name}
               </Badge>
-              <Badge {...getStatusBadge(status)} />
-              <Badge {...getDishStatusBadge(dishData.status)} />
+              <Badge {...getStatusBadge(status, t)} />
+              <Badge {...getDishStatusBadge(dishData.status, t)} />
             </div>
             <h1 className="text-4xl font-bold mb-2">{dishData.name}</h1>
             <div className="flex items-baseline gap-3">
@@ -79,7 +82,7 @@ export default function DishDetail({ dish }: { dish: MenuItemResType["data"] }) 
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold mb-2">Mô tả</h2>
+            <h2 className="text-lg font-semibold mb-2">{t("description")}</h2>
             <p className="text-muted-foreground leading-relaxed">{dishData.description}</p>
           </div>
 
@@ -87,23 +90,23 @@ export default function DishDetail({ dish }: { dish: MenuItemResType["data"] }) 
             <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50">
               <Clock className="w-5 h-5 text-muted-foreground" />
               <div>
-                <div className="text-sm text-muted-foreground">Thời gian</div>
-                <div className="font-semibold">{dishData.preparationTime} phút</div>
+                <div className="text-sm text-muted-foreground">{t("prepTime")}</div>
+                <div className="font-semibold">{t("minutes", { value: dishData.preparationTime })}</div>
               </div>
             </div>
 
             <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50">
               <div className="flex gap-1">{getSpicyLevel(dishData.spicyLevel)}</div>
               <div>
-                <div className="text-sm text-muted-foreground">Độ cay</div>
-                <div className="font-semibold">{getSpicy(dishData.spicyLevel)}</div>
+                <div className="text-sm text-muted-foreground">{t("spicyLevel")}</div>
+                <div className="font-semibold">{getSpicy(dishData.spicyLevel, t)}</div>
               </div>
             </div>
 
             <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50">
               <TrendingUp className="w-5 h-5 text-muted-foreground" />
               <div>
-                <div className="text-sm text-muted-foreground">Lượt gọi món</div>
+                <div className="text-sm text-muted-foreground">{t("popularity")}</div>
                 <div className="font-semibold">{dishData.popularity}</div>
               </div>
             </div>
@@ -111,7 +114,7 @@ export default function DishDetail({ dish }: { dish: MenuItemResType["data"] }) 
             <div className="flex items-center gap-2 p-3 rounded-lg bg-muted/50">
               <TrendingUp className="w-5 h-5 text-muted-foreground" />
               <div>
-                <div className="text-sm text-muted-foreground">Nguyên liệu chính</div>
+                <div className="text-sm text-muted-foreground">{t("mainIngredients")}</div>
                 <div className="font-semibold">{dishData.ingredients?.join(", ")}</div>
               </div>
             </div>
@@ -119,10 +122,10 @@ export default function DishDetail({ dish }: { dish: MenuItemResType["data"] }) 
         </div>
         <div className="text-sm text-muted-foreground space-y-1 pt-4 border-t">
           <p>
-            Từ khóa tìm kiếm: <span className="text-foreground">{dishData.searchKeywords}</span>
+            {t("searchKeywords")} <span className="text-foreground">{dishData.searchKeywords}</span>
           </p>
           <p>
-            Cập nhật lần cuối:{" "}
+            {t("lastUpdated")}{" "}
             <span className="text-foreground">
               {format(new Date(dishData.updatedAt), "dd/MM/yyyy HH:mm")}
             </span>

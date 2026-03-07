@@ -2,7 +2,9 @@ import { menuApiRequests } from "@/apiRequests/menu";
 import PopularDishes from "@/components/popular-dishes";
 import SlideImageHero from "@/components/slide-image-hero";
 import { Link } from "@/i18n/routing";
+import { htmlToTextForDescription } from "@/lib/server-utils";
 import { wrapServerApi } from "@/lib/utils";
+import { envConfig, Locale } from "@/utils/config";
 import { Award, ChefHat, Sparkles, Users } from "lucide-react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Image from "next/image";
@@ -38,6 +40,24 @@ export type DishSuggestList = {
   createdAt: Date;
   updatedAt: Date;
 }[];
+
+// dùng api generateMetadata khi cần dịch - còn không cần dịch thì dùng metaData tĩnh
+export async function generateMetadata(props: { params: Promise<{ locale: Locale }> }) {
+  const params = await props.params;
+
+  const { locale } = params;
+
+  const t = await getTranslations({ locale, namespace: "HomePage" });
+  const url = envConfig.NEXT_PUBLIC_URL + `/${locale}`;
+
+  return {
+    title: t("title"),
+    description: htmlToTextForDescription(t("description")),
+    alternates: {
+      canonical: url,
+    },
+  };
+}
 
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const locale = (await params).locale;

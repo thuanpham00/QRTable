@@ -115,16 +115,16 @@ export type UpdateMeBodyType = z.TypeOf<typeof UpdateMeBody>;
 
 export const ChangePasswordBody = z
   .object({
-    oldPassword: z.string().min(6).max(100),
-    password: z.string().min(6).max(100),
-    confirmPassword: z.string().min(6).max(100),
+    oldPassword: z.string().min(6, { message: "minmaxPassword" }).max(100, { message: "minmaxPassword" }),
+    password: z.string().min(6, { message: "minmaxPassword" }).max(100, { message: "minmaxPassword" }),
+    confirmPassword: z.string().min(6, { message: "minmaxPassword" }).max(100, { message: "minmaxPassword" }),
   })
   .strict()
   .superRefine(({ confirmPassword, password }, ctx) => {
     if (confirmPassword !== password) {
       ctx.addIssue({
         code: "custom",
-        message: "Mật khẩu mới không khớp",
+        message: "passwordNotMatch",
         path: ["confirmPassword"],
       });
     }

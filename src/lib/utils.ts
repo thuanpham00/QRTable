@@ -88,12 +88,21 @@ export const setTableTypeQRFromLocalStorage = (value: string) => {
   return isClient && localStorage.setItem("tableTypeQR", value);
 };
 
+export const getNameGuestFromLocalStorage = () => {
+  return isClient ? localStorage.getItem("nameGuest") : null;
+};
+
+export const setNameGuestFromLocalStorage = (value: string) => {
+  return isClient && localStorage.setItem("nameGuest", value);
+};
+
 export const removeTokenFromLocalStorage = () => {
   isClient && localStorage.removeItem("accessToken");
   isClient && localStorage.removeItem("refreshToken");
   isClient && localStorage.removeItem("tableNumber");
   isClient && localStorage.removeItem("orderTypeQR");
   isClient && localStorage.removeItem("tableTypeQR");
+  isClient && localStorage.removeItem("nameGuest");
 };
 
 export const checkAndRefreshToken = async (params?: {

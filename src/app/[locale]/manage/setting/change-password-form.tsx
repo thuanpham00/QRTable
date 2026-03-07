@@ -70,12 +70,14 @@ export default function ChangePasswordForm() {
               <FormField
                 control={form.control}
                 name="oldPassword"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <InputPassword
                       field={field}
                       label={t("oldPassword") || "Old Password"}
                       controlLabel="oldPassword"
+                      nameI18="ManageAccounts"
+                      fieldError={errors.oldPassword?.message}
                     />
                   </FormItem>
                 )}
@@ -83,12 +85,14 @@ export default function ChangePasswordForm() {
               <FormField
                 control={form.control}
                 name="password"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <InputPassword
                       field={field}
                       label={t("newPassword") || "New Password"}
                       controlLabel="password"
+                      nameI18="ManageAccounts"
+                      fieldError={errors.password?.message}
                     />
                   </FormItem>
                 )}
@@ -96,12 +100,14 @@ export default function ChangePasswordForm() {
               <FormField
                 control={form.control}
                 name="confirmPassword"
-                render={({ field }) => (
+                render={({ field, formState: { errors } }) => (
                   <FormItem>
                     <InputPassword
                       field={field}
                       label={t("confirmNewPassword") || "Confirm New Password"}
                       controlLabel="confirmPassword"
+                      nameI18="ManageAccounts"
+                      fieldError={errors.confirmPassword?.message}
                     />
                   </FormItem>
                 )}

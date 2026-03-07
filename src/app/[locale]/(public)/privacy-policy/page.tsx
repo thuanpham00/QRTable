@@ -1,4 +1,24 @@
+import { htmlToTextForDescription } from "@/lib/server-utils";
+import { envConfig, Locale } from "@/utils/config";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+
+// dùng api generateMetadata khi cần dịch - còn không cần dịch thì dùng metaData tĩnh
+export async function generateMetadata(props: { params: Promise<{ locale: Locale }> }) {
+  const params = await props.params;
+
+  const { locale } = params;
+
+  const t = await getTranslations({ locale, namespace: "PrivacyPolicyPage" });
+  const url = envConfig.NEXT_PUBLIC_URL + `/${locale}/privacy-policy`;
+
+  return {
+    title: t("title"),
+    description: htmlToTextForDescription(t("description")),
+    alternates: {
+      canonical: url,
+    },
+  };
+}
 
 export default async function PrivacyPolicy({ params }: { params: Promise<{ locale: string }> }) {
   const locale = (await params).locale;

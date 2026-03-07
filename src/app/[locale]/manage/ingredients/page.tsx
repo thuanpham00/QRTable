@@ -2,6 +2,34 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Suspense } from "react";
 import IngredientTable from "@/app/[locale]/manage/ingredients/ingredient-table";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Metadata } from "next";
+import { envConfig, Locale } from "@/utils/config";
+
+type Props = {
+  params: Promise<{ locale: Locale }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const params = await props.params;
+  const t = await getTranslations({
+    locale: params.locale,
+    namespace: "ManageIngredients",
+  });
+
+  const url = envConfig.NEXT_PUBLIC_URL + `/${params.locale}/manage/ingredients`;
+
+  return {
+    title: t("title"),
+    description: t("description"),
+    alternates: {
+      canonical: url,
+    },
+    robots: {
+      index: false, // chặn trạng này không được index bởi công cụ tìm kiếm (là google không index trang này vào kết quả tìm kiếm)
+    },
+  };
+}
 
 export default async function IngredientsPage({ params }: { params: Promise<{ locale: string }> }) {
   const locale = (await params).locale;

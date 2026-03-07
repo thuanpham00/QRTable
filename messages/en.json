@@ -1,7 +1,7 @@
 {
   "Brand": {
-    "title": "Big Boy Restaurant",
-    "defaultTitle": "Big Boy"
+    "title": "QRTable",
+    "defaultTitle": "QRTable - It's not just food, it's an emotional experience!"
   },
   "HomePage": {
     "hello": "Welcome to QRTable!",
@@ -42,16 +42,38 @@
     "minmaxPassword": "Password must be between 6 and 100 characters"
   },
   "DishDetail": {
-    "notFound": "Dish not found"
+    "notFound": "Dish not found",
+    "description": "Description",
+    "prepTime": "Prep Time",
+    "minutes": "{value} mins",
+    "spicyLevel": "Spicy Level",
+    "spicyNone": "Not Spicy",
+    "spicyMild": "Mild",
+    "spicyMedium": "Medium",
+    "spicyHot": "Very Spicy",
+    "popularity": "Order Count",
+    "mainIngredients": "Main Ingredients",
+    "searchKeywords": "Search Keywords:",
+    "lastUpdated": "Last Updated:",
+    "statusAvailable": "In Stock",
+    "statusOutOfStock": "Out of Stock",
+    "statusHidden": "Hidden",
+    "dishStatusActive": "On Sale",
+    "dishStatusInactive": "Unavailable"
   },
   "LoginGuest": {
     "title": "Login to order",
     "nameGuest": "Guest name",
-    "buttonLogin": "Login"
+    "buttonLogin": "Login",
+    "description": "Enter login information to place an order"
   },
   "GuestMenu": {
     "title": "Menu",
     "description": "Choose your favorite dishes"
+  },
+  "GuestOrders": {
+    "title": "My Orders",
+    "description": "Track your order status and details"
   },
   "ManageAccounts": {
     "title": "Accounts",
@@ -749,6 +771,7 @@
     "title": "About QRTable Restaurant",
     "address": "Address: 123 HV HCM City",
     "storyTitle": "Our Story",
+    "description": "We are committed to maximizing the protection of your personal information when using QRTable's services. This policy explains in detail how we collect, use, store, protect, and share your data, as well as your rights and choices regarding your personal information.",
     "storyContent": "Big Boy was founded in 2010 with a simple mission: to serve delicious, high-quality food that brings people together. Our passion for special ingredients and creative recipes has made us a beloved local establishment, known for our commitment to creating meals that nourish both body and soul.",
     "valueTitle": "Our Values",
     "valueContent": "At the heart of Big Boy is a deep dedication to sustainability, community, and culinary excellence. We source ingredients from local farmers and producers, ensuring freshness and supporting the local economy. Our team is passionate about creating dishes that not only delight the palate but also nourish the body, with a focus on wholesome, unprocessed foods.",
@@ -797,6 +820,8 @@
     "seenDetail": "View Details"
   },
   "MenuPage": {
+    "title": "Menu",
+    "description": "Explore our delicious menu and order your favorite dishes",
     "NoMenuActive": "No active menu"
   },
   "GuestOrderPage": {
