@@ -1,8 +1,9 @@
-import DashboardMain from "@/app/[locale]/manage/dashboard/dashboard-main";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { envConfig, Locale } from "@/utils/config";
-import { Metadata } from "next";
+import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Metadata } from "next";
+import { envConfig, Locale } from "@/utils/config";
+import SupplierTable from "@/app/[locale]/manage/suppliers/supplier-table";
 
 type Props = {
   params: Promise<{ locale: Locale }>;
@@ -13,10 +14,10 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params;
   const t = await getTranslations({
     locale: params.locale,
-    namespace: "ManageDashboard",
+    namespace: "ManageSuppliers",
   });
 
-  const url = envConfig.NEXT_PUBLIC_URL + `/${params.locale}/manage/dashboard`;
+  const url = envConfig.NEXT_PUBLIC_URL + `/${params.locale}/manage/suppliers`;
 
   return {
     title: t("title"),
@@ -30,32 +31,27 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   };
 }
 
-export default async function Dashboard({ params }: { params: Promise<{ locale: string }> }) {
+export default async function SuppliersPage({ params }: { params: Promise<{ locale: string }> }) {
   const locale = (await params).locale;
   setRequestLocale(locale); // set ngôn ngữ cho trang này, nếu ko set thì sẽ lấy ngôn ngữ mặc định là en, dù cho url có là /vi đi nữa
-  const t = await getTranslations("ManageDashboard");
+  const t = await getTranslations("ManageSuppliers");
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
       <div className="space-y-2">
         <Card x-chunk="dashboard-06-chunk-0">
           <CardHeader>
-            <CardTitle>{t("title")}</CardTitle>
+            <CardTitle className="text-xl">{t("title")}</CardTitle>
             <CardDescription>{t("description")}</CardDescription>
           </CardHeader>
           <CardContent>
-            <DashboardMain />
+            <Suspense>
+              {/* ngăn lỗi useSearchParams nên dùng Suspense */}
+              <SupplierTable />
+            </Suspense>
           </CardContent>
         </Card>
       </div>
     </main>
   );
 }
-
-/**
- * Các page như trên vẫn là SSG vì có generateStaticParams với [locale], nên Next.js sẽ build ra HTML tĩnh cho từng locale.
-Tuy nhiên, phần bên trong (component con như AccountTable) được bọc bởi <Suspense> và là client component, nên chỉ render nội dung tĩnh ở lớp ngoài, còn bên trong sẽ hydrate và render ở client.
-Như vậy, bạn vẫn giữ được SSG cho phần ngoài, còn phần bên trong sẽ luôn cập nhật theo trạng thái client (ví dụ: dùng hook, lấy dữ liệu động, v.v.).
- */
-
-// nếu bỏ suspense để và bên trong fix lỗi useSearchParams thì page thành static hoàn toàn. nếu build sẵn html thì khi thao tác với trang nó sẽ không cập nhật vì đã có html tĩnh rồi -> nên giữ trang dynamic để lấy data mới và thao tác với trang

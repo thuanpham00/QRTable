@@ -10,6 +10,9 @@ import {
   ShoppingBasket,
   DollarSign,
   LayoutDashboard,
+  ArrowLeftRight,
+  Warehouse,
+  Truck,
 } from "lucide-react";
 
 export function getMenuItems(t: (key: string) => string) {
@@ -66,6 +69,24 @@ export function getMenuItems(t: (key: string) => string) {
       title: t("ingredients"),
       Icon: ShoppingBasket,
       href: "/manage/ingredients",
+      roles: [Role.Owner],
+    },
+    {
+      title: t("supplier"),
+      Icon: Truck,
+      href: "/manage/suppliers",
+      roles: [Role.Owner],
+    },
+    {
+      title: t("import-export"),
+      Icon: ArrowLeftRight,
+      href: "/manage/import-export-stocks",
+      roles: [Role.Owner],
+    },
+    {
+      title: t("inventory-stock"),
+      Icon: Warehouse,
+      href: "/manage/inventory-stocks",
       roles: [Role.Owner],
     },
     {

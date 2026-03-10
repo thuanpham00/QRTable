@@ -12,7 +12,7 @@ import { PlusCircle } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { GuestLoginBody, GuestLoginBodyType } from "@/schemaValidations/guest.schema";
+import { GuestLoginBody, GuestLoginBodyInputType, GuestLoginBodyType } from "@/schemaValidations/guest.schema";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -60,7 +60,7 @@ export default function AddOrder() {
     return result + order.quantity * menuItem.price;
   }, 0);
 
-  const form = useForm<GuestLoginBodyType>({
+  const form = useForm<GuestLoginBodyInputType, any, GuestLoginBodyType>({
     resolver: zodResolver(GuestLoginBody),
     defaultValues: {
       name: "",
@@ -189,7 +189,9 @@ export default function AddOrder() {
                             <Label htmlFor="tableNumber">{t("chooseTable")}</Label>
                             <div className="col-span-3 w-full space-y-2">
                               <div className="flex items-center gap-4">
-                                <div>{t("table")} {field.value}</div>
+                                <div>
+                                  {t("table")} {field.value}
+                                </div>
                                 <TablesDialog
                                   onChoose={(table) => {
                                     field.onChange(table.number);
@@ -219,7 +221,9 @@ export default function AddOrder() {
                   <div>
                     {selectedGuest.name} (#{selectedGuest.id})
                   </div>
-                  <div>{t("table")}: {selectedGuest.tableNumber}</div>
+                  <div>
+                    {t("table")}: {selectedGuest.tableNumber}
+                  </div>
                 </div>
               </div>
             )}

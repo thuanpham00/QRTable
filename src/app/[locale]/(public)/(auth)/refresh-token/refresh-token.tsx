@@ -18,6 +18,7 @@ export default function RefreshToken() {
     if (refreshTokenFromURL && refreshTokenFromURL === getRefreshTokenFromLocalStorage()) {
       checkAndRefreshToken({
         onSuccess: () => {
+          console.log("log");
           router.push(redirectFromURL || "/");
         },
       });

@@ -32,7 +32,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export default async function OrdersPage({ params }: { params: Promise<{ locale: string }> }) {
   const locale = (await params).locale;
-  setRequestLocale(locale);
+  setRequestLocale(locale); // set ngôn ngữ cho trang này, nếu ko set thì sẽ lấy ngôn ngữ mặc định là en, dù cho url có là /vi đi nữa
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">

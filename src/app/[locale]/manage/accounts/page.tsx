@@ -33,7 +33,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export default async function Dashboard({ params }: { params: Promise<{ locale: string }> }) {
   const locale = (await params).locale;
-  setRequestLocale(locale);
+  setRequestLocale(locale); // set ngôn ngữ cho trang này, nếu ko set thì sẽ lấy ngôn ngữ mặc định là en, dù cho url có là /vi đi nữa
   const t = await getTranslations("ManageAccounts");
 
   return (

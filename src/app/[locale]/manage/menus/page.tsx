@@ -33,7 +33,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export default async function MenusPage({ params }: { params: Promise<{ locale: string }> }) {
   const locale = (await params).locale;
-  setRequestLocale(locale);
+  setRequestLocale(locale); // set ngôn ngữ cho trang này, nếu ko set thì sẽ lấy ngôn ngữ mặc định là en, dù cho url có là /vi đi nữa
   const t = await getTranslations("ManageMenus");
 
   return (
@@ -55,7 +55,6 @@ export default async function MenusPage({ params }: { params: Promise<{ locale: 
     </main>
   );
 }
-
 
 /**
  * Các page như trên vẫn là SSG vì có generateStaticParams với [locale], nên Next.js sẽ build ra HTML tĩnh cho từng locale.

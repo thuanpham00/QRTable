@@ -18,7 +18,7 @@ export default function NavLinks() {
   return (
     <TooltipProvider>
       <aside className="fixed inset-y-0 left-0 z-10 hidden sm:w-50 border-r dark:bg-background bg-[#ddd] sm:flex flex-col">
-        <nav className="flex flex-col items-center gap-4 px-2 py-4">
+        <nav className="px-2 py-4">
           <Link
             href="/"
             className="group flex shrink-0 items-center justify-center gap-2 p-2 rounded-full text-sm font-semibold md:text-base md:mb-4"
@@ -34,42 +34,44 @@ export default function NavLinks() {
             <span className="text-black dark:text-white">QRTable</span>
           </Link>
 
-          {menuItems.map((Item, index) => {
-            if (!Item.roles.includes(isRole as "Owner" | "Employee")) return null;
-            const isActive = pathname.includes(Item.href);
-            const isCallGuest = Item.href === "/manage/call-waiters";
-            const isOrderToday = Item.href === "/manage/orders";
-            return (
-              <Tooltip key={index}>
-                <TooltipTrigger asChild>
-                  <Link
-                    href={Item.href}
-                    className={cn(
-                      "flex h-9 w-9 items-center justify-start gap-2 p-2 pl-4 rounded-lg transition-colors hover:text-foreground md:h-8 md:w-full relative",
-                      {
-                        "bg-accent text-accent-foreground": isActive,
-                        "text-muted-foreground": !isActive,
-                      },
-                    )}
-                  >
-                    {isCallGuest && (
-                      <span className="absolute top-0 left-7.5 w-4 h-4 bg-red-500 rounded-full text-white text-xs text-center block">
-                        {countGuestCalls}
-                      </span>
-                    )}
-                    {isOrderToday && (
-                      <span className="absolute top-0 left-7.5 w-4 h-4 bg-red-500 rounded-full text-white text-xs text-center block">
-                        {countOrderToday}
-                      </span>
-                    )}
-                    <Item.Icon className="h-5 w-5" />
-                    <div>{Item.title}</div>
-                    <span className="sr-only">{Item.title}</span>
-                  </Link>
-                </TooltipTrigger>
-              </Tooltip>
-            );
-          })}
+          <div className="h-130 flex flex-col justify-between overflow-auto">
+            {menuItems.map((Item, index) => {
+              if (!Item.roles.includes(isRole as "Owner" | "Employee")) return null;
+              const isActive = pathname.includes(Item.href);
+              const isCallGuest = Item.href === "/manage/call-waiters";
+              const isOrderToday = Item.href === "/manage/orders";
+              return (
+                <Tooltip key={index}>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href={Item.href}
+                      className={cn(
+                        "flex items-center justify-start gap-2 p-2 pl-4 rounded-lg transition-colors hover:text-foreground md:h-8 md:w-full relative",
+                        {
+                          "bg-accent text-accent-foreground": isActive,
+                          "text-muted-foreground": !isActive,
+                        },
+                      )}
+                    >
+                      {isCallGuest && (
+                        <span className="absolute top-0 left-7.5 w-4 h-4 bg-red-500 rounded-full text-white text-xs text-center block">
+                          {countGuestCalls}
+                        </span>
+                      )}
+                      {isOrderToday && (
+                        <span className="absolute top-0 left-7.5 w-4 h-4 bg-red-500 rounded-full text-white text-xs text-center block">
+                          {countOrderToday}
+                        </span>
+                      )}
+                      <Item.Icon className="h-5 w-5" />
+                      <div>{Item.title}</div>
+                      <span className="sr-only">{Item.title}</span>
+                    </Link>
+                  </TooltipTrigger>
+                </Tooltip>
+              );
+            })}
+          </div>
         </nav>
       </aside>
     </TooltipProvider>
