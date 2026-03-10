@@ -80,7 +80,7 @@ export function getMenuItems(t: (key: string) => string) {
     {
       title: t("import-export"),
       Icon: ArrowLeftRight,
-      href: "/manage/import-export-stocks",
+      href: "/manage/import-export-inventory",
       roles: [Role.Owner],
     },
     {

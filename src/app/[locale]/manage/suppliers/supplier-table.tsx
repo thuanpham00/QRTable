@@ -45,15 +45,19 @@ type SupplierItem = SupplierListResType["data"][0];
 
 // sử dụng trong phạm vị component SupplierTable và các component con của nó
 export const SupplierTableContext = createContext<{
-  setSupplierIdEdit: (value: number | undefined) => void;
   supplierIdEdit: number | undefined;
+  setSupplierIdEdit: (value: number | undefined) => void;
   supplierDelete: SupplierItem | null;
   setSupplierDelete: (value: SupplierItem | null) => void;
+  showModal: number | null;
+  setShowModal: (value: number | null) => void;
 }>({
   setSupplierIdEdit: (value: number | undefined) => {},
   supplierIdEdit: undefined,
   supplierDelete: null,
   setSupplierDelete: (value: SupplierItem | null) => {},
+  showModal: null,
+  setShowModal: (value: number | null) => {},
 });
 
 export const getColumns = (t: any) => {
@@ -89,8 +93,9 @@ export const getColumns = (t: any) => {
       accessorKey: "ingredientCount",
       header: t("ingredients"),
       cell: function Actions({ row }) {
-        const { setSupplierIdEdit } = useContext(SupplierTableContext);
+        const { setSupplierIdEdit, setShowModal } = useContext(SupplierTableContext);
         const openEditSupplier = () => {
+          setShowModal(2);
           setSupplierIdEdit(row.original.id);
         };
 
@@ -128,9 +133,10 @@ export const getColumns = (t: any) => {
       id: "actions",
       header: t("actions"),
       cell: function Actions({ row }) {
-        const { setSupplierIdEdit, setSupplierDelete } = useContext(SupplierTableContext);
+        const { setSupplierIdEdit, setSupplierDelete, setShowModal } = useContext(SupplierTableContext);
         const openEditSupplier = () => {
           setSupplierIdEdit(row.original.id);
+          setShowModal(1);
         };
 
         const openDeleteSupplier = () => {
@@ -289,14 +295,20 @@ export default function SupplierTable() {
     },
   });
 
+  const [showModal, setShowModal] = useState<number | null>(null);
+
   return (
     <SupplierTableContext.Provider
-      value={{ supplierIdEdit, setSupplierIdEdit, supplierDelete, setSupplierDelete }}
+      value={{
+        supplierIdEdit,
+        setSupplierIdEdit,
+        supplierDelete,
+        setSupplierDelete,
+        showModal,
+        setShowModal,
+      }}
     >
       <div className="w-full">
-        <EditSupplier id={supplierIdEdit} setId={setSupplierIdEdit} />
-        <AlertDialogDeleteSupplier supplierDelete={supplierDelete} setSupplierDelete={setSupplierDelete} />
-
         <div className="flex items-center gap-2">
           <Form {...form}>
             <form
@@ -415,7 +427,9 @@ export default function SupplierTable() {
         </div>
       </div>
 
-      <DialogShowSupplyBySupplier />
+      <EditSupplier showModal={showModal} setShowModal={setShowModal} />
+      <AlertDialogDeleteSupplier supplierDelete={supplierDelete} setSupplierDelete={setSupplierDelete} />
+      <DialogShowSupplyBySupplier showModal={showModal} setShowModal={setShowModal} />
     </SupplierTableContext.Provider>
   );
 }

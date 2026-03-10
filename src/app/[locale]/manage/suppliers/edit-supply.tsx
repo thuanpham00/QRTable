@@ -1,19 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusCircle } from "lucide-react";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { handleErrorApi } from "@/lib/utils";
@@ -21,23 +13,32 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useAddSupplyMutation } from "@/queries/useSupply";
+import { useGetSupplyDetailQuery, useUpdateSupplyMutation } from "@/queries/useSupply";
 import {
   CreateSupplierIngredientBody,
   CreateSupplierIngredientBodyType,
+  UpdateSupplierIngredientBodyType,
 } from "@/schemaValidations/supplierIngredient.schema";
 import { IngredientDialog, IngredientItem } from "@/app/[locale]/manage/suppliers/ingredient-dialog";
-import { SupplierTableContext } from "@/app/[locale]/manage/suppliers/supplier-table";
 import Image from "next/image";
 import { useQueryClient } from "@tanstack/react-query";
+import { SupplyTableContext } from "@/app/[locale]/manage/suppliers/show-supply.dialog";
 
-export default function AddSupply() {
-  const { supplierIdEdit } = useContext(SupplierTableContext);
+export default function EditSupply() {
+  const { supplyIdEdit, setSupplyIdEdit } = useContext(SupplyTableContext);
+  console.log(supplyIdEdit);
   const queryClient = useQueryClient();
   const t = useTranslations("ManageSupplies");
-  const addSupplyMutation = useAddSupplyMutation();
-  const [open, setOpen] = useState(false);
-  const [selectedIngredient, setSelectedIngredient] = useState<IngredientItem | null>(null);
+  const supplyDetail = useGetSupplyDetailQuery({
+    id: supplyIdEdit as number,
+    enabled: Boolean(supplyIdEdit),
+  });
+  const dataSupplyDetail = supplyDetail.data?.payload.data;
+
+  const updateSupplyMutation = useUpdateSupplyMutation();
+  const [selectedIngredient, setSelectedIngredient] = useState<
+    IngredientItem | { id: number; name: string; image: string } | null
+  >(null);
 
   const form = useForm<CreateSupplierIngredientBodyType>({
     resolver: zodResolver(CreateSupplierIngredientBody),
@@ -50,28 +51,54 @@ export default function AddSupply() {
     },
   });
 
+  // Reset form khi data thay đổi
+  useEffect(() => {
+    if (dataSupplyDetail) {
+      form.reset({
+        supplierId: dataSupplyDetail.supplierId || 0,
+        ingredientId: dataSupplyDetail.ingredientId || 0,
+        price: dataSupplyDetail.price || 0,
+        isPreferred: dataSupplyDetail.isPreferred || false,
+        note: dataSupplyDetail.note || "",
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataSupplyDetail]);
+
+  // Load ingredient khi mở dialog edit
+  useEffect(() => {
+    if (dataSupplyDetail?.ingredient) {
+      setSelectedIngredient({
+        id: dataSupplyDetail.ingredientId,
+        name: dataSupplyDetail.ingredient.name,
+        image: dataSupplyDetail.ingredient.image || "",
+      });
+    } else {
+      setSelectedIngredient(null);
+    }
+  }, [supplyIdEdit, dataSupplyDetail?.ingredientId, dataSupplyDetail?.ingredient]);
+
   const reset = () => {
     form.reset();
     setSelectedIngredient(null);
   };
 
-  const submit = async (values: CreateSupplierIngredientBodyType) => {
-    if (addSupplyMutation.isPending) return;
-    const body: CreateSupplierIngredientBodyType = {
-      ...values,
-      supplierId: supplierIdEdit as number,
-    };
+  const submit = async (values: UpdateSupplierIngredientBodyType) => {
+    if (updateSupplyMutation.isPending) return;
+    const body: UpdateSupplierIngredientBodyType = values;
     try {
       const {
         payload: { message },
-      } = await addSupplyMutation.mutateAsync(body);
+      } = await updateSupplyMutation.mutateAsync({
+        id: supplyIdEdit as number,
+        body,
+      });
       toast.success(message, {
         duration: 2000,
       });
       reset();
-      setOpen(false);
-      setSelectedIngredient(null);
-      queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+      setSupplyIdEdit(undefined);
+      queryClient.invalidateQueries({ queryKey: ["supplies"] });
     } catch (error) {
       handleErrorApi({
         errors: error,
@@ -85,26 +112,20 @@ export default function AddSupply() {
       onOpenChange={(val) => {
         if (!val) {
           reset();
+          setSupplyIdEdit(undefined);
         }
-        setOpen(val);
       }}
-      open={open}
+      open={Boolean(supplyIdEdit)}
     >
-      <DialogTrigger asChild>
-        <Button size="sm" className="h-7 gap-1">
-          <PlusCircle className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">{t("createSupply")}</span>
-        </Button>
-      </DialogTrigger>
       <DialogContent className="sm:max-w-150 max-h-screen overflow-auto">
         <DialogHeader>
-          <DialogTitle>{t("createSupply")}</DialogTitle>
+          <DialogTitle>{t("updateSupply")}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
             noValidate
             className="grid auto-rows-max items-start gap-4 md:gap-8"
-            id="add-supplier-form"
+            id="edit-supply-form"
             onReset={reset}
             onSubmit={form.handleSubmit(submit, (err) => {
               console.log(err);
@@ -245,11 +266,8 @@ export default function AddSupply() {
           </form>
         </Form>
         <DialogFooter>
-          <Button type="reset" form="add-supplier-form">
-            {t("cancel")}
-          </Button>
-          <Button type="submit" form="add-supplier-form" className="bg-blue-500 hover:bg-blue-400 text-white">
-            {t("create")}
+          <Button type="submit" form="edit-supply-form" className="bg-blue-500 hover:bg-blue-400 text-white">
+            {t("save")}
           </Button>
         </DialogFooter>
       </DialogContent>

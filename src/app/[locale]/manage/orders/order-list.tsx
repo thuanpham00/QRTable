@@ -60,6 +60,40 @@ const OrderTableContext = createContext({
   }) => {},
 });
 
+function checkStatusOrder(statusOrder: string): Record<string, boolean> {
+  switch (statusOrder) {
+    case OrderStatus.Pending:
+      return {
+        [OrderStatus.Pending]: true,
+        [OrderStatus.Processing]: false,
+        [OrderStatus.Rejected]: false,
+        [OrderStatus.Delivered]: true,
+        [OrderStatus.Paid]: true,
+      };
+    case OrderStatus.Processing:
+      return {
+        [OrderStatus.Pending]: true,
+        [OrderStatus.Processing]: true,
+        [OrderStatus.Rejected]: true,
+        [OrderStatus.Delivered]: false,
+        [OrderStatus.Paid]: true,
+      };
+    case OrderStatus.Paid:
+    case OrderStatus.Rejected:
+    case OrderStatus.Delivered:
+      return {
+        [OrderStatus.Pending]: true,
+        [OrderStatus.Processing]: true,
+        [OrderStatus.Rejected]: true,
+        [OrderStatus.Delivered]: true,
+        [OrderStatus.Paid]: true,
+      };
+
+    default:
+      return {};
+  }
+}
+
 type OrderItem = GetOrdersResType["data"][0];
 const getColumns = (t: any) => {
   const orderTableColumns: ColumnDef<OrderItem>[] = [
@@ -171,6 +205,7 @@ const getColumns = (t: any) => {
             quantity: row.original.quantity,
           });
         };
+        const listStatusOrderActive = checkStatusOrder(row.original.status);
         return (
           <Select
             onValueChange={(value: (typeof OrderStatusValues)[number]) => {
@@ -186,10 +221,15 @@ const getColumns = (t: any) => {
               <SelectValue placeholder="Theme" />
             </SelectTrigger>
             <SelectContent>
-              {OrderStatusValues.map((status) => {
+              {}
+              {Object.entries(listStatusOrderActive).map(([key, status]) => {
+                console.log(key, status);
+                // nếu chờ xử lý thì cho phép "Đang nấu" hoặc "Từ chối"
+                // nếu "Đang nấu" thì cho phép "Đã phục vụ"
+                // nếu "Đã phục vụ thì cho phép "Thanh toán"
                 return (
-                  <SelectItem key={status} value={status} disabled={status === OrderStatus.Paid}>
-                    {getVietnameseOrderStatus(status)}
+                  <SelectItem key={key} value={key} disabled={status}>
+                    {getVietnameseOrderStatus(key as (typeof OrderStatusValues)[number])}
                   </SelectItem>
                 );
               })}

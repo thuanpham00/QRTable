@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/incompatible-library */
 "use client";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { handleErrorApi } from "@/lib/utils";
@@ -16,16 +15,21 @@ import { toast } from "sonner";
 import { useGetSupplierDetailQuery, useUpdateSupplierMutation } from "@/queries/useSupplier";
 import { UpdateSupplierBody, UpdateSupplierBodyType } from "@/schemaValidations/supplier.schema";
 import { useTranslations } from "next-intl";
+import { SupplierTableContext } from "@/app/[locale]/manage/suppliers/supplier-table";
 
 export default function EditSupplier({
-  id,
-  setId,
+  showModal,
+  setShowModal,
 }: {
-  id?: number | undefined;
-  setId: (value: number | undefined) => void;
+  showModal?: number | null;
+  setShowModal: (value: number | null) => void;
 }) {
+  const { supplierIdEdit, setSupplierIdEdit } = useContext(SupplierTableContext);
   const t = useTranslations("ManageSuppliers");
-  const supplierDetail = useGetSupplierDetailQuery({ id: id as number, enabled: Boolean(id) });
+  const supplierDetail = useGetSupplierDetailQuery({
+    id: supplierIdEdit as number,
+    enabled: Boolean(supplierIdEdit),
+  });
   const dataSupplierDetail = supplierDetail.data?.payload.data;
   const updateSupplierMutation = useUpdateSupplierMutation();
   const form = useForm<UpdateSupplierBodyType>({
@@ -57,13 +61,12 @@ export default function EditSupplier({
 
   const submit = async (values: UpdateSupplierBodyType) => {
     if (updateSupplierMutation.isPending) return;
-    let body = values;
     try {
       const {
         payload: { message },
       } = await updateSupplierMutation.mutateAsync({
-        id: id as number,
-        body: body,
+        id: supplierIdEdit as number,
+        body: values,
       });
 
       toast.success(message, {
@@ -79,13 +82,14 @@ export default function EditSupplier({
   };
 
   const reset = () => {
-    setId(undefined);
+    setSupplierIdEdit(undefined);
     form.reset();
+    setShowModal(null);
   };
 
   return (
     <Dialog
-      open={Boolean(id)}
+      open={showModal === 1 ? true : false}
       onOpenChange={(value) => {
         if (!value) {
           reset();

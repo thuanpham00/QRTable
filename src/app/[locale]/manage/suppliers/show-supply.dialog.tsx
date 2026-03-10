@@ -19,14 +19,26 @@ import { Badge } from "@/components/ui/badge";
 import { createContext, useContext, useEffect, useState } from "react";
 import { SupplierIngredientListResType } from "@/schemaValidations/supplierIngredient.schema";
 import { useTranslations } from "next-intl";
-import { useGetListSupplyBySupplierQuery } from "@/queries/useSupply";
-import { simpleMatchText } from "@/lib/utils";
+import { useDeleteSupplyMutation, useGetListSupplyBySupplierQuery } from "@/queries/useSupply";
+import { handleErrorApi, simpleMatchText } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import AddSupply from "@/app/[locale]/manage/suppliers/add-supply";
 import { SupplierTableContext } from "@/app/[locale]/manage/suppliers/supplier-table";
+import EditSupply from "@/app/[locale]/manage/suppliers/edit-supply";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useQueryClient } from "@tanstack/react-query";
 
 type SupplyItem = SupplierIngredientListResType["data"][0];
-
 
 // sử dụng trong phạm vị component SupplierTable và các component con của nó
 export const SupplyTableContext = createContext<{
@@ -120,6 +132,7 @@ const getColumns = (t: (key: string) => string): ColumnDef<SupplyItem>[] => [
       const t = useTranslations("ManageSupplies");
       const { setSupplyIdEdit, setSupplyDelete } = useContext(SupplyTableContext);
       const openEditSupply = () => {
+        console.log(row.original.id);
         setSupplyIdEdit(row.original.id);
       };
 
@@ -141,8 +154,71 @@ const getColumns = (t: (key: string) => string): ColumnDef<SupplyItem>[] => [
   },
 ];
 
+function AlertDialogDeleteSupply({
+  supplyDelete,
+  setSupplyDelete,
+}: {
+  supplyDelete: SupplyItem | null;
+  setSupplyDelete: (value: SupplyItem | null) => void;
+}) {
+  const t = useTranslations("ManageSupplies");
+  const deleteSupplierMutation = useDeleteSupplyMutation();
+  const queryClient = useQueryClient();
+
+  const handleDelete = async () => {
+    if (supplyDelete) {
+      try {
+        const {
+          payload: { message },
+        } = await deleteSupplierMutation.mutateAsync(supplyDelete.id);
+        queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+        toast.success(message, {
+          duration: 2000,
+        });
+        setSupplyDelete(null);
+      } catch (error) {
+        handleErrorApi({ errors: error });
+      }
+    }
+  };
+
+  return (
+    <AlertDialog
+      open={Boolean(supplyDelete)}
+      onOpenChange={(value) => {
+        if (!value) {
+          setSupplyDelete(null);
+        }
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t("deleteSupply")}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {t("deleteSupplyDesc")}{" "}
+            <span className="bg-foreground text-primary-foreground rounded px-1">
+              {supplyDelete?.ingredient?.name}
+            </span>{" "}
+            {t("deleteSupplyDesc2")}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={() => setSupplyDelete(null)}>{t("cancelButton")}</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDelete}>{t("continueButton")}</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
 const PAGE_SIZE = 10;
-export default function DialogShowSupplyBySupplier() {
+export default function DialogShowSupplyBySupplier({
+  showModal,
+  setShowModal,
+}: {
+  showModal?: number | null;
+  setShowModal: (value: number | null) => void;
+}) {
   const { supplierIdEdit, setSupplierIdEdit } = useContext(SupplierTableContext);
   const t = useTranslations("ManageSupplies");
   const columns = getColumns(t as (key: string) => string);
@@ -198,97 +274,113 @@ export default function DialogShowSupplyBySupplier() {
 
   const reset = () => {
     setSupplierIdEdit(undefined);
+    setShowModal(null);
   };
 
+  const [supplyIdEdit, setSupplyIdEdit] = useState<number | undefined>();
+  const [supplyDelete, setSupplyDelete] = useState<SupplyItem | null>(null);
+
   return (
-    <Dialog
-      open={Boolean(supplierIdEdit)}
-      onOpenChange={(value) => {
-        if (!value) {
-          reset();
-        }
+    <SupplyTableContext.Provider
+      value={{
+        supplyDelete,
+        setSupplyDelete,
+        supplyIdEdit,
+        setSupplyIdEdit,
       }}
     >
-      <DialogContent className="sm:max-w-225 flex flex-col">
-        <DialogHeader>
-          <DialogTitle>{t("supplierIngredientsTitle", { name: supplierName })}</DialogTitle>
-        </DialogHeader>
-        <div className="flex-1 overflow-auto">
-          <div className="w-full">
-            <div className="flex items-center justify-between mb-3">
-              <Input
-                placeholder={t("searchIngredient")}
-                value={(table.getColumn("ingredient")?.getFilterValue() as string) ?? ""}
-                onChange={(event) => table.getColumn("ingredient")?.setFilterValue(event.target.value)}
-                className="max-w-sm"
-              />
-              <AddSupply />
-            </div>
-
-            <div className="rounded-md border max-h-90 overflow-auto">
-              <Table>
-                <TableHeader>
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id}>
-                      {headerGroup.headers.map((header) => {
-                        return (
-                          <TableHead key={header.id}>
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(header.column.columnDef.header, header.getContext())}
-                          </TableHead>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-                <TableBody>
-                  {table.getRowModel().rows?.length ? (
-                    table.getRowModel().rows.map((row) => (
-                      <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={columns.length} className="h-24 text-center">
-                        No results.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-            <div className="flex items-center justify-end space-x-2 py-4">
-              <div className="text-xs text-muted-foreground py-4 flex-1 ">
-                {t("showingOf", { count: table.getPaginationRowModel().rows.length, total: data.length })}
+      <Dialog
+        open={showModal === 2 ? true : false}
+        onOpenChange={(value) => {
+          if (!value) {
+            reset();
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-225 flex flex-col">
+          <DialogHeader>
+            <DialogTitle>{t("supplierIngredientsTitle", { name: supplierName })}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-auto">
+            <div className="w-full">
+              <div className="flex items-center justify-between mb-3">
+                <Input
+                  placeholder={t("searchIngredient")}
+                  value={(table.getColumn("ingredient")?.getFilterValue() as string) ?? ""}
+                  onChange={(event) => table.getColumn("ingredient")?.setFilterValue(event.target.value)}
+                  className="max-w-sm"
+                />
+                <AddSupply />
               </div>
-              <div className="space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                >
-                  {t("previous")}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                >
-                  {t("next")}
-                </Button>
+
+              <div className="rounded-md border max-h-90 overflow-auto">
+                <Table>
+                  <TableHeader>
+                    {table.getHeaderGroups().map((headerGroup) => (
+                      <TableRow key={headerGroup.id}>
+                        {headerGroup.headers.map((header) => {
+                          return (
+                            <TableHead key={header.id}>
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(header.column.columnDef.header, header.getContext())}
+                            </TableHead>
+                          );
+                        })}
+                      </TableRow>
+                    ))}
+                  </TableHeader>
+                  <TableBody>
+                    {table.getRowModel().rows?.length ? (
+                      table.getRowModel().rows.map((row) => (
+                        <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                          {row.getVisibleCells().map((cell) => (
+                            <TableCell key={cell.id}>
+                              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={columns.length} className="h-24 text-center">
+                          No results.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+              <div className="flex items-center justify-end space-x-2 py-4">
+                <div className="text-xs text-muted-foreground py-4 flex-1 ">
+                  {t("showingOf", { count: table.getPaginationRowModel().rows.length, total: data.length })}
+                </div>
+                <div className="space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                  >
+                    {t("previous")}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                  >
+                    {t("next")}
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      <EditSupply />
+      <AlertDialogDeleteSupply supplyDelete={supplyDelete} setSupplyDelete={setSupplyDelete} />
+    </SupplyTableContext.Provider>
   );
 }
