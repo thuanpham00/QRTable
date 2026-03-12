@@ -27,6 +27,17 @@ export const useGetSupplierDetailQuery = ({ id, enabled }: { id: number; enabled
   });
 };
 
+export const useGetSupplierOptionQuery = () => {
+  return useQuery({
+    queryKey: ["supplier-options"],
+    queryFn: () => {
+      return supplierApiRequests.getSupplierOption();
+    },
+    placeholderData: keepPreviousData,
+    staleTime: 1000 * 60 * 5, // 1 minute
+  });
+};
+
 export const useAddSupplierMutation = () => {
   const queryClient = useQueryClient();
   return useMutation({

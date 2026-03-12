@@ -21,7 +21,4 @@ export const importInventoryApiRequests = {
   updateImportInventory: (id: number, body: UpdateImportReceiptBodyType) => {
     return http.put<GetImportReceiptDetailResType>(`/import-receipts/${id}`, body);
   },
-  deleteImportInventory: (id: number) => {
-    return http.delete<GetImportReceiptDetailResType>(`/import-receipts/${id}`);
-  },
 };

@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { createContext, useContext, useState } from "react";
 import AutoPagination from "@/components/auto-pagination";
-import { Eye, Search, X } from "lucide-react";
+import { Eye, PlusCircle, Search, X } from "lucide-react";
 import useQueryParams from "@/hooks/useQueryParams";
-import { useRouter } from "@/i18n/routing";
+import { Link, useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import {
   GetImportReceiptListResType,
@@ -26,18 +26,18 @@ import { Form, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import AddImport from "./add-import";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useGetSupplierOptionQuery } from "@/queries/useSupplier";
 
 type ImportReceiptItem = GetImportReceiptListResType["data"][0];
-
-// sử dụng trong phạm vị component ImportTable và các component con của nó
-export const ImportReceiptTableContext = createContext<{
-  importReceiptIdViewItems: number | undefined;
-  setImportReceiptIdViewItems: (value: number | undefined) => void;
-}>({
-  importReceiptIdViewItems: undefined,
-  setImportReceiptIdViewItems: (value: number | undefined) => {},
-});
 
 export const getColumns = (t: any): ColumnDef<ImportReceiptItem>[] => [
   {
@@ -98,9 +98,9 @@ export const getColumns = (t: any): ColumnDef<ImportReceiptItem>[] => [
     id: "viewItems",
     header: t("items"),
     cell: function ViewItems({ row }) {
-      const { setImportReceiptIdViewItems } = useContext(ImportReceiptTableContext);
+      const router = useRouter();
       const openViewItems = () => {
-        setImportReceiptIdViewItems(row.original.id);
+        router.push("/manage/update-import-receipt/" + row.original.id);
       };
 
       return (
@@ -124,7 +124,7 @@ export default function ImportTable() {
   const router = useRouter();
   const queryParams = useQueryParams();
 
-  const limit = queryParams.limit ? Number(queryParams.limit) : 2;
+  const limit = queryParams.limit ? Number(queryParams.limit) : 10;
   const page = queryParams.page ? Number(queryParams.page) : 1;
   const type = queryParams.type || "export";
 
@@ -141,8 +141,6 @@ export default function ImportTable() {
     isUndefined,
   ) as ImportReceiptQueryType;
 
-  const [importReceiptIdViewItems, setImportReceiptIdViewItems] = useState<number | undefined>();
-
   const listImportReceipt = useGetListImportReceiptQuery(queryConfig);
 
   const data: GetImportReceiptListResType["data"] = listImportReceipt.data?.payload.data || [];
@@ -154,6 +152,9 @@ export default function ImportTable() {
     pageIndex: queryConfig.page ? queryConfig.page - 1 : 0,
     pageSize: queryConfig.limit,
   };
+
+  const listSupplierOptionQuery = useGetSupplierOptionQuery();
+  const dataOptionsSupplier = listSupplierOptionQuery.data?.payload.data || [];
 
   const table = useReactTable({
     data,
@@ -172,22 +173,42 @@ export default function ImportTable() {
     defaultValues: {
       fromDate: queryParams.fromDate ? new Date(queryParams.fromDate as string).toISOString() : undefined,
       toDate: queryParams.toDate ? new Date(queryParams.toDate as string).toISOString() : undefined,
+      status: queryParams.status || undefined,
+      supplierId: queryParams.supplierId || undefined,
     },
   });
 
   const reset = () => {
     const params = new URLSearchParams(
-      Object.entries({ ...queryConfig, fromDate: undefined, toDate: undefined })
+      Object.entries({
+        ...queryConfig,
+        fromDate: undefined,
+        toDate: undefined,
+        status: undefined,
+        supplierId: undefined,
+      })
         .filter(([key, value]) => value !== undefined)
         .map(([key, value]) => [key, String(value)]),
     );
-    form.reset();
+    form.reset({
+      fromDate: undefined,
+      toDate: undefined,
+      status: "",
+      supplierId: "",
+    });
     router.push(`/manage/import-export-inventory?${params.toString()}`);
   };
 
   const submit = (data: SearchImportReceiptType) => {
     const params = new URLSearchParams(
-      Object.entries({ ...queryConfig, page: 1, fromDate: data.fromDate, toDate: data.toDate })
+      Object.entries({
+        ...queryConfig,
+        page: 1,
+        fromDate: data.fromDate,
+        toDate: data.toDate,
+        status: data.status,
+        supplierId: data.supplierId,
+      })
         .filter(([key, value]) => value !== undefined && value !== "")
         .map(([key, value]) => [key, String(value)]),
     );
@@ -195,12 +216,7 @@ export default function ImportTable() {
   };
 
   return (
-    <ImportReceiptTableContext.Provider
-      value={{
-        importReceiptIdViewItems,
-        setImportReceiptIdViewItems,
-      }}
-    >
+    <div>
       <div className="w-full">
         <Card x-chunk="dashboard-06-chunk-0">
           <CardHeader>
@@ -218,61 +234,139 @@ export default function ImportTable() {
                     console.log(err);
                   })}
                 >
-                  <div className="flex items-center gap-4">
+                  <div>
+                    <div className="flex items-center gap-4">
+                      <FormField
+                        control={form.control}
+                        name="fromDate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <div className="flex items-center">
+                              <span className="mr-2 text-sm">{t("from")}</span>
+                              <Input
+                                type="datetime-local"
+                                placeholder={t("fromDate")}
+                                className="text-sm"
+                                value={field.value ? format(new Date(field.value), "yyyy-MM-dd'T'HH:mm") : ""}
+                                onChange={(event) =>
+                                  field.onChange(
+                                    event.target.value ? new Date(event.target.value) : undefined,
+                                  )
+                                }
+                              />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="toDate"
+                        render={({ field }) => (
+                          <FormItem>
+                            <div className="flex items-center">
+                              <span className="mr-2 text-sm">{t("to")}</span>
+                              <Input
+                                type="datetime-local"
+                                placeholder={t("toDate")}
+                                className="text-sm"
+                                value={field.value ? format(new Date(field.value), "yyyy-MM-dd'T'HH:mm") : ""}
+                                onChange={(event) =>
+                                  field.onChange(
+                                    event.target.value ? new Date(event.target.value) : undefined,
+                                  )
+                                }
+                              />
+                            </div>
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="status"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Select
+                              onValueChange={(val) => {
+                                field.onChange(val);
+                              }}
+                              value={field.value || ""}
+                            >
+                              <SelectTrigger className="w-45">
+                                <SelectValue placeholder={t("chooseStatus")} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>{t("status")}</SelectLabel>
+
+                                  <SelectItem key={"draft"} value="Draft">
+                                    {t("draft")}
+                                  </SelectItem>
+                                  <SelectItem key={"completed"} value="Completed">
+                                    {t("completed")}
+                                  </SelectItem>
+                                  <SelectItem key={"cancelled"} value="Cancelled">
+                                    {t("cancelled")}
+                                  </SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="flex items-center gap-1">
+                        <Button variant="outline" size="icon" type="reset">
+                          <X />
+                        </Button>
+                        <Button variant="outline" size="icon" className="bg-blue-500!" type="submit">
+                          <Search />
+                        </Button>
+                      </div>
+                    </div>
+
                     <FormField
                       control={form.control}
-                      name="fromDate"
+                      name="supplierId"
                       render={({ field }) => (
-                        <FormItem>
-                          <div className="flex items-center">
-                            <span className="mr-2 text-sm">{t("from")}</span>
-                            <Input
-                              type="datetime-local"
-                              placeholder={t("fromDate")}
-                              className="text-sm"
-                              value={field.value ? format(new Date(field.value), "yyyy-MM-dd'T'HH:mm") : ""}
-                              onChange={(event) =>
-                                field.onChange(event.target.value ? new Date(event.target.value) : undefined)
-                              }
-                            />
-                          </div>
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="toDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <div className="flex items-center">
-                            <span className="mr-2 text-sm">{t("to")}</span>
-                            <Input
-                              type="datetime-local"
-                              placeholder={t("toDate")}
-                              className="text-sm"
-                              value={field.value ? format(new Date(field.value), "yyyy-MM-dd'T'HH:mm") : ""}
-                              onChange={(event) =>
-                                field.onChange(event.target.value ? new Date(event.target.value) : undefined)
-                              }
-                            />
-                          </div>
+                        <FormItem className="mt-4">
+                          <Select
+                            onValueChange={(val) => {
+                              field.onChange(String(val) || "");
+                            }}
+                            value={field.value || ""}
+                          >
+                            <SelectTrigger className="w-60">
+                              <SelectValue placeholder={t("chooseSupplier")} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                <SelectLabel>{t("supplier")}</SelectLabel>
+                                {dataOptionsSupplier.map((supplier) => (
+                                  <SelectItem key={supplier.id} value={String(supplier.id)}>
+                                    {supplier.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
                         </FormItem>
                       )}
                     />
                   </div>
-
-                  <Button variant="outline" size="icon" type="reset">
-                    <X />
-                  </Button>
-
-                  <Button variant="outline" size="icon" className="bg-blue-500!" type="submit">
-                    <Search />
-                  </Button>
                 </form>
               </Form>
 
               <div className="ml-auto flex items-center gap-2">
-                <AddImport />
+                <Link
+                  href={"/manage/add-import-receipt"}
+                  className="bg-green-600 flex items-center gap-2 p-2 rounded text-white"
+                >
+                  <PlusCircle className="h-3.5 w-3.5" />
+                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                    {t("createImportReceipt")}
+                  </span>
+                </Link>
               </div>
             </div>
 
@@ -332,6 +426,6 @@ export default function ImportTable() {
         </Card>
       </div>
       <ListExportReceiptItemDialog />
-    </ImportReceiptTableContext.Provider>
+    </div>
   );
 }

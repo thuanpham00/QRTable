@@ -308,3 +308,16 @@ export const generateSlugUrl = ({ name, id }: { name: string; id: number }) => {
 export const getIdFromSlugUrl = (slug: string) => {
   return Number(slug.split("-i.")[1]);
 };
+
+/**
+ * Tạo mã lô (batch number) ngẫu nhiên theo format: BATCH-XX-X-XXXXXX
+ * Ví dụ: BATCH-48-2-512145
+ * @returns Chuỗi mã lô ngẫu nhiên
+ */
+export const generateBatchNumber = (): string => {
+  const part1 = Math.floor(Math.random() * 90) + 10; // 2 chữ số: 10-99
+  const part2 = Math.floor(Math.random() * 9) + 1; // 1 chữ số: 1-9
+  const part3 = Math.floor(Math.random() * 900000) + 100000; // 6 chữ số: 100000-999999
+
+  return `BATCH-${part1}-${part2}-${part3}`;
+};

@@ -33,6 +33,8 @@ import { Label } from "@/components/ui/label";
 import EditInventoryStock from "@/app/[locale]/manage/inventory-stocks/edit-inventory-stock";
 import InventoryBatchesDialog from "@/app/[locale]/manage/inventory-stocks/inventory-batches-dialog";
 import { toast } from "sonner";
+import { useAppStore } from "@/components/app-provider";
+import { Role } from "@/constants/type";
 
 type InventoryStockItem = InventoryStockListResType["data"][0];
 
@@ -231,7 +233,7 @@ export const getColumns = (t: any): ColumnDef<InventoryStockItem>[] => [
     cell: function Actions({ row }) {
       const { setInventoryStockIdEdit, setShowModal } = useContext(InventoryStockTableContext);
       const openEditInventoryStock = () => {
-        if (row.original.batchCount as number <= 0) {
+        if ((row.original.batchCount as number) <= 0) {
           toast.error(t("noBatches"));
           return;
         }
@@ -259,6 +261,9 @@ export default function InventoryStockTable() {
   const columns = getColumns(t);
   const router = useRouter();
   const queryParams = useQueryParams();
+
+  const isRole = useAppStore((state) => state.isRole);
+  const socket = useAppStore((state) => state.socket);
 
   const limit = queryParams.limit ? Number(queryParams.limit) : 10;
   const page = queryParams.page ? Number(queryParams.page) : 1;
@@ -311,7 +316,10 @@ export default function InventoryStockTable() {
   const [inventoryStockIdEdit, setInventoryStockIdEdit] = useState<number | undefined>();
 
   const listInventoryStock = useGetListInventoryStockQuery(queryConfig);
-  const listInventoryStockNoPagination = useGetListInventoryStockNoPaginationQuery();
+  const listInventoryStockNoPagination = useGetListInventoryStockNoPaginationQuery({
+    key: "inventory-stocks-no-pagination",
+    enabled: isRole !== Role.Guest && Boolean(isRole) && Boolean(socket), // có nghĩa là chỉ chạy khi đã login
+  });
 
   const data: InventoryStockListResType["data"] = listInventoryStock.data?.payload.data || [];
   const currentPage = listInventoryStock.data?.payload.pagination.page || 0; // trang hiện tại

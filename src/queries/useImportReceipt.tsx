@@ -50,15 +50,3 @@ export const useUpdateImportReceiptMutation = () => {
     },
   });
 };
-
-export const useDeleteImportReceiptMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (id: number) => {
-      return importInventoryApiRequests.deleteImportInventory(id);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["import-receipts"] });
-    },
-  });
-};

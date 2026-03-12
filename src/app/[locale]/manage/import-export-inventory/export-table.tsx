@@ -137,7 +137,7 @@ export default function ExportTable() {
   const router = useRouter();
   const queryParams = useQueryParams();
 
-  const limit = queryParams.limit ? Number(queryParams.limit) : 5;
+  const limit = queryParams.limit ? Number(queryParams.limit) : 10;
   const page = queryParams.page ? Number(queryParams.page) : 1;
   const type = queryParams.type || "export";
 

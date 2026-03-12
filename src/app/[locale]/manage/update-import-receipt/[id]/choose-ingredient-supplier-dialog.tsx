@@ -1,8 +1,4 @@
 /* eslint-disable react-hooks/incompatible-library */
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useEffect, useState } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -15,69 +11,96 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { cn, simpleMatchText } from "@/lib/utils";
-import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useEffect, useState } from "react";
+import { SupplierIngredientListResType } from "@/schemaValidations/supplierIngredient.schema";
 import { useTranslations } from "next-intl";
-import { useGetListSupplierQuery } from "@/queries/useSupplier";
-import { SupplierListResType } from "@/schemaValidations/supplier.schema";
+import { useGetListSupplyBySupplierQuery } from "@/queries/useSupply";
+import { simpleMatchText } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
 
-type SupplierItem = SupplierListResType["data"][0];
+import { PlusCircle } from "lucide-react";
 
-const getColumns = (t: (key: string) => string): ColumnDef<SupplierItem>[] => [
+type SupplyItem = SupplierIngredientListResType["data"][0];
+
+const getColumns = (t: (key: string) => string): ColumnDef<SupplyItem>[] => [
   {
-    accessorKey: "code",
-    header: t("supplierCode"),
-    cell: ({ row }) => <div className="font-medium">{row.getValue("code")}</div>,
+    accessorKey: "id",
+    header: "ID",
+    size: 60,
+    cell: ({ row }) => <div className="text-center">{row.getValue("id")}</div>,
   },
   {
-    accessorKey: "name",
-    header: t("supplierName"),
-    cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
+    accessorKey: "ingredient",
+    header: t("ingredientName"),
+    size: 200,
+    cell: ({ row }) => {
+      const ingredient = row.original.ingredient;
+      return (
+        <div className="font-medium">
+          {ingredient?.name || "—"}
+          {ingredient?.category && (
+            <span className="text-xs text-muted-foreground ml-2">({ingredient.category})</span>
+          )}
+        </div>
+      );
+    },
     filterFn: (row, columnId, filterValue: string) => {
       if (filterValue === undefined) return true;
-      return simpleMatchText(String(row.original.name), String(filterValue));
+      return simpleMatchText(String(row.original.ingredient?.name), String(filterValue));
     },
   },
   {
-    accessorKey: "phone",
-    header: t("phone"),
-    cell: ({ row }) => <div>{row.getValue("phone") || "-"}</div>,
-  },
-  {
-    accessorKey: "address",
-    header: t("address"),
+    accessorKey: "price",
+    header: () => <div className="text-right">{t("price")}</div>,
+    size: 130,
     cell: ({ row }) => (
-      <div className="max-w-50 truncate" title={row.getValue("address")}>
-        {row.getValue("address") || "-"}
+      <div className="text-right font-medium">
+        {new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(row.getValue("price"))}
       </div>
     ),
   },
   {
-    accessorKey: "ingredientCount",
-    header: t("ingredientCount"),
-    cell: ({ row }) => <div className="text-center">{row.getValue("ingredientCount") || 0}</div>,
+    accessorKey: "isPreferred",
+    header: t("preferred"),
+    size: 100,
+    cell: ({ row }) =>
+      row.getValue("isPreferred") ? (
+        <Badge className="bg-yellow-100 text-black">⭐ {t("yes")}</Badge>
+      ) : (
+        <span className="text-muted-foreground text-sm">{t("no")}</span>
+      ),
+  },
+  {
+    accessorKey: "note",
+    header: t("note"),
+    size: 200,
+    cell: ({ row }) => (
+      <div className="text-xs text-muted-foreground truncate max-w-50">{row.getValue("note") || "—"}</div>
+    ),
   },
 ];
 
 const PAGE_SIZE = 10;
-
-export function SupplierListDialog({
+export default function ChooseIngredientSupplierDialog({
+  supplierId,
   onChoose,
-  disable = false,
 }: {
-  onChoose: (supplier: SupplierItem) => void;
-  disable?: boolean;
+  supplierId: number;
+  onChoose: (value: SupplyItem) => void;
 }) {
   const t = useTranslations("ManageImportReceipts");
   const columns = getColumns(t as (key: string) => string);
-  const [open, setOpen] = useState(false);
-  const listTableQuery = useGetListSupplierQuery({
-    page: 1,
-    limit: 5, // ko phân trang, lấy hết bàn
-    pagination: "false",
+
+  const listGuestsQuery = useGetListSupplyBySupplierQuery({
+    supplierId: supplierId as number,
+    enabled: Boolean(supplierId),
   });
-  const data: SupplierListResType["data"] = listTableQuery.data?.payload.data || [];
-  const dataFiltered = data.filter((supplier) => supplier.status !== "Inactive");
+
+  const data: SupplierIngredientListResType["data"] = listGuestsQuery.data?.payload.data || [];
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -89,7 +112,7 @@ export function SupplierListDialog({
   });
 
   const table = useReactTable({
-    data: dataFiltered,
+    data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -111,39 +134,49 @@ export function SupplierListDialog({
   });
 
   useEffect(() => {
-    table.setPagination({
-      pageIndex: 0,
-      pageSize: PAGE_SIZE,
-    });
-  }, [table]);
+    if (supplierId) {
+      table.setPagination({
+        pageIndex: 0,
+        pageSize: PAGE_SIZE,
+      });
+    }
+  }, [supplierId, table]);
 
-  const choose = (supplier: SupplierItem) => {
-    onChoose(supplier); // chuyển dữ liệu từ child lên parent thông qua hàm onChoose (props)
-    setOpen(false);
+  const supplierName = data[0]?.supplier?.name || "Nhà cung cấp";
+
+  const [showModalChooseIngredient, setShowModalChooseIngredient] = useState<boolean>(false);
+
+  const choose = (supply: SupplyItem) => {
+    onChoose(supply); // chuyển dữ liệu từ child lên parent thông qua hàm onChoose (props)
+    setShowModalChooseIngredient(false);
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={showModalChooseIngredient} onOpenChange={setShowModalChooseIngredient}>
       <DialogTrigger asChild>
-        <Button variant="outline" disabled={disable}>
-          {t("chooseSupplier")}
+        <Button size="sm" className="h-7 gap-1 w-40">
+          <PlusCircle className="h-3.5 w-3.5" />
+          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">{t("chooseIngredient")}</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-5xl max-h-full overflow-auto">
+      <DialogContent className="sm:max-w-225 flex flex-col">
         <DialogHeader>
-          <DialogTitle>{t("chooseSupplier")}</DialogTitle>
+          <DialogTitle>
+            {t("chooseIngredient")} từ {supplierName}
+          </DialogTitle>
         </DialogHeader>
-        <div>
+        <div className="flex-1 overflow-auto">
           <div className="w-full">
-            <div className="flex items-center py-4">
+            <div className="flex items-center justify-between mb-3">
               <Input
-                placeholder={t("filterSupplierName")}
-                value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-                onChange={(event) => table.getColumn("name")?.setFilterValue(event.target.value)}
+                placeholder={t("searchIngredient")}
+                value={(table.getColumn("ingredient")?.getFilterValue() as string) ?? ""}
+                onChange={(event) => table.getColumn("ingredient")?.setFilterValue(event.target.value)}
                 className="max-w-sm"
               />
             </div>
-            <div className="rounded-md border">
+
+            <div className="rounded-md border max-h-90 overflow-auto">
               <Table>
                 <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (
@@ -167,14 +200,8 @@ export function SupplierListDialog({
                         key={row.id}
                         data-state={row.getIsSelected() && "selected"}
                         onClick={() => {
-                          if (row.original.status === "Active") {
-                            choose(row.original);
-                          }
+                          choose(row.original);
                         }}
-                        className={cn({
-                          "cursor-pointer": row.original.status === "Active",
-                          "cursor-not-allowed opacity-50": row.original.status === "Inactive",
-                        })}
                       >
                         {row.getVisibleCells().map((cell) => (
                           <TableCell key={cell.id}>
@@ -186,7 +213,7 @@ export function SupplierListDialog({
                   ) : (
                     <TableRow>
                       <TableCell colSpan={columns.length} className="h-24 text-center">
-                        {t("noSuppliers")}
+                        No results.
                       </TableCell>
                     </TableRow>
                   )}
@@ -195,12 +222,9 @@ export function SupplierListDialog({
             </div>
             <div className="flex items-center justify-end space-x-2 py-4">
               <div className="text-xs text-muted-foreground py-4 flex-1 ">
-                {t("showingOf", {
-                  count: table.getPaginationRowModel().rows.length,
-                  total: dataFiltered.length,
-                })}
+                {t("showingOf", { count: table.getPaginationRowModel().rows.length, total: data.length })}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="space-x-2">
                 <Button
                   variant="outline"
                   size="sm"

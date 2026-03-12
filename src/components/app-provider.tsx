@@ -21,6 +21,7 @@ import { endOfDay, startOfDay } from "date-fns";
 import { OrderMode, Role } from "@/constants/type";
 import { useCountOrderTodayQuery } from "@/queries/useOrder";
 import { useQueryClient } from "@tanstack/react-query";
+import { useGetListInventoryStockNoPaginationQuery } from "@/queries/useInventoryStock";
 
 type InfoGuestType = {
   name: string;
@@ -45,6 +46,9 @@ type AppStoreType = {
 
   countOrderToday: number;
   setCountOrderToday: (countOrderToday: number) => void;
+
+  countWarningStock: number;
+  setCountWarningStock: (countWarningStock: number) => void;
 
   // Lưu data serving guests theo bàn để truyền sang trang detail
   selectedTableGuests: any;
@@ -73,6 +77,9 @@ export const useAppStore = create<AppStoreType>((set) => ({
   countOrderToday: 0,
   setCountOrderToday: (countOrderToday: number) => set({ countOrderToday }),
 
+  countWarningStock: 0,
+  setCountWarningStock: (countWarningStock: number) => set({ countWarningStock }),
+
   selectedTableGuests: null,
   setSelectedTableGuests: (data: any) => set({ selectedTableGuests: data }),
 }));
@@ -88,6 +95,7 @@ export default function AppProvider({ children }: { children: React.ReactNode })
   const setInfoGuest = useAppStore((state) => state.setInfoGuest);
   const setCountGuestCalls = useAppStore((state) => state.setCountGuestCalls);
   const setCountOrderToday = useAppStore((state) => state.setCountOrderToday);
+  const setCountWarningStock = useAppStore((state) => state.setCountWarningStock);
 
   const queryClient = useQueryClient();
 
@@ -112,6 +120,11 @@ export default function AppProvider({ children }: { children: React.ReactNode })
       enabled: isRole !== Role.Guest && Boolean(isRole) && Boolean(socket), // có nghĩa là chỉ chạy khi đã login
     },
   ); // fetch order list ngày hôm nay (mặc định)
+
+  const listInventoryStockNoPagination = useGetListInventoryStockNoPaginationQuery({
+    key: "inventory-stocks-global",
+    enabled: isRole !== Role.Guest && Boolean(isRole) && Boolean(socket), // có nghĩa là chỉ chạy khi đã login
+  });
 
   useEffect(() => {
     const accessToken = getAccessTokenFromLocalStorage();
@@ -141,14 +154,30 @@ export default function AppProvider({ children }: { children: React.ReactNode })
     if (countPending.data?.payload.data !== undefined) {
       setCountGuestCalls(countPending.data.payload.data);
     }
+    
     if (countOrder.data?.payload.data !== undefined) {
       setCountOrderToday(countOrder.data.payload.data);
+    }
+
+    if (listInventoryStockNoPagination.data?.payload.data !== undefined) {
+      const lowStockItems =
+        listInventoryStockNoPagination.data?.payload.data.filter(
+          (item) => item.minStock && item.quantity < item.minStock,
+        ).length || 0;
+      const overstockItems =
+        listInventoryStockNoPagination.data?.payload.data.filter(
+          (item) => item.maxStock && item.quantity > item.maxStock,
+        ).length || 0;
+      const warningStock = lowStockItems + overstockItems;
+      setCountWarningStock(warningStock);
     }
   }, [
     countPending?.data?.payload.data,
     setCountGuestCalls,
     countOrder?.data?.payload.data,
     setCountOrderToday,
+    listInventoryStockNoPagination?.data?.payload.data,
+    setCountWarningStock,
   ]);
 
   useEffect(() => {

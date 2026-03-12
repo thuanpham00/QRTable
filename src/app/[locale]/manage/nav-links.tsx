@@ -12,6 +12,8 @@ export default function NavLinks() {
   const isRole = useAppStore((state) => state.isRole);
   const countGuestCalls = useAppStore((state) => state.countGuestCalls);
   const countOrderToday = useAppStore((state) => state.countOrderToday);
+  const countWarningStock = useAppStore((state) => state.countWarningStock);
+
   const t = useTranslations("NavItemManage");
   const menuItems = getMenuItems(t);
 
@@ -37,13 +39,14 @@ export default function NavLinks() {
           <div className="h-130 flex flex-col justify-between overflow-auto">
             {menuItems.map((Item, index) => {
               if (!Item.roles.includes(isRole as "Owner" | "Employee")) return null;
-              
+
               // Tách path khỏi query string để so sánh
-              const itemPath = Item.href.split('?')[0];
-              const isActive = pathname === itemPath || pathname.startsWith(itemPath + '/');
-              
+              const itemPath = Item.href.split("?")[0];
+              const isActive = pathname === itemPath || pathname.startsWith(itemPath + "/");
+
               const isCallGuest = Item.href === "/manage/call-waiters";
               const isOrderToday = Item.href === "/manage/orders";
+              const isWarningStock = Item.href === "/manage/inventory-stocks";
               return (
                 <Tooltip key={index}>
                   <TooltipTrigger asChild>
@@ -65,6 +68,11 @@ export default function NavLinks() {
                       {isOrderToday && (
                         <span className="absolute top-0 left-7.5 w-4 h-4 bg-red-500 rounded-full text-white text-xs text-center block">
                           {countOrderToday}
+                        </span>
+                      )}
+                      {isWarningStock && (
+                        <span className="absolute top-0 left-7.5 w-4 h-4 bg-red-500 rounded-full text-white text-xs text-center block">
+                          {countWarningStock}
                         </span>
                       )}
                       <Item.Icon className="h-5 w-5" />

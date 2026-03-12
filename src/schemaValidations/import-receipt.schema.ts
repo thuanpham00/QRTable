@@ -3,8 +3,10 @@ import z from "zod";
 
 export const SearchImportReceipt = z
   .object({
+    supplierId: z.string().optional(),
     fromDate: z.union([z.string(), z.date()]).optional(),
     toDate: z.union([z.string(), z.date()]).optional(),
+    status: z.string().optional(),
   })
   .refine(
     (data) => {
@@ -35,14 +37,30 @@ export const ImportReceiptQuery = BaseQuery.and(
 export type ImportReceiptQueryType = z.TypeOf<typeof ImportReceiptQuery>;
 
 // Schema cho ImportReceiptItem trong body
-export const ImportReceiptItemBodySchema = z.object({
-  supplierIngredientId: z.number(),
-  quantity: z.number().positive("quantityMustBePositive"),
-  unitPrice: z.number().positive("unitPriceMustBePositive"),
-  batchNumber: z.string().optional(),
-  expiryDate: z.string().optional(),
-  note: z.string().optional(),
-});
+export const ImportReceiptItemBodySchema = z
+  .object({
+    supplierIngredientId: z.number().min(1, "ingredientRequired"),
+    quantity: z.number().positive("quantityMustBePositive"),
+    unitPrice: z.number().positive("unitPriceMustBePositive"),
+    unit: z.string().min(1, "unitRequired"),
+    batchNumber: z.string().min(1, "batchNumberRequired").max(100, "batchNumberTooLong"),
+    expiryDate: z.string().min(1, "expiryDateRequired"),
+    note: z.string().max(500, "importItemNoteTooLong").optional(),
+  })
+  .refine(
+    (data) => {
+      if (!data.expiryDate) return true;
+      const expiryDate = new Date(data.expiryDate);
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      expiryDate.setHours(0, 0, 0, 0);
+      return expiryDate > now;
+    },
+    {
+      message: "expiryDateMustBeFuture",
+      path: ["expiryDate"],
+    },
+  );
 
 export type ImportReceiptItemBodySchemaType = z.TypeOf<typeof ImportReceiptItemBodySchema>;
 
@@ -62,6 +80,7 @@ export const ImportReceiptItemSchema = z.object({
   ingredientName: z.string().optional(),
   ingredientUnit: z.string().optional(),
   ingredientImage: z.string().optional(),
+  ingredientCategory: z.string().optional(),
   supplierName: z.string().optional(),
 });
 
@@ -87,12 +106,28 @@ export const ImportReceiptSchema = z.object({
 export type ImportReceiptSchemaType = z.TypeOf<typeof ImportReceiptSchema>;
 
 // Body cho create ImportReceipt
-export const CreateImportReceiptBody = z.object({
-  supplierId: z.number().min(1, "supplierRequired"),
-  importDate: z.string().optional(),
-  note: z.string().optional(),
-  items: z.array(ImportReceiptItemBodySchema).min(1, "itemsRequired"),
-});
+export const CreateImportReceiptBody = z
+  .object({
+    supplierId: z.number().min(1, "supplierRequired"),
+    importDate: z.string().min(1, "importDateRequired"),
+    quantityIngredientImport: z.number().positive("quantityIngredientImportMustBePositive"),
+    note: z.string().optional(),
+    items: z.array(ImportReceiptItemBodySchema).min(1, "itemsRequired"),
+  })
+  .refine(
+    (data) => {
+      if (!data.importDate) return false;
+      const importDate = new Date(data.importDate);
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      importDate.setHours(0, 0, 0, 0);
+      return importDate <= now;
+    },
+    {
+      message: "importDateNotFuture",
+      path: ["importDate"],
+    },
+  );
 
 export type CreateImportReceiptBodyType = z.TypeOf<typeof CreateImportReceiptBody>;
 
@@ -105,13 +140,29 @@ export const CreateImportReceiptRes = z.object({
 export type CreateImportReceiptResType = z.TypeOf<typeof CreateImportReceiptRes>;
 
 // Body cho update ImportReceipt
-export const UpdateImportReceiptBody = z.object({
-  supplierId: z.number().optional(),
-  importDate: z.string().optional(),
-  status: z.enum(["Draft", "Completed", "Cancelled"]).optional(),
-  note: z.string().optional(),
-  items: z.array(ImportReceiptItemBodySchema).optional(),
-});
+export const UpdateImportReceiptBody = z
+  .object({
+    supplierId: z.number().optional(),
+    importDate: z.string().optional(),
+    quantityIngredientImport: z.number().positive("quantityIngredientImportMustBePositive"),
+    status: z.enum(["Draft", "Completed", "Cancelled"]).optional(),
+    note: z.string().optional(),
+    items: z.array(ImportReceiptItemBodySchema).optional(),
+  })
+  .refine(
+    (data) => {
+      if (!data.importDate) return true;
+      const importDate = new Date(data.importDate);
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      importDate.setHours(0, 0, 0, 0);
+      return importDate <= now;
+    },
+    {
+      message: "importDateNotFuture",
+      path: ["importDate"],
+    },
+  );
 
 export type UpdateImportReceiptBodyType = z.TypeOf<typeof UpdateImportReceiptBody>;
 

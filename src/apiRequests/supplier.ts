@@ -3,7 +3,8 @@ import {
   SupplierQueryType,
   CreateSupplierBodyType,
   UpdateSupplierBodyType,
-  SupplierResType
+  SupplierResType,
+  SupplierOptionsResType,
 } from "@/schemaValidations/supplier.schema";
 import http from "@/utils/http";
 import queryString from "query-string";
@@ -23,5 +24,8 @@ export const supplierApiRequests = {
   },
   getSupplierById: (id: number) => {
     return http.get<SupplierResType>(`/suppliers/${id}`);
+  },
+  getSupplierOption: () => {
+    return http.get<SupplierOptionsResType>(`/suppliers/options`);
   },
 };

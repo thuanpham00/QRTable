@@ -16,14 +16,15 @@ export const useGetListInventoryStockQuery = (params: InventoryStockQueryType) =
   });
 };
 
-export const useGetListInventoryStockNoPaginationQuery = () => {
+export const useGetListInventoryStockNoPaginationQuery = ({ key, enabled }: { key: string; enabled: boolean }) => {
   return useQuery({
-    queryKey: ["inventory-stocks-no-pagination"],
+    queryKey: [key],
     queryFn: () => {
       return inventoryStockApiRequests.listNoPagination();
     },
     placeholderData: keepPreviousData,
     staleTime: 1000 * 60, // 1 minute
+    enabled: enabled,
   });
 };
 
