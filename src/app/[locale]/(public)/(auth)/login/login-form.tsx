@@ -12,7 +12,7 @@ import { useLoginMutation } from "@/queries/useAuth";
 import { toast } from "sonner";
 import { generateSocket, handleErrorApi } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, LoaderIcon } from "lucide-react";
 import { useAppStore } from "@/components/app-provider";
 import { envConfig } from "@/utils/config";
 import { useTranslations } from "next-intl";
@@ -142,14 +142,14 @@ export default function LoginForm() {
                         </Button>
                       </div>
                       <FormMessage>
-                        {Boolean(errors.password?.message) &&
-                          t(errors.password?.message as any)}
+                        {Boolean(errors.password?.message) && t(errors.password?.message as any)}
                       </FormMessage>
                     </div>
                   </FormItem>
                 )}
               />
               <Button type="submit" className="w-full">
+                {loginMutation.isPending && <LoaderIcon className="h-5 w-5 animate-spin" />}
                 {t("buttonLogin")}
               </Button>
               <Link

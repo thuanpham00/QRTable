@@ -29,6 +29,7 @@ import { OrderMode, OrderModeType } from "@/constants/type";
 import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { Checkbox } from "@/components/ui/checkbox";
+import { LoaderIcon } from "lucide-react";
 
 // Import constants
 const DietaryPreferenceValues = [
@@ -254,6 +255,7 @@ export default function GuestLoginForm() {
               </FormItem>
 
               <Button type="submit" className="w-full">
+                {useGuestLogin.isPending && <LoaderIcon className="h-5 w-5 animate-spin" />}{" "}
                 {t("buttonLogin")}
               </Button>
             </div>

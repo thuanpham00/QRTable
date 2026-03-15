@@ -15,6 +15,7 @@ import guestApiRequest from "@/apiRequests/guest";
 import { BookX, CookingPot, HandCoins, Loader, Truck } from "lucide-react";
 import { io } from "socket.io-client";
 import slugify from "slugify";
+import { jwtDecode } from "jwt-decode";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -250,7 +251,7 @@ export const getTableLink = ({
 };
 
 export const decodeToken = (token: string) => {
-  return jwt.decode(token) as TokenPayload;
+  return jwtDecode(token) as TokenPayload;
 };
 
 export const formatDateTimeToLocaleString = (date: string | Date) => {

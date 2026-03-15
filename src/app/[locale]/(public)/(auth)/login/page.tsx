@@ -17,7 +17,7 @@ export default async function Login({ params }: { params: Promise<{ locale: stri
         }}
         className="absolute z-1 inset-0"
       ></div>
-      <div className="absolute z-2 inset-0">
+      <div className="absolute z-2 inset-0 mx-4">
         <LoginForm />
       </div>
     </div>

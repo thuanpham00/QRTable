@@ -10,6 +10,7 @@ import { routing } from "@/i18n/routing";
 import { notFound } from "next/navigation";
 import { Locale } from "@/utils/config";
 import { baseOpenGraph } from "@/shared-metadata";
+import NextTopLoader from "nextjs-toploader";
 
 // fonts chữ
 const geistSans = Geist({
@@ -79,6 +80,7 @@ export default async function RootLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <NextTopLoader showSpinner={false} />
         <NextIntlClientProvider messages={messages}>
           <ReactQueryInstance>
             <AppProvider>

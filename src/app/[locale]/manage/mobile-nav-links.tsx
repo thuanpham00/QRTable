@@ -10,10 +10,11 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { Package2, PanelLeft } from "lucide-react";
+import { PanelLeft } from "lucide-react";
 import { Link, usePathname } from "@/i18n/routing";
 import { getMenuItems } from "@/app/[locale]/manage/menuItems";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 
 export default function MobileNavLinks() {
   const pathname = usePathname();
@@ -31,18 +32,25 @@ export default function MobileNavLinks() {
           <span className="sr-only">Toggle Menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="sm:max-w-xs">
+      <SheetContent side="left" className="max-w-75 sm:max-w-xs">
         <SheetHeader className="sr-only">
           <SheetTitle />
           <SheetDescription />
         </SheetHeader>
         <nav className="grid gap-6 text-lg font-medium">
           <Link
-            href="#"
-            className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
+            href="/"
+            className="group flex shrink-0 items-center justify-start gap-2 p-2 rounded-full text-sm font-semibold md:text-base md:mb-4"
           >
-            <Package2 className="h-5 w-5 transition-all group-hover:scale-110" />
-            <span className="sr-only">Acme Inc</span>
+            <Image
+              src="/images/logo.png"
+              alt="Logo"
+              width={128}
+              height={128}
+              quality={100}
+              className="h-9 w-9 md:h-12 md:w-12 object-contain"
+            />
+            <span className="text-black dark:text-white">QRTable</span>
           </Link>
           {menuItems.map((Item, index) => {
             if (!Item.roles.includes(isRole as "Owner" | "Employee")) return null;
@@ -59,12 +67,12 @@ export default function MobileNavLinks() {
                 })}
               >
                 {isCallGuest && (
-                  <span className="absolute top-0 left-7.5 w-4 h-4 bg-red-500 rounded-full text-white text-xs text-center block">
+                  <span className="absolute top-[8.5%] left-[6%] w-4 h-4 bg-red-500 rounded-full text-white text-xs text-center block">
                     {countGuestCalls}
                   </span>
                 )}
                 {isOrderToday && (
-                  <span className="absolute top-0 left-7.5 w-4 h-4 bg-red-500 rounded-full text-white text-xs text-center block">
+                  <span className="absolute top-[16%] left-[6%] w-4 h-4 bg-red-500 rounded-full text-white text-xs text-center block">
                     {countOrderToday}
                   </span>
                 )}

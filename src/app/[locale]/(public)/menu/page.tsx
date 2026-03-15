@@ -4,7 +4,7 @@ import { MenuItemStatus } from "@/constants/type";
 import { formatCurrency, wrapServerApi } from "@/lib/utils";
 import { MenuActiveResType } from "@/schemaValidations/menu.schema";
 import Image from "next/image";
-import bgLogin from "../../../../../public/images/food_example.jpg";
+import bgMenu from "../../../../../public/images/food_example.jpg";
 import logoFavourite from "../../../../../public/images/favorites.png";
 import { Link } from "@/i18n/routing";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -72,19 +72,20 @@ export default async function MenuPage({ params }: { params: Promise<{ locale: s
 
   return (
     <section className="space-y-10 p-4 md:p-8">
-      <div
-        className="text-center space-y-4 p-20 sm:p-40 rounded-xl"
-        style={{
-          backgroundImage: `url(${bgLogin.src})`,
-          backgroundPosition: "center",
-          backgroundSize: "cover",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        <h2 className="text-3xl font-bold text-white dark:text-primary">{menuActive.name}</h2>
-        {menuActive.description && <p className="text-white max-w-2xl mx-auto">{menuActive.description}</p>}
-        <div className="flex items-center justify-center">
-          <Badge variant="default">{menuActive.menuItems.length} món ăn</Badge>
+      <div className="w-full h-50 sm:h-70 lg:h-87.5 flex items-center justify-center space-y-4 relative">
+        <Image
+          src={bgMenu}
+          alt="Background"
+          className="object-cover z-20 rounded-xl w-full h-full"
+          fetchPriority="high"
+          loading="lazy"
+        />
+        <div className="absolute z-30 text-center space-y-4">
+          <h1 className="text-3xl font-bold text-white dark:text-primary">{menuActive.name}</h1>
+          {menuActive.description && <p className="text-white max-w-2xl mx-auto">{menuActive.description}</p>}
+          <div className="flex items-center justify-center">
+            <Badge variant="default">{menuActive.menuItems.length} món ăn</Badge>
+          </div>
         </div>
       </div>
 
@@ -104,7 +105,7 @@ export default async function MenuPage({ params }: { params: Promise<{ locale: s
                     />
                   )}
                   <div>
-                    <h3 className="text-2xl font-bold text-foreground">{categoryName}</h3>
+                    <h2 className="text-2xl font-bold text-foreground">{categoryName}</h2>
                     <p className="text-sm text-muted-foreground">{items.length} món ăn</p>
                   </div>
                 </div>
@@ -136,9 +137,9 @@ export default async function MenuPage({ params }: { params: Promise<{ locale: s
 
                     <div className="p-3 space-y-1 flex-1 flex flex-col">
                       <div className="space-y-1 flex-1">
-                        <h4 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-300">
+                        <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors duration-300">
                           {dish.name}
-                        </h4>
+                        </h3>
                         <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                           {dish.description}
                         </p>

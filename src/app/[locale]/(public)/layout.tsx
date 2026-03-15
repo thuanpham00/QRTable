@@ -27,7 +27,7 @@ export default async function Layout({
   params: Promise<{ locale: string }>;
 }>) {
   const locale = (await params).locale;
-  setRequestLocale(locale); // Thiết lập locale cho request hiện tại - Đặt ngôn ngữ cho toàn bộ Server Components trong request đó - chỉ dùng dc cho server component 
+  setRequestLocale(locale); // Thiết lập locale cho request hiện tại - Đặt ngôn ngữ cho toàn bộ Server Components trong request đó - chỉ dùng dc cho server component
 
   return (
     <div className="flex min-h-screen w-full flex-col relative">
@@ -44,7 +44,7 @@ export default async function Layout({
             />
             <span className="">QRTable</span>
           </div>
-          <NavItems className="transition-colors hover:text-foreground shrink-0 text-black dark:text-white" />
+          <NavItems className="transition-colors hover:text-foreground shrink-0" />
         </nav>
 
         {/* navbar dành cho mobile */}

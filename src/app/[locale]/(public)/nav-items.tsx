@@ -3,7 +3,8 @@ import { useAppStore } from "@/components/app-provider";
 import { Role } from "@/constants/type";
 import { RoleType } from "@/types/jwt.types";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/routing";
+import { Link, usePathname } from "@/i18n/routing";
+import { cn } from "@/lib/utils";
 
 // server: trả về món ăn + đăng nhập do server ko biết trạng thái login
 // client: đầu tiên client sẽ hiển thị món ăn + đăng nhập
@@ -16,6 +17,7 @@ export default function NavItems({ className }: { className?: string }) {
   const t = useTranslations("NavItem");
   const isAuth = useAppStore((state) => state.isAuth);
   const isRole = useAppStore((state) => state.isRole);
+  const pathname = usePathname();
   // nếu check login ở server thì chỉ check bằng cookies() nhưng cookies() thì page sẽ thành dynamic function
   // dẫn đến các trang thành dynamic page hết
   // nếu là tránh việc này check ở client bằng localStorage như trên và chỉ chạy đoạn này ở client nếu chạy ở server thì null (dành cho build page)
@@ -68,7 +70,11 @@ export default function NavItems({ className }: { className?: string }) {
   return checkRole(isRole).map((item) => {
     if ((item.authRequired === false && isAuth) || (item.authRequired === true && !isAuth)) return null;
     return (
-      <Link href={item.href} key={item.href} className={className}>
+      <Link
+        href={item.href}
+        key={item.href}
+        className={cn(className, pathname === item.href ? "dark:text-white text-black" : "dark:text-muted-foreground text-gray-500")}
+      >
         {item.title}
       </Link>
     );

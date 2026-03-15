@@ -2,9 +2,8 @@
 import { useAppStore } from "@/components/app-provider";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useRef } from "react";
-import jwt from "jsonwebtoken";
 import { RoleType } from "@/types/jwt.types";
-import { generateSocket } from "@/lib/utils";
+import { decodeToken, generateSocket } from "@/lib/utils";
 import { toast } from "sonner";
 import { useLoginOauthMutation } from "@/queries/useAuth";
 import { useRouter } from "@/i18n/routing";
@@ -28,7 +27,7 @@ function OauthForm() {
     refFlag.current = false;
 
     if (accessToken && refreshToken) {
-      const { role } = jwt.decode(refreshToken) as { role: RoleType };
+      const { role } = decodeToken(refreshToken) as { role: RoleType };
       mutateAsync({ accessToken, refreshToken }).then(() => {
         setIsRole(role);
         setSocket(generateSocket(accessToken));

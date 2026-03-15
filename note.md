@@ -138,3 +138,10 @@ vẫn nên có thẻ title, meta description
           minute: "2-digit",
      })}
 ```
+
+# Chạy phân tích @next/bundle-analyzer
+lệnh `analyze=true yarn build`
+
+cách chạy phân tích này dạy cho nextjs build bằng webpack. còn dự án hiện tại dùng turbopack
+vào network (f12) check lighthouse xem file js nào nặng và vào bundle analyzer tìm file js gây nặng đó -> phân tích xem do đâu nó nặng và fix 
+![alt text]({D56F080F-CB86-4777-B3A9-DC3EE653D9B0}.png)

@@ -34,6 +34,7 @@ export default function SlideImageHero() {
             alt="Main dish"
             className="w-full h-auto object-cover"
             priority={currentImageIndex === 0}
+            fetchPriority="high"
           />
         </motion.div>
       </AnimatePresence>
