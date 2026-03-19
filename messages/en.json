@@ -678,7 +678,8 @@
     "tableSessionCurrentDescription": "Manage table session",
     "tableSessionHidden": "Hidden",
     "tableSessionEmpty": "Empty",
-    "tableSessionServing": "Serving"
+    "tableSessionServing": "Serving",
+    "note": "Note"
   },
   "ManageDashboard": {
     "title": "Dashboard",
@@ -1067,7 +1068,8 @@
       "logoutQuestion": "Are you sure you want to log out?",
       "logoutCancel": "Cancel",
       "logoutConfirm": "Signing out may result in loss of your orders"
-    }
+    },
+    "historyPayments": "History of Payments"
   },
   "NavItemManage": {
     "dashboard": "Dashboard",
@@ -1158,7 +1160,7 @@
     "NoMenuActive": "No active menu"
   },
   "GuestOrderPage": {
-    "Chatbot": "Chatbot for advice",
+    "Chatbot": "Chatbot",
     "GuestCall": "Call waiter",
     "Order": "Order",
     "takeawayModeNotice": "You are in Takeaway Mode — cannot change",
@@ -1188,6 +1190,22 @@
     "Processing": "Processing",
     "Delivered": "Delivered",
     "Paid": "Paid",
-    "Rejected": "Rejected"
+    "Rejected": "Rejected",
+    "note": "Note"
+  },
+  "GuestHistoryPayment": {
+    "title": "Payment History",
+    "description": "Review your previous payment transactions",
+    "noPayment": "No payment found",
+    "totalAmount": "Total amount",
+    "paymentMethod": "Payment method",
+    "status": "Status",
+    "createdAt": "Created at",
+    "guest": "Guest",
+    "table": "Table",
+    "Paid": "Paid",
+    "Cancelled": "Cancelled",
+    "CASH": "Cash",
+    "SEPAY": "Sepay"
   }
 }

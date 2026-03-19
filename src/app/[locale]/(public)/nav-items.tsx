@@ -47,6 +47,12 @@ export default function NavItems({ className }: { className?: string }) {
       roles: [Role.Guest], // ko yêu cầu login và chỉ role khách xem được
     },
     {
+      title: t("historyPayments"),
+      href: "/guest/history-payment",
+      authRequired: true,
+      roles: [Role.Guest], // ko yêu cầu login và chỉ role khách xem được
+    },
+    {
       title: t("login"),
       href: "/login",
       authRequired: false,
@@ -73,7 +79,11 @@ export default function NavItems({ className }: { className?: string }) {
       <Link
         href={item.href}
         key={item.href}
-        className={cn(className, pathname === item.href ? "dark:text-white text-black" : "dark:text-muted-foreground text-gray-500")}
+        title={`Redirect to ${item.href}`}
+        className={cn(
+          className,
+          pathname === item.href ? "dark:text-white text-black" : "dark:text-muted-foreground text-gray-500",
+        )}
       >
         {item.title}
       </Link>

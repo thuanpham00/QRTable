@@ -14,6 +14,8 @@ import { formatCurrency, getVietnameseOrderStatus } from "../../../../lib/utils"
 import { useAppStore } from "@/components/app-provider";
 import { Badge } from "@/components/ui/badge";
 import { useTranslations } from "next-intl";
+import { Textarea } from "@/components/ui/textarea";
+import { useQueryClient } from "@tanstack/react-query";
 
 const orderStatusMap = (t: any) => ({
   [OrderStatus.Pending]: {
@@ -40,6 +42,7 @@ const orderStatusMap = (t: any) => ({
 
 export default function OrdersCart() {
   const t = useTranslations("GuestOrderPage");
+  const queryClient = useQueryClient();
 
   const infoGuest = useAppStore((state) => state.infoGuest);
   const socket = useAppStore((state) => state.socket);
@@ -130,6 +133,7 @@ export default function OrdersCart() {
         duration: 4000,
       });
       refetch();
+      queryClient.invalidateQueries({ queryKey: ["payments-for-guest"] });
     }
 
     socket?.on("update-order", onUpdateOrder);
@@ -150,7 +154,7 @@ export default function OrdersCart() {
       socket?.off("payment-completed", onPaymentCompleted);
       socket?.off("payment-group-completed", onPaymentCompleted);
     };
-  }, [refetch, socket]);
+  }, [refetch, socket, queryClient]);
 
   return (
     <div className="space-y-4">
@@ -167,7 +171,10 @@ export default function OrdersCart() {
           <div className="text-center text-gray-500 py-8">{t("no-order")}</div>
         ) : (
           listOrder.map((order) => (
-            <div key={order.id} className="flex gap-4 bg-card p-3 rounded-lg shadow-sm border">
+            <div
+              key={order.id}
+              className="flex gap-4 bg-background dark:bg-card p-3 rounded-lg shadow-sm border"
+            >
               <div className="shrink-0 relative">
                 <Image
                   src={order.dishSnapshot.image}
@@ -176,7 +183,7 @@ export default function OrdersCart() {
                   width={100}
                   quality={100}
                   unoptimized
-                  className="object-cover w-24 h-24 rounded-md"
+                  className="object-cover w-36 h-36 rounded-md"
                 />
               </div>
               <div className="flex-1 space-y-2">
@@ -205,6 +212,11 @@ export default function OrdersCart() {
                   <div className="text-sm font-bold text-white bg-linear-to-r from-orange-500 to-amber-500 px-3 py-1 rounded-lg shadow-lg">
                     {formatCurrency(order.dishSnapshot.price * order.quantity)}
                   </div>
+                </div>
+
+                <div>
+                  <span className="text-xs mb-2 block">{t("note")}:</span>
+                  <Textarea className="text-xs" value={order.note || "-"} disabled />
                 </div>
               </div>
             </div>

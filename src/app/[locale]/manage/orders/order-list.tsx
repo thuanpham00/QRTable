@@ -242,7 +242,11 @@ const getColumns = (t: any) => {
         );
       },
     },
-
+    {
+      id: "note",
+      header: t("note"),
+      cell: ({ row }) => <div>{row.original.note ? row.original.note : "-"}</div>,
+    },
     {
       id: "orderHandlerName",
       header: t("orderHandlerHeader"),
@@ -276,9 +280,7 @@ const getColumns = (t: any) => {
             <Button
               size="sm"
               onClick={openEditOrder}
-              disabled={
-                row.original.status !== OrderStatus.Pending
-              }
+              disabled={row.original.status !== OrderStatus.Pending}
               className="bg-blue-500 hover:bg-blue-400 text-white"
             >
               {t("editButton")}

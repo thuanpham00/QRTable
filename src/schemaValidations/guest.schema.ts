@@ -105,3 +105,21 @@ export const GuestSchema = z.object({
 });
 
 export type GuestSchemaType = z.TypeOf<typeof GuestSchema>;
+
+// GuestGetPaymentsRes schema
+export const GuestGetPaymentsRes = z.object({
+  message: z.string(),
+  data: z.array(
+    z.object({
+      id: z.number(),
+      totalAmount: z.number(),
+      paymentMethod: z.string(),
+      status: z.string(),
+      guest: GuestSchema,
+      createdAt: z.date(),
+      updatedAt: z.date(),
+    }),
+  ),
+});
+
+export type GuestGetPaymentsResType = z.TypeOf<typeof GuestGetPaymentsRes>;

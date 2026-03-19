@@ -3,6 +3,7 @@ import {
   GuestCreateOrdersBodyType,
   GuestCreateOrdersResType,
   GuestGetOrdersResType,
+  GuestGetPaymentsResType,
   GuestLoginBodyType,
   GuestLoginResType,
 } from "@/schemaValidations/guest.schema";
@@ -56,6 +57,7 @@ const guestApiRequest = {
 
   getOrderList: () => http.get<GuestGetOrdersResType>("/guest/orders"),
   order: (body: GuestCreateOrdersBodyType) => http.post<GuestCreateOrdersResType>("/guest/orders", body),
+  getPaymentHistory: () => http.get<GuestGetPaymentsResType>("/guest/payments"),
 };
 
 export default guestApiRequest;

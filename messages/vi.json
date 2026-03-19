@@ -689,7 +689,8 @@
     "tableSessionCurrentDescription": "Quản lý phiên bàn",
     "tableSessionHidden": "Ẩn",
     "tableSessionEmpty": "Trống",
-    "tableSessionServing": "Đang phục vụ"
+    "tableSessionServing": "Đang phục vụ",
+    "note": "Ghi chú"
   },
   "ManageDashboard": {
     "title": "Bảng điều khiển",
@@ -1078,7 +1079,8 @@
       "logoutQuestion": "Bạn có chắc chắn muốn đăng xuất?",
       "logoutCancel": "Hủy",
       "logoutConfirm": "Đăng xuất có thể dẫn đến mất dữ liệu đơn hàng của bạn"
-    }
+    },
+    "historyPayments": "Lịch sử thanh toán"
   },
   "NavItemManage": {
     "dashboard": "Bảng điều khiển",
@@ -1199,6 +1201,22 @@
     "Processing": "Đang nấu",
     "Delivered": "Đã phục vụ",
     "Paid": "Đã thanh toán",
-    "Rejected": "Từ chối"
+    "Rejected": "Từ chối",
+    "note": "Ghi chú"
+  },
+  "GuestHistoryPayment": {
+    "title": "Lịch sử thanh toán",
+    "description": "Xem lại các giao dịch thanh toán trước đây của bạn",
+    "noPayment": "Không có thanh toán nào",
+    "totalAmount": "Tổng tiền",
+    "paymentMethod": "Phương thức thanh toán",
+    "status": "Trạng thái",
+    "createdAt": "Ngày tạo",
+    "guest": "Khách",
+    "table": "Bàn",
+    "Paid": "Đã thanh toán",
+    "Cancelled": "Đã hủy",
+    "CASH": "Tiền mặt",
+    "SEPAY": "Sepay"
   }
 }

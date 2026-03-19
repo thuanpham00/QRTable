@@ -39,3 +39,12 @@ export const useGuestOrderMutation = () => {
     },
   });
 };
+
+export const useGuestPaymentQuery = () => {
+  return useQuery({
+    queryKey: ["payments-for-guest"],
+    queryFn: () => {
+      return guestApiRequest.getPaymentHistory();
+    },
+  });
+};

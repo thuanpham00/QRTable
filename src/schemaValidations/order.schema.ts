@@ -38,6 +38,7 @@ export const OrderSchema = z.object({
   status: z.enum(OrderStatusValues),
   createdAt: z.date(),
   updatedAt: z.date(),
+  note: z.string().nullable(),
 });
 
 export const UpdateOrderBody = z.object({

@@ -6,7 +6,7 @@ import { cn, decodeToken, formatCurrency, handleErrorApi, setOrderTypeQRFromLoca
 import { useGuestOrderMutation } from "@/queries/useGuest";
 import { GuestCreateOrdersBodyType } from "@/schemaValidations/guest.schema";
 import Image from "next/image";
-import { Fragment, useEffect, useState } from "react";
+import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -26,6 +26,8 @@ import { Check, House, Truck } from "lucide-react";
 import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import Chatbot from "@/app/[locale]/guest/menu/chatbot";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 type OrderList = (GuestCreateOrdersBodyType["listOrder"][number] & {
   price: number;
@@ -110,15 +112,40 @@ export default function MenuOrder() {
 
   const totalPriceOrder = orders.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
+  const [listNoteFood, setListNoteFood] = useState<{ menuItemId: number; note: string }[]>([]);
+  console.log(listNoteFood);
+
+  const handleChangeValueNote = (event: ChangeEvent<HTMLTextAreaElement>, menuItemId?: number) => {
+    const { value } = event.target;
+    const findNote = listNoteFood.find((item) => item.menuItemId === menuItemId);
+    if (findNote) {
+      // Cập nhật ghi chú nếu đã tồn tại
+      setListNoteFood((prev) =>
+        prev.map((item) => (item.menuItemId === menuItemId ? { ...item, note: value } : item)),
+      );
+      return;
+    }
+    // Thêm ghi chú mới nếu chưa tồn tại
+    setListNoteFood((prev) => [...prev, { menuItemId: menuItemId!, note: value }]);
+  };
+
   const handleOrder = async () => {
     if (orders.length === 0) {
       toast.error("Vui lòng chọn món ăn trước khi gọi món");
       return;
     }
     if (orderMutation.isPending) return;
+    const listOrder = orders.map((order) => {
+      const findMenuItem = listNoteFood.find((item) => item.menuItemId === order.menuItemId);
+      return {
+        menuItemId: order.menuItemId,
+        quantity: order.quantity,
+        note: findMenuItem ? findMenuItem.note : null,
+      };
+    });
     try {
       const body = {
-        listOrder: orders.map((order) => ({ menuItemId: order.menuItemId, quantity: order.quantity })),
+        listOrder: listOrder,
         typeOrder: orderMode,
       };
       const {
@@ -202,7 +229,9 @@ export default function MenuOrder() {
         {menuActive?.name ? menuActive.name : "Menu quán"} -{" "}
         <Badge variant="default">
           {" "}
-          {infoGuest?.tableTypeQR === OrderModeType.DINE_IN ? `${t("table")} ${infoGuest.tableNumber}` : t("takeaway")}
+          {infoGuest?.tableTypeQR === OrderModeType.DINE_IN
+            ? `${t("table")} ${infoGuest.tableNumber}`
+            : t("TakeAway")}
         </Badge>
       </h1>
 
@@ -218,7 +247,7 @@ export default function MenuOrder() {
           }}
         >
           <span>
-            {t("Order")} · {orders.length} món
+            {t("Order")} ({orders.length})
           </span>
           <span>{formatCurrency(totalPriceOrder)} </span>
         </Button>
@@ -388,22 +417,29 @@ export default function MenuOrder() {
                 <p className="text-sm text-muted-foreground">
                   {t("confirmOrderDesc", { count: orders.length })}{" "}
                 </p>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
+                <div className="space-y-2 max-h-68 overflow-y-auto">
                   {orders.map((order) => {
                     const menuItem = menuItems.find((item) => item.id === order.menuItemId);
                     const dish = menuItem?.dish;
                     return (
-                      <div
-                        key={order.menuItemId}
-                        className="flex justify-between items-center text-sm bg-gray-200 dark:bg-card p-2 rounded"
-                      >
-                        <div className="flex-1">
-                          <span className="font-medium text-black dark:text-white">{dish?.name}</span>
-                          <span className="text-muted-foreground"> x{order.quantity}</span>
+                      <div key={order.menuItemId} className="mb-3">
+                        <div className="flex justify-between items-center text-sm bg-gray-200 dark:bg-card p-2 rounded">
+                          <div className="flex-1 text-left">
+                            <span className="font-medium text-black dark:text-white">{dish?.name}</span>
+                            <span className="text-muted-foreground"> x{order.quantity}</span>
+                          </div>
+                          <span className="font-semibold text-orange-600">
+                            {formatCurrency(order.price * order.quantity)}
+                          </span>
                         </div>
-                        <span className="font-semibold text-orange-600">
-                          {formatCurrency(order.price * order.quantity)}
-                        </span>
+
+                        <div className="mt-2">
+                          <Label className="mb-2">Ghi chú:</Label>
+                          <Textarea
+                            placeholder={`Ghi chú cho món ${dish?.name}`}
+                            onChange={(event) => handleChangeValueNote(event, order.menuItemId)}
+                          />
+                        </div>
                       </div>
                     );
                   })}
