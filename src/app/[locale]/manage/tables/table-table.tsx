@@ -30,13 +30,22 @@ import QrCodeTable from "@/components/qrcode-table";
 import { toast } from "sonner";
 import useQueryParams from "@/hooks/useQueryParams";
 import { isUndefined, omitBy } from "lodash";
-import { OrderModeType } from "@/constants/type";
+import { OrderModeType, TableStatus, TableStatusValues } from "@/constants/type";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem } from "@/components/ui/form";
 import { Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type TableItem = TableListResType["data"][0];
 
@@ -132,6 +141,7 @@ export default function TableTable() {
       page,
       limit,
       number: queryParams.number ? queryParams.number : undefined,
+      status: (queryParams.status as (typeof TableStatusValues)[number]) || undefined,
     },
     isUndefined,
   ) as TableQueryType;
@@ -140,12 +150,13 @@ export default function TableTable() {
     resolver: zodResolver(SearchTable),
     defaultValues: {
       number: queryParams.number || "",
+      status: (queryParams.status as (typeof TableStatusValues)[number]) || undefined,
     },
   });
 
   const reset = () => {
     const params = new URLSearchParams(
-      Object.entries({ ...queryConfig, number: undefined })
+      Object.entries({ ...queryConfig, number: undefined, status: undefined })
         .filter(([key, value]) => value !== undefined)
         .map(([key, value]) => [key, String(value)]),
     );
@@ -155,7 +166,7 @@ export default function TableTable() {
 
   const submit = (data: SearchTableType) => {
     const params = new URLSearchParams(
-      Object.entries({ ...queryConfig, page: 1, number: data.number })
+      Object.entries({ ...queryConfig, page: 1, number: data.number, status: data.status })
         .filter(([key, value]) => value !== undefined && value !== "")
         .map(([key, value]) => [key, String(value)]),
     );
@@ -206,12 +217,41 @@ export default function TableTable() {
                 )}
               />
 
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <Select
+                      onValueChange={(val) => {
+                        field.onChange(val);
+                      }}
+                      value={field.value || ""}
+                    >
+                      <SelectTrigger className="w-45">
+                        <SelectValue placeholder={t("chooseStatus")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>{t("status")}</SelectLabel>
+                          {Object.values(TableStatus).map((status) => (
+                            <SelectItem key={status} value={status}>
+                              {getVietnameseTableStatus(status)}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+
               <Button variant="outline" size="icon" type="reset">
                 <X />
               </Button>
 
               <Button variant="outline" size="icon" className="bg-blue-500!" type="submit">
-                <Search color="white"/>
+                <Search color="white" />
               </Button>
             </form>
           </Form>

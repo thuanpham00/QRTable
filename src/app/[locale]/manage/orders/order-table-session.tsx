@@ -2,7 +2,7 @@
 "use client";
 import { GetOrdersResType } from "@/schemaValidations/order.schema";
 import { useEffect, useState } from "react";
-import { OrderModeType, OrderStatus, OrderStatusType, OrderStatusValues } from "@/constants/type";
+import { OrderModeType, OrderStatus, OrderStatusType, OrderStatusValues, TableStatus } from "@/constants/type";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import OrderList from "@/app/[locale]/manage/orders/order-list";
 import TableSessionList from "@/app/[locale]/manage/orders/table-session-list";
@@ -54,7 +54,9 @@ export default function OrderTableSession() {
 
   const getListActiveTableSessionQuery = useGetListActiveTableSessionQuery(); // trả về danh sách phiên bàn hiện tại đang hoạt động (chưa kết thúc)
 
-  const tableListSortedByNumber = tableList.sort((a, b) => a.number - b.number);
+  const tableListSortedByNumber = tableList
+    .filter((table) => table.status !== TableStatus.Hidden)
+    .sort((a, b) => a.number - b.number);
 
   const { statics, servingGuestByTableNumber } = useOrderService(orderList);
 

@@ -13,6 +13,7 @@ import {
 import { useRouter } from "@/i18n/routing";
 import { TableSessionActiveListResType } from "@/schemaValidations/tableSessions.schema";
 import { useTranslations } from "next-intl";
+import Image from "next/image";
 
 // Ví dụ:
 // const statics: Statics = {
@@ -89,6 +90,7 @@ export default function OrderStatics({
             const tableNumber: number = table.number;
             const statusTable = table.status;
             const typeTable = table.typeQR;
+            const capacity = table.capacity;
             const tableStatics: Record<number, StatusCountObject> | undefined = statics.table[tableNumber];
             let isEmptyTable = true;
             let countObject: StatusCountObject = {
@@ -133,6 +135,10 @@ export default function OrderStatics({
                   <div className="font-semibold text-center text-lg">
                     {typeTable === OrderModeType.DINE_IN ? `${t("table")} ${tableNumber} ` : t("takeOut")}
                   </div>
+                  <div className="font-semibold text-center text-sm">
+                    {t("capacity")}: {capacity}
+                  </div>
+                  <Image src="/images/table.png" alt="Meeting Room" width={80} height={80} />
                 </div>
                 <Separator
                   orientation="vertical"
@@ -164,7 +170,7 @@ export default function OrderStatics({
                   <div className="flex justify-between items-center text-sm">{t("tableSessionHidden")}</div>
                 )}
                 {isEmptyTable && statusTable !== TableStatus.Hidden && (
-                  <div className="flex justify-between items-center text-sm">{t("tableSessionEmpty")}</div>
+                  <div className="flex justify-between items-center text-sm font-semibold">{t("tableSessionEmpty")}</div>
                 )}
                 {!isEmptyTable && (
                   <div className="flex flex-col gap-2">

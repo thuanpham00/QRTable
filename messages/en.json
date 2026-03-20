@@ -679,7 +679,8 @@
     "tableSessionHidden": "Hidden",
     "tableSessionEmpty": "Empty",
     "tableSessionServing": "Serving",
-    "note": "Note"
+    "note": "Note",
+    "capacity": "Capacity"
   },
   "ManageDashboard": {
     "title": "Dashboard",

@@ -4,6 +4,7 @@ import z from "zod";
 
 export const SearchTable = z.object({
   number: z.string().max(256).optional(),
+  status: z.enum(TableStatusValues).optional(),
 });
 
 export type SearchTableType = z.TypeOf<typeof SearchTable>;
@@ -11,6 +12,7 @@ export type SearchTableType = z.TypeOf<typeof SearchTable>;
 export const TableQuery = BaseQuery.and(
   z.object({
     number: z.string().trim().max(256).optional(),
+    status: z.enum(TableStatusValues).optional(),
     pagination: z.string().optional(),
   }),
 );

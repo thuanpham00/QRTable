@@ -690,7 +690,8 @@
     "tableSessionHidden": "Ẩn",
     "tableSessionEmpty": "Trống",
     "tableSessionServing": "Đang phục vụ",
-    "note": "Ghi chú"
+    "note": "Ghi chú",
+    "capacity": "Sức chứa"
   },
   "ManageDashboard": {
     "title": "Bảng điều khiển",
@@ -1083,7 +1084,7 @@
     "historyPayments": "Lịch sử thanh toán"
   },
   "NavItemManage": {
-    "dashboard": "Bảng điều khiển",
+    "dashboard": "Tổng quan",
     "orders": "Đơn hàng",
     "payments": "Thanh toán",
     "callWaiters": "Gọi phục vụ",
