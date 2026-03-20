@@ -139,6 +139,9 @@ export default function PaymentTable() {
     }
   });
 
+  console.log(paymentGroups);
+  //Đúng, bill chung (paymentGroup) nên dùng cho admin để quản lý, theo dõi nhóm thanh toán và biết nhóm đó gồm những bill lẻ của khách nào.
+  //Còn khách thì chỉ nên thấy bill lẻ của mình để biết chi tiết đã order món nào, số tiền từng lần thanh toán, lịch sử cá nhân.
   return (
     <PaymentTableContext.Provider value={{ paymentIdEdit, setPaymentIdEdit }}>
       <div className="w-full">

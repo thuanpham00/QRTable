@@ -1217,6 +1217,10 @@
     "Paid": "Đã thanh toán",
     "Cancelled": "Đã hủy",
     "CASH": "Tiền mặt",
-    "SEPAY": "Sepay"
+    "SEPAY": "Sepay",
+    "orders": "Danh sách order",
+    "viewDetails": "Xem chi tiết",
+    "hiddenDetails": "Ẩn chi tiết",
+    "amountBill": "Tổng bill:"
   }
 }
