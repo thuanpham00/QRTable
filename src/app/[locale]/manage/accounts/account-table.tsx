@@ -36,7 +36,7 @@ import { useRouter } from "@/i18n/routing";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem } from "@/components/ui/form";
-import { Search, X } from "lucide-react";
+import { RefreshCcw, Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 type AccountItem = AccountListResType["data"][0];
@@ -222,7 +222,7 @@ export default function AccountTable() {
   const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>();
   const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null);
 
-  const { data } = useGetListEmployeeQuery(queryConfig);
+  const { data, refetch } = useGetListEmployeeQuery(queryConfig);
 
   const dataAccount: AccountListResType["data"] = data?.payload.data || [];
   const currentPage = data?.payload.pagination.page || 0; // trang hiện tại
@@ -253,11 +253,11 @@ export default function AccountTable() {
       <div className="w-full">
         <EditEmployee id={employeeIdEdit} setId={setEmployeeIdEdit} />
         <AlertDialogDeleteAccount employeeDelete={employeeDelete} setEmployeeDelete={setEmployeeDelete} />
-        <div className="flex items-center py-4">
+        <div className="flex items-center justify-between py-4">
           <Form {...form}>
             <form
               noValidate
-              className="flex items-center gap-2 py-4"
+              className="flex items-center gap-2"
               onReset={reset}
               onSubmit={form.handleSubmit(submit, (err) => {
                 console.log(err);
@@ -284,6 +284,9 @@ export default function AccountTable() {
           </Form>
           <div className="ml-auto flex items-center gap-2">
             <AddEmployee />
+            <Button variant="outline" className="bg-red-500! hover:bg-red-600!" onClick={() => refetch()}>
+              <RefreshCcw />
+            </Button>
           </div>
         </div>
 

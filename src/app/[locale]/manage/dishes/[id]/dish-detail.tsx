@@ -38,6 +38,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useTranslations } from "next-intl";
+import { RefreshCcw } from "lucide-react";
 
 // sử dụng trong phạm vị component AccountTable và các component con của nó
 const DishTableContext = createContext<{
@@ -229,8 +230,8 @@ export default function DishDetail() {
   const columns = getColumns(t);
   const params = useParams();
   const id = params.id as string;
-  const listIngredientForDish = useGetListDishIngredient(Number(id));
-  const data = listIngredientForDish.data?.payload.data ?? [];
+  const { data: listIngredientForDish, refetch } = useGetListDishIngredient(Number(id));
+  const data = listIngredientForDish?.payload.data ?? [];
 
   // state mặc định của table
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -286,8 +287,11 @@ export default function DishDetail() {
         <div className="w-full h-px bg-[#2e2f2f] my-8"></div>
         <div className="flex items-center mb-6">
           <div className="text-lg font-semibold">{t("IngredientList")}</div>
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-2">
             <AddIngredientToDishForm idDish={Number(id)} dataIngredientForDishCurrent={data} />
+            <Button variant="outline" className="bg-red-500! hover:bg-red-600!" onClick={() => refetch()}>
+              <RefreshCcw />
+            </Button>
           </div>
         </div>
 

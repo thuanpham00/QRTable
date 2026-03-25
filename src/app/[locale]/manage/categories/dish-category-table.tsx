@@ -28,7 +28,7 @@ import {
   SearchCategoryDish,
   SearchCategoryDishType,
 } from "@/schemaValidations/dishCategory.schema";
-import { Eye, Search, X } from "lucide-react";
+import { Eye, RefreshCcw, Search, X } from "lucide-react";
 import useQueryParams from "@/hooks/useQueryParams";
 import { isUndefined, omitBy } from "lodash";
 import { Link, useRouter } from "@/i18n/routing";
@@ -210,11 +210,11 @@ export default function DishCategoryTable() {
   const [dishCategoryIdEdit, setDishCategoryIdEdit] = useState<number | undefined>();
   const [dishCategoryDelete, setDishCategoryDelete] = useState<DishCategoryItem | null>(null);
 
-  const listDishCategory = useGetListDishCategoryQuery(queryConfig);
-  const data: DishCategoryListResType["data"] = listDishCategory.data?.payload.data || [];
-  const currentPage = listDishCategory.data?.payload.pagination.page || 0; // trang hiện tại
-  const totalPages = listDishCategory.data?.payload.pagination.totalPages || 0; // tổng số trang
-  const total = listDishCategory.data?.payload.pagination.total || 0; // tổng số item
+  const { data: listDishCategory, refetch } = useGetListDishCategoryQuery(queryConfig);
+  const data: DishCategoryListResType["data"] = listDishCategory?.payload.data || [];
+  const currentPage = listDishCategory?.payload.pagination.page || 0; // trang hiện tại
+  const totalPages = listDishCategory?.payload.pagination.totalPages || 0; // tổng số trang
+  const total = listDishCategory?.payload.pagination.total || 0; // tổng số item
 
   const pagination = {
     pageIndex: queryConfig.page ? queryConfig.page - 1 : 0,
@@ -268,13 +268,16 @@ export default function DishCategoryTable() {
               </Button>
 
               <Button variant="outline" size="icon" className="bg-blue-500!" type="submit">
-                <Search color="white"/>
+                <Search color="white" />
               </Button>
             </form>
           </Form>
 
           <div className="ml-auto flex items-center gap-2">
             <AddDishCategory />
+            <Button variant="outline" className="bg-red-500! hover:bg-red-600!" onClick={() => refetch()}>
+              <RefreshCcw />
+            </Button>
           </div>
         </div>
         <div className="rounded-md border">

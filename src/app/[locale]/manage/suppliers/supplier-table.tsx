@@ -26,7 +26,7 @@ import { isUndefined, omitBy } from "lodash";
 import { Badge } from "@/components/ui/badge";
 import AddSupplier from "@/app/[locale]/manage/suppliers/add-supplier";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { EyeIcon, Search, X } from "lucide-react";
+import { EyeIcon, RefreshCcw, Search, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem } from "@/components/ui/form";
@@ -269,14 +269,12 @@ export default function SupplierTable() {
   const [supplierIdEdit, setSupplierIdEdit] = useState<number | undefined>();
   const [supplierDelete, setSupplierDelete] = useState<SupplierItem | null>(null);
 
-  const listSupplier = useGetListSupplierQuery(queryConfig);
+  const { data: listSupplier, refetch } = useGetListSupplierQuery(queryConfig);
 
-  const data: SupplierListResType["data"] = listSupplier.data?.payload.data || [];
-  const currentPage =
-    (listSupplier.data?.payload.pagination && listSupplier.data?.payload.pagination.page) || 0; // trang hiện tại
-  const totalPages =
-    (listSupplier.data?.payload.pagination && listSupplier.data?.payload.pagination.totalPages) || 0; // tổng số trang
-  const total = (listSupplier.data?.payload.pagination && listSupplier.data?.payload.pagination.total) || 0; // tổng số item
+  const data: SupplierListResType["data"] = listSupplier?.payload.data || [];
+  const currentPage = (listSupplier?.payload.pagination && listSupplier?.payload.pagination.page) || 0; // trang hiện tại
+  const totalPages = (listSupplier?.payload.pagination && listSupplier?.payload.pagination.totalPages) || 0; // tổng số trang
+  const total = (listSupplier?.payload.pagination && listSupplier?.payload.pagination.total) || 0; // tổng số item
 
   const pagination = {
     pageIndex: queryConfig.page ? queryConfig.page - 1 : 0,
@@ -364,6 +362,9 @@ export default function SupplierTable() {
 
           <div className="ml-auto flex items-center gap-2">
             <AddSupplier />
+            <Button variant="outline" className="bg-red-500! hover:bg-red-600!" onClick={() => refetch()}>
+              <RefreshCcw />
+            </Button>
           </div>
         </div>
         <div className="rounded-md border max-w-[calc(100vw-300px)] overflow-auto">

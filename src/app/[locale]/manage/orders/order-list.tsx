@@ -26,7 +26,7 @@ import { createContext, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getVietnameseOrderStatus, handleErrorApi } from "@/lib/utils";
 import { OrderMode, OrderModeType, OrderStatusType, OrderStatusValues } from "@/constants/type";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, RefreshCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -490,7 +490,7 @@ export default function OrderList({
             <div className=" flex items-center">
               <div className="flex flex-wrap gap-2">
                 <div className="flex items-center">
-                  <span className="mr-2">{t("fromLabel")}</span>
+                  <span className="mr-2 text-sm">{t("fromLabel")}</span>
                   <Input
                     type="datetime-local"
                     placeholder={t("fromDatePlaceholder")}
@@ -500,86 +500,88 @@ export default function OrderList({
                   />
                 </div>
                 <div className="flex items-center">
-                  <span className="mr-2">{t("toLabel")}</span>
+                  <span className="mr-2 text-sm">{t("toLabel")}</span>
                   <Input
                     type="datetime-local"
                     placeholder={t("toDatePlaceholder")}
+                    className="text-sm"
                     value={format(toDate, "yyyy-MM-dd HH:mm").replace(" ", "T")}
                     onChange={(event) => setToDate(new Date(event.target.value))}
                   />
                 </div>
+                <Input
+                  placeholder={t("filterGuestName")}
+                  value={(table.getColumn("guestName")?.getFilterValue() as string) ?? ""}
+                  onChange={(event) => table.getColumn("guestName")?.setFilterValue(event.target.value)}
+                  className="max-w-25"
+                />
+                <Input
+                  placeholder={t("filterTableNumber")}
+                  value={(table.getColumn("tableNumber")?.getFilterValue() as string) ?? ""}
+                  onChange={(event) => table.getColumn("tableNumber")?.setFilterValue(event.target.value)}
+                  className="max-w-20"
+                />
+                <Popover open={openStatusFilter} onOpenChange={setOpenStatusFilter}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={openStatusFilter}
+                      className="w-37.5 text-sm justify-between"
+                    >
+                      {table.getColumn("status")?.getFilterValue()
+                        ? getVietnameseOrderStatus(
+                            table.getColumn("status")?.getFilterValue() as (typeof OrderStatusValues)[number],
+                          )
+                        : t("statusFilter")}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-50 p-0">
+                    <Command>
+                      <CommandGroup>
+                        <CommandList>
+                          {OrderStatusValues.map((status) => (
+                            <CommandItem
+                              key={status}
+                              value={status}
+                              onSelect={(currentValue: any) => {
+                                table
+                                  .getColumn("status")
+                                  ?.setFilterValue(
+                                    currentValue === table.getColumn("status")?.getFilterValue()
+                                      ? ""
+                                      : currentValue,
+                                  );
+                                setOpenStatusFilter(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  table.getColumn("status")?.getFilterValue() === status
+                                    ? "opacity-100"
+                                    : "opacity-0",
+                                )}
+                              />
+                              {getVietnameseOrderStatus(status)}
+                            </CommandItem>
+                          ))}
+                        </CommandList>
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
                 <Button className="" variant={"outline"} onClick={resetDateFilter}>
                   Reset
                 </Button>
               </div>
-              <div className="ml-auto">
+              <div className="ml-auto flex items-center gap-2">
+                <Button variant="outline" className="bg-red-500! hover:bg-red-600!" onClick={() => refetch()}>
+                  <RefreshCcw />
+                </Button>
                 <AddOrder />
               </div>
-            </div>
-            <div className="flex flex-wrap items-center gap-4 py-4">
-              <Input
-                placeholder={t("filterGuestName")}
-                value={(table.getColumn("guestName")?.getFilterValue() as string) ?? ""}
-                onChange={(event) => table.getColumn("guestName")?.setFilterValue(event.target.value)}
-                className="max-w-25"
-              />
-              <Input
-                placeholder={t("filterTableNumber")}
-                value={(table.getColumn("tableNumber")?.getFilterValue() as string) ?? ""}
-                onChange={(event) => table.getColumn("tableNumber")?.setFilterValue(event.target.value)}
-                className="max-w-20"
-              />
-              <Popover open={openStatusFilter} onOpenChange={setOpenStatusFilter}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    aria-expanded={openStatusFilter}
-                    className="w-37.5 text-sm justify-between"
-                  >
-                    {table.getColumn("status")?.getFilterValue()
-                      ? getVietnameseOrderStatus(
-                          table.getColumn("status")?.getFilterValue() as (typeof OrderStatusValues)[number],
-                        )
-                      : t("statusFilter")}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-50 p-0">
-                  <Command>
-                    <CommandGroup>
-                      <CommandList>
-                        {OrderStatusValues.map((status) => (
-                          <CommandItem
-                            key={status}
-                            value={status}
-                            onSelect={(currentValue: any) => {
-                              table
-                                .getColumn("status")
-                                ?.setFilterValue(
-                                  currentValue === table.getColumn("status")?.getFilterValue()
-                                    ? ""
-                                    : currentValue,
-                                );
-                              setOpenStatusFilter(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                table.getColumn("status")?.getFilterValue() === status
-                                  ? "opacity-100"
-                                  : "opacity-0",
-                              )}
-                            />
-                            {getVietnameseOrderStatus(status)}
-                          </CommandItem>
-                        ))}
-                      </CommandList>
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
             </div>
 
             <div className="flex justify-start items-end gap-4 flex-wrap py-4">

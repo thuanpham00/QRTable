@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { createContext, useContext, useState } from "react";
 import AutoPagination from "@/components/auto-pagination";
-import { Eye, Search, X } from "lucide-react";
+import { Eye, RefreshCcw, Search, X } from "lucide-react";
 import useQueryParams from "@/hooks/useQueryParams";
 import { isUndefined, omitBy } from "lodash";
 import { useRouter } from "@/i18n/routing";
@@ -181,12 +181,12 @@ export default function ExportTable() {
 
   const [exportReceiptIdViewItems, setExportReceiptIdViewItems] = useState<number | undefined>();
 
-  const listExportReceipt = useGetListExportReceiptQuery(queryConfig);
+  const { data: listExportReceipt, refetch } = useGetListExportReceiptQuery(queryConfig);
 
-  const data: ExportReceiptListResType["data"] = listExportReceipt.data?.payload.data || [];
-  const currentPage = listExportReceipt.data?.payload.pagination.page || 0; // trang hiện tại
-  const totalPages = listExportReceipt.data?.payload.pagination.totalPages || 0; // tổng số trang
-  const total = listExportReceipt.data?.payload.pagination.total || 0; // tổng số item
+  const data: ExportReceiptListResType["data"] = listExportReceipt?.payload.data || [];
+  const currentPage = listExportReceipt?.payload.pagination.page || 0; // trang hiện tại
+  const totalPages = listExportReceipt?.payload.pagination.totalPages || 0; // tổng số trang
+  const total = listExportReceipt?.payload.pagination.total || 0; // tổng số item
 
   const pagination = {
     pageIndex: queryConfig.page ? queryConfig.page - 1 : 0,
@@ -219,7 +219,7 @@ export default function ExportTable() {
             <CardDescription>{t("description")}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center pb-4">
+            <div className="flex items-center justify-between pb-4">
               <Form {...form}>
                 <form
                   noValidate
@@ -281,6 +281,9 @@ export default function ExportTable() {
                   </Button>
                 </form>
               </Form>
+              <Button variant="outline" className="bg-red-500! hover:bg-red-600!" onClick={() => refetch()}>
+                <RefreshCcw />
+              </Button>
             </div>
             <div className="rounded-md border">
               <Table>

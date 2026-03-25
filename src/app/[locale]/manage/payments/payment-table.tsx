@@ -15,7 +15,7 @@ import { useGetListPaymentQuery } from "@/queries/usePayment";
 import FormPaymentDetail from "@/app/[locale]/manage/payments/form-payment-detail";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { Search } from "lucide-react";
+import { RefreshCcw, Search } from "lucide-react";
 import { FieldErrors, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "@/i18n/routing";
@@ -117,14 +117,12 @@ export default function PaymentTable() {
 
   const [paymentIdEdit, setPaymentIdEdit] = useState<number | undefined>();
 
-  const listPayment = useGetListPaymentQuery(queryConfig);
+  const { data: listPayment, refetch } = useGetListPaymentQuery(queryConfig);
 
-  const data: PaymentListResType["data"] = listPayment.data?.payload.data || [];
-  const currentPage =
-    (listPayment.data?.payload.pagination && listPayment.data?.payload.pagination.page) || 0;
-  const totalPages =
-    (listPayment.data?.payload.pagination && listPayment.data?.payload.pagination.totalPages) || 0;
-  const total = (listPayment.data?.payload.pagination && listPayment.data?.payload.pagination.total) || 0;
+  const data: PaymentListResType["data"] = listPayment?.payload.data || [];
+  const currentPage = (listPayment?.payload.pagination && listPayment?.payload.pagination.page) || 0;
+  const totalPages = (listPayment?.payload.pagination && listPayment?.payload.pagination.totalPages) || 0;
+  const total = (listPayment?.payload.pagination && listPayment?.payload.pagination.total) || 0;
 
   // Tạo map để track các payment group và đếm số lượng payment trong mỗi group
   const paymentGroups: Record<string, PaymentItemType[]> = {};
@@ -139,7 +137,6 @@ export default function PaymentTable() {
     }
   });
 
-  console.log(paymentGroups);
   //Đúng, bill chung (paymentGroup) nên dùng cho admin để quản lý, theo dõi nhóm thanh toán và biết nhóm đó gồm những bill lẻ của khách nào.
   //Còn khách thì chỉ nên thấy bill lẻ của mình để biết chi tiết đã order món nào, số tiền từng lần thanh toán, lịch sử cá nhân.
   return (
@@ -152,104 +149,97 @@ export default function PaymentTable() {
             onReset={reset}
             onSubmit={form.handleSubmit(submit, invalidSubmit)}
           >
-            <div className="grid grid-cols-4 items-center">
-              <div className="col-span-3 flex flex-col gap-4">
-                <div className="flex items-center gap-4">
-                  <FormField
-                    control={form.control}
-                    name="fromDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center">
-                          <span className="mr-2 text-sm">{t("from")}</span>
-                          <Input
-                            type="datetime-local"
-                            placeholder={t("fromDate")}
-                            className="text-sm"
-                            value={field.value ? format(new Date(field.value), "yyyy-MM-dd'T'HH:mm") : ""}
-                            onChange={(event) =>
-                              field.onChange(event.target.value ? new Date(event.target.value) : undefined)
-                            }
-                          />
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="toDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center">
-                          <span className="mr-2 text-sm">{t("to")}</span>
-                          <Input
-                            type="datetime-local"
-                            placeholder={t("toDate")}
-                            className="text-sm"
-                            value={field.value ? format(new Date(field.value), "yyyy-MM-dd'T'HH:mm") : ""}
-                            onChange={(event) =>
-                              field.onChange(event.target.value ? new Date(event.target.value) : undefined)
-                            }
-                          />
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="flex items-center gap-4">
-                  <FormField
-                    control={form.control}
-                    name="paymentMethod"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center">
-                          <span className="mr-2 text-sm">{t("paymentMethodLabel")}</span>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            value={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder={t("chooseOption")} />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="CASH">{t("cash")}</SelectItem>
-                              <SelectItem value="SEPAY">{t("sepay")}</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="numberTable"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex items-center">
-                          <span className="mr-2 text-sm">{t("tableNumberLabel")}</span>
-                          <Input
-                            type="number"
-                            value={field.value ?? ""}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              field.onChange(value === "" ? undefined : Number(value));
-                            }}
-                          />
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
+            <div className="flex justify-between flex-wrap items-center gap-2">
+              <FormField
+                control={form.control}
+                name="fromDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center">
+                      <span className="mr-2 text-sm">{t("from")}</span>
+                      <Input
+                        type="datetime-local"
+                        placeholder={t("fromDate")}
+                        className="text-sm"
+                        value={field.value ? format(new Date(field.value), "yyyy-MM-dd'T'HH:mm") : ""}
+                        onChange={(event) =>
+                          field.onChange(event.target.value ? new Date(event.target.value) : undefined)
+                        }
+                      />
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="toDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center">
+                      <span className="mr-2 text-sm">{t("to")}</span>
+                      <Input
+                        type="datetime-local"
+                        placeholder={t("toDate")}
+                        className="text-sm"
+                        value={field.value ? format(new Date(field.value), "yyyy-MM-dd'T'HH:mm") : ""}
+                        onChange={(event) =>
+                          field.onChange(event.target.value ? new Date(event.target.value) : undefined)
+                        }
+                      />
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="paymentMethod"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center">
+                      <span className="mr-2 text-sm">{t("paymentMethodLabel")}</span>
+                      <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t("chooseOption")} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="CASH">{t("cash")}</SelectItem>
+                          <SelectItem value="SEPAY">{t("sepay")}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="numberTable"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center">
+                      <span className="mr-2 text-sm">{t("tableNumberLabel")}</span>
+                      <Input
+                        type="number"
+                        value={field.value ?? ""}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          field.onChange(value === "" ? undefined : Number(value));
+                        }}
+                      />
+                    </div>
+                  </FormItem>
+                )}
+              />
               <div className="ml-auto flex items-center gap-2">
                 <Button className="" variant={"outline"} type="reset">
                   Reset
                 </Button>
                 <Button className="bg-blue-500!" variant={"outline"} type="submit">
                   <Search color="white" />
+                </Button>
+                <Button variant="outline" className="bg-red-500! hover:bg-red-600!" onClick={() => refetch()}>
+                  <RefreshCcw />
                 </Button>
               </div>
             </div>

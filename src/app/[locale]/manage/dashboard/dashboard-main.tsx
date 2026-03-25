@@ -15,7 +15,7 @@ import { formatCurrency } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTranslations } from "next-intl";
-import { AlertCircle, Package, TrendingUp, Utensils, Users } from "lucide-react";
+import { AlertCircle, Package, TrendingUp, Utensils, Users, RefreshCcw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 type DateRangeType = "date" | "month" | "year";
@@ -29,7 +29,7 @@ export default function DashboardMain() {
   const [fromDate, setFromDate] = useState(initFromDate);
   const [toDate, setToDate] = useState(initToDate);
 
-  const { data } = useDashboardIndicator({
+  const { data, refetch } = useDashboardIndicator({
     fromDate,
     toDate,
   });
@@ -172,48 +172,55 @@ export default function DashboardMain() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-2 items-end">
-        <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">{t("dateRangeTypeLabel")}</label>
-          <Select value={dateRangeType} onValueChange={handleDateRangeTypeChange}>
-            <SelectTrigger className="w-35">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="date">{t("byDate")}</SelectItem>
-              <SelectItem value="month">{t("byMonth")}</SelectItem>
-              <SelectItem value="year">{t("byYear")}</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="flex items-center justify-between">
+        <div className="flex flex-wrap gap-2 items-end">
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">{t("dateRangeTypeLabel")}</label>
+            <Select value={dateRangeType} onValueChange={handleDateRangeTypeChange}>
+              <SelectTrigger className="w-35">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="date">{t("byDate")}</SelectItem>
+                <SelectItem value="month">{t("byMonth")}</SelectItem>
+                <SelectItem value="year">{t("byYear")}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-        <div className="ml-4 flex items-center gap-2">
-          <label className="text-sm font-medium">{t("from")}</label>
-          <Input
-            type={getInputType()}
-            placeholder={t("from")}
-            className="w-52"
-            value={getInputValue(fromDate)}
-            onChange={(e) => handleDateChange(e.target.value, true)}
-            {...(dateRangeType === "year" && { min: 2000, max: 2100 })}
-          />
-        </div>
+          <div className="ml-4 flex items-center gap-2">
+            <label className="text-sm font-medium">{t("from")}</label>
+            <Input
+              type={getInputType()}
+              placeholder={t("from")}
+              className="w-52"
+              value={getInputValue(fromDate)}
+              onChange={(e) => handleDateChange(e.target.value, true)}
+              {...(dateRangeType === "year" && { min: 2000, max: 2100 })}
+            />
+          </div>
 
-        <div className="flex items-center gap-2">
-          <label className="text-sm font-medium">{t("to")}</label>
-          <Input
-            type={getInputType()}
-            placeholder={t("to")}
-            className="w-52"
-            value={getInputValue(toDate)}
-            onChange={(e) => handleDateChange(e.target.value, false)}
-            {...(dateRangeType === "year" && { min: 2000, max: 2100 })}
-          />
-        </div>
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">{t("to")}</label>
+            <Input
+              type={getInputType()}
+              placeholder={t("to")}
+              className="w-52"
+              value={getInputValue(toDate)}
+              onChange={(e) => handleDateChange(e.target.value, false)}
+              {...(dateRangeType === "year" && { min: 2000, max: 2100 })}
+            />
+          </div>
 
-        <Button variant="outline" onClick={resetDateFilter}>
-          Reset
-        </Button>
+          <Button variant="outline" onClick={resetDateFilter}>
+            Reset
+          </Button>
+        </div>
+        <div>
+          <Button variant="outline" className="bg-red-500! hover:bg-red-600!" onClick={() => refetch()}>
+            <RefreshCcw />
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">

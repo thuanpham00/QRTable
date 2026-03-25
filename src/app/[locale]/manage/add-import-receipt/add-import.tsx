@@ -224,7 +224,7 @@ export default function AddImport() {
                 type="button"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Thêm nguyên liệu
+                {t("addIngredient")}
               </Button>
               <Button type="submit" form="edit-dish-form">
                 {t("saveImportReceipt")}

@@ -35,7 +35,7 @@ import {
 import AddIngredient from "@/app/[locale]/manage/ingredients/add-ingredient";
 import EditIngredient from "@/app/[locale]/manage/ingredients/edit-ingredient";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, X } from "lucide-react";
+import { RefreshCcw, Search, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem } from "@/components/ui/form";
@@ -304,15 +304,13 @@ export default function IngredientTable() {
   const [ingredientIdEdit, setIngredientIdEdit] = useState<number | undefined>();
   const [ingredientDelete, setIngredientDelete] = useState<IngredientItem | null>(null);
 
-  const listIngredient = useGetListIngredientQuery(queryConfig);
+  const { data: listIngredient, refetch } = useGetListIngredientQuery(queryConfig);
 
-  const data: IngredientListResType["data"] = listIngredient.data?.payload.data || [];
-  const currentPage =
-    (listIngredient.data?.payload.pagination && listIngredient.data?.payload.pagination.page) || 0; // trang hiện tại
+  const data: IngredientListResType["data"] = listIngredient?.payload.data || [];
+  const currentPage = (listIngredient?.payload.pagination && listIngredient?.payload.pagination.page) || 0; // trang hiện tại
   const totalPages =
-    (listIngredient.data?.payload.pagination && listIngredient.data?.payload.pagination.totalPages) || 0; // tổng số trang
-  const total =
-    (listIngredient.data?.payload.pagination && listIngredient.data?.payload.pagination.total) || 0; // tổng số item
+    (listIngredient?.payload.pagination && listIngredient?.payload.pagination.totalPages) || 0; // tổng số trang
+  const total = (listIngredient?.payload.pagination && listIngredient?.payload.pagination.total) || 0; // tổng số item
 
   const pagination = {
     pageIndex: queryConfig.page ? queryConfig.page - 1 : 0,
@@ -431,6 +429,9 @@ export default function IngredientTable() {
 
           <div className="ml-auto flex items-center gap-2">
             <AddIngredient />
+            <Button variant="outline" className="bg-red-500! hover:bg-red-600!" onClick={() => refetch()}>
+              <RefreshCcw />
+            </Button>
           </div>
         </div>
         <div className="rounded-md border">

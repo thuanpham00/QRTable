@@ -113,7 +113,7 @@ export default async function MenuPage({ params }: { params: Promise<{ locale: s
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-x-4 gap-y-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-x-4 gap-y-6">
               {items.map((menuItem) => {
                 const dish = menuItem.dish;
 
@@ -126,7 +126,7 @@ export default async function MenuPage({ params }: { params: Promise<{ locale: s
                       id: menuItem.id,
                     })}`}
                   >
-                    <div className="relative overflow-hidden h-56 bg-muted">
+                    <div className="relative overflow-hidden h-32 sm:h-48 lg:h-62 bg-muted">
                       <Image
                         alt={dish.name}
                         src={dish.image}
@@ -148,11 +148,11 @@ export default async function MenuPage({ params }: { params: Promise<{ locale: s
                         </p>
                       </div>
 
-                      <div className="flex items-center justify-between">
+                      <div className="flex sm:items-center sm:flex-row justify-between flex-col items-stretch">
                         <div className="text-xl font-bold text-gray-800 dark:text-white rounded-lg">
                           {formatCurrency(dish.price)}
                         </div>
-                        <div className="text-xs text-gray-700 dark:text-primary font-semibold">
+                        <div className="mt-1 sm:mt-0 text-xs text-gray-700 dark:text-primary font-semibold">
                           {t("seenDetail")}
                         </div>
                       </div>

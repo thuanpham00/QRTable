@@ -7,6 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useState } from "react";
 import AutoPagination from "@/components/auto-pagination";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { RefreshCcw } from "lucide-react";
 
 export default function ChatbotTable() {
   const t = useTranslations("ManageChatbots");
@@ -25,10 +27,10 @@ export default function ChatbotTable() {
     isUndefined,
   ) as ChatbotQueryType;
 
-  const listMessage = useGetListChatMessages(queryConfig);
-  const messages = (listMessage.data?.payload.data || []) as ChatStoryAllGuestsListResType["data"];
-  const currentPage = listMessage.data?.payload.pagination.page || 0; // trang hiện tại
-  const totalPages = listMessage.data?.payload.pagination.totalPages || 0; // tổng số trang
+  const { data: listMessage, refetch } = useGetListChatMessages(queryConfig);
+  const messages = (listMessage?.payload.data || []) as ChatStoryAllGuestsListResType["data"];
+  const currentPage = listMessage?.payload.pagination.page || 0; // trang hiện tại
+  const totalPages = listMessage?.payload.pagination.totalPages || 0; // tổng số trang
 
   const [selectedGuestId, setSelectedGuestId] = useState<number | null>(null);
 
@@ -37,13 +39,12 @@ export default function ChatbotTable() {
 
   return (
     <div>
-      <AutoPagination
-        queryConfig={queryConfig}
-        page={currentPage} // trang hiện tại
-        totalPages={totalPages} // tổng số trang
-        pathname="/manage/chatbots"
-      />
-      <div className="mt-4 flex gap-6">
+      <div className="mb-4 flex justify-end">
+        <Button variant="outline" className="bg-red-500! hover:bg-red-600!" onClick={() => refetch()}>
+          <RefreshCcw />
+        </Button>
+      </div>
+      <div className="flex gap-6">
         {/* Danh sách guest */}
         <div className="w-80 border rounded-md overflow-y-auto max-h-125">
           <Table>
@@ -95,6 +96,14 @@ export default function ChatbotTable() {
             <div>Chọn một guest để xem lịch sử chat</div>
           )}
         </div>
+      </div>
+      <div className="mt-4">
+        <AutoPagination
+          queryConfig={queryConfig}
+          page={currentPage} // trang hiện tại
+          totalPages={totalPages} // tổng số trang
+          pathname="/manage/chatbots"
+        />
       </div>
     </div>
   );

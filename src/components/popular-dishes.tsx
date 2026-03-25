@@ -51,7 +51,7 @@ export default function PopularDishes({ data }: { data: DishSuggestList }) {
                 320: { slidesPerView: 1 },
                 480: { slidesPerView: 2 },
                 768: { slidesPerView: 3 },
-                1024: { slidesPerView: 4 },
+                1024: { slidesPerView: 3 },
                 1280: { slidesPerView: 4 },
               }}
               className="mySwiper relative"
@@ -66,7 +66,7 @@ export default function PopularDishes({ data }: { data: DishSuggestList }) {
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
                     {/* Image */}
-                    <div className="relative h-58 overflow-hidden">
+                    <div className="relative h-62 sm:h-46 lg:h-54 xl:h-72 overflow-hidden">
                       <div className="absolute inset-0 z-9" />
                       <Image
                         src={dish.dish.image}

@@ -18,7 +18,7 @@ import { DishStatus } from "@/constants/type";
 import { Badge } from "@/components/ui/badge";
 import { Link, useRouter } from "@/i18n/routing";
 import { Button } from "@/components/ui/button";
-import { Search, X } from "lucide-react";
+import { RefreshCcw, Search, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Form, FormField, FormItem } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -196,12 +196,12 @@ export default function DishTable() {
   const [dishIdEdit, setDishIdEdit] = useState<number | undefined>();
   const [dishDelete, setDishDelete] = useState<DishItem | null>(null);
 
-  const listDish = useGetListDishQuery(queryConfig);
+  const { data: listDish, refetch } = useGetListDishQuery(queryConfig);
 
-  const data: DishListResType["data"] = listDish.data?.payload.data || [];
-  const currentPage = (listDish.data?.payload.pagination && listDish.data?.payload.pagination.page) || 0; // trang hiện tại
-  const totalPages = (listDish.data?.payload.pagination && listDish.data?.payload.pagination.totalPages) || 0; // tổng số trang
-  const total = (listDish.data?.payload.pagination && listDish.data?.payload.pagination.total) || 0; // tổng số item
+  const data: DishListResType["data"] = listDish?.payload.data || [];
+  const currentPage = (listDish?.payload.pagination && listDish?.payload.pagination.page) || 0; // trang hiện tại
+  const totalPages = (listDish?.payload.pagination && listDish?.payload.pagination.totalPages) || 0; // tổng số trang
+  const total = (listDish?.payload.pagination && listDish?.payload.pagination.total) || 0; // tổng số item
 
   const pagination = {
     pageIndex: queryConfig.page ? queryConfig.page - 1 : 0,
@@ -287,6 +287,9 @@ export default function DishTable() {
 
           <div className="ml-auto flex items-center gap-2">
             <AddDish />
+            <Button variant="outline" className="bg-red-500! hover:bg-red-600!" onClick={() => refetch()}>
+              <RefreshCcw />
+            </Button>
           </div>
         </div>
         <div className="rounded-md border">

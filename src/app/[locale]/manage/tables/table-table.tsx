@@ -34,7 +34,7 @@ import { OrderModeType, TableStatus, TableStatusValues } from "@/constants/type"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField, FormItem } from "@/components/ui/form";
-import { Search, X } from "lucide-react";
+import { RefreshCcw, Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useParams } from "next/navigation";
 import {
@@ -176,13 +176,13 @@ export default function TableTable() {
   const [tableIdEdit, setTableIdEdit] = useState<number | undefined>();
   const [tableDelete, setTableDelete] = useState<TableItem | null>(null);
 
-  const listTable = useGetListTableQuery(queryConfig);
-  const data: TableListResType["data"] = listTable.data?.payload.data || [];
+  const { data: listTable, refetch } = useGetListTableQuery(queryConfig);
+  const data: TableListResType["data"] = listTable?.payload.data || [];
   const dataSortTypeQR = data.sort((a, b) => b.typeQR.localeCompare(a.typeQR));
 
-  const currentPage = listTable.data?.payload.pagination.page || 0; // trang hiện tại
-  const totalPages = listTable.data?.payload.pagination.totalPages || 0; // tổng số trang
-  const total = listTable.data?.payload.pagination.total || 0; // tổng số item
+  const currentPage = listTable?.payload.pagination.page || 0; // trang hiện tại
+  const totalPages = listTable?.payload.pagination.totalPages || 0; // tổng số trang
+  const total = listTable?.payload.pagination.total || 0; // tổng số item
 
   const openEditTable = (id: number) => {
     setTableIdEdit(id);
@@ -258,6 +258,9 @@ export default function TableTable() {
 
           <div className="ml-auto flex items-center gap-2">
             <AddTable />
+            <Button variant="outline" className="bg-red-500! hover:bg-red-600!" onClick={() => refetch()}>
+              <RefreshCcw />
+            </Button>
           </div>
         </div>
         <div>

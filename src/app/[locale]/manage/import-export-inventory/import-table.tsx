@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { createContext, useContext, useState } from "react";
 import AutoPagination from "@/components/auto-pagination";
-import { Eye, PlusCircle, Search, X } from "lucide-react";
+import { Eye, PlusCircle, RefreshCcw, Search, X } from "lucide-react";
 import useQueryParams from "@/hooks/useQueryParams";
 import { Link, useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
@@ -141,12 +141,12 @@ export default function ImportTable() {
     isUndefined,
   ) as ImportReceiptQueryType;
 
-  const listImportReceipt = useGetListImportReceiptQuery(queryConfig);
+  const {data: listImportReceipt, refetch} = useGetListImportReceiptQuery(queryConfig);
 
-  const data: GetImportReceiptListResType["data"] = listImportReceipt.data?.payload.data || [];
-  const currentPage = listImportReceipt.data?.payload.pagination.page || 0; // trang hiện tại
-  const totalPages = listImportReceipt.data?.payload.pagination.totalPages || 0; // tổng số trang
-  const total = listImportReceipt.data?.payload.pagination.total || 0; // tổng số item
+  const data: GetImportReceiptListResType["data"] = listImportReceipt?.payload.data || [];
+  const currentPage = listImportReceipt?.payload.pagination.page || 0; // trang hiện tại
+  const totalPages = listImportReceipt?.payload.pagination.totalPages || 0; // tổng số trang
+  const total = listImportReceipt?.payload.pagination.total || 0; // tổng số item
 
   const pagination = {
     pageIndex: queryConfig.page ? queryConfig.page - 1 : 0,
@@ -228,7 +228,7 @@ export default function ImportTable() {
               <Form {...form}>
                 <form
                   noValidate
-                  className="flex items-center gap-2 py-4"
+                  className="flex items-center gap-2 pt-4 pb-2"
                   onReset={reset}
                   onSubmit={form.handleSubmit(submit, (err) => {
                     console.log(err);
@@ -315,6 +315,35 @@ export default function ImportTable() {
                         )}
                       />
 
+                      <FormField
+                        control={form.control}
+                        name="supplierId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Select
+                              onValueChange={(val) => {
+                                field.onChange(String(val) || "");
+                              }}
+                              value={field.value || ""}
+                            >
+                              <SelectTrigger className="w-60">
+                                <SelectValue placeholder={t("chooseSupplier")} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>{t("supplier")}</SelectLabel>
+                                  {dataOptionsSupplier.map((supplier) => (
+                                    <SelectItem key={supplier.id} value={String(supplier.id)}>
+                                      {supplier.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                          </FormItem>
+                        )}
+                      />
+
                       <div className="flex items-center gap-1">
                         <Button variant="outline" size="icon" type="reset">
                           <X />
@@ -324,51 +353,23 @@ export default function ImportTable() {
                         </Button>
                       </div>
                     </div>
-
-                    <FormField
-                      control={form.control}
-                      name="supplierId"
-                      render={({ field }) => (
-                        <FormItem className="mt-4">
-                          <Select
-                            onValueChange={(val) => {
-                              field.onChange(String(val) || "");
-                            }}
-                            value={field.value || ""}
-                          >
-                            <SelectTrigger className="w-60">
-                              <SelectValue placeholder={t("chooseSupplier")} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectGroup>
-                                <SelectLabel>{t("supplier")}</SelectLabel>
-                                {dataOptionsSupplier.map((supplier) => (
-                                  <SelectItem key={supplier.id} value={String(supplier.id)}>
-                                    {supplier.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
-                        </FormItem>
-                      )}
-                    />
                   </div>
                 </form>
               </Form>
 
               <div className="ml-auto flex items-center gap-2">
-                <Link
-                  href={"/manage/add-import-receipt"}
-                  className="bg-green-600 flex items-center gap-2 p-2 rounded text-white"
-                >
-                  <PlusCircle className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    {t("createImportReceipt")}
-                  </span>
-                </Link>
+                <Button variant="outline" className="bg-red-500! hover:bg-red-600!" onClick={() => refetch()}>
+                  <RefreshCcw />
+                </Button>
               </div>
             </div>
+            <Link
+              href={"/manage/add-import-receipt"}
+              className="bg-green-600 items-center gap-2 p-2 mb-4 inline-flex w-46 rounded text-white"
+            >
+              <PlusCircle className="h-3.5 w-3.5" />
+              <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">{t("createImportReceipt")}</span>
+            </Link>
 
             <div className="rounded-md border">
               <Table>

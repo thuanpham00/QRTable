@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { createContext, useContext, useState } from "react";
 import AutoPagination from "@/components/auto-pagination";
-import { Search, X } from "lucide-react";
+import { RefreshCcw, Search, X } from "lucide-react";
 import useQueryParams from "@/hooks/useQueryParams";
 import { isUndefined, omitBy } from "lodash";
 import { useRouter } from "@/i18n/routing";
@@ -315,16 +315,16 @@ export default function InventoryStockTable() {
 
   const [inventoryStockIdEdit, setInventoryStockIdEdit] = useState<number | undefined>();
 
-  const listInventoryStock = useGetListInventoryStockQuery(queryConfig);
+  const {data: listInventoryStock, refetch} = useGetListInventoryStockQuery(queryConfig);
   const listInventoryStockNoPagination = useGetListInventoryStockNoPaginationQuery({
     key: "inventory-stocks-no-pagination",
     enabled: isRole !== Role.Guest && Boolean(isRole) && Boolean(socket), // có nghĩa là chỉ chạy khi đã login
   });
 
-  const data: InventoryStockListResType["data"] = listInventoryStock.data?.payload.data || [];
-  const currentPage = listInventoryStock.data?.payload.pagination.page || 0; // trang hiện tại
-  const totalPages = listInventoryStock.data?.payload.pagination.totalPages || 0; // tổng số trang
-  const total = listInventoryStock.data?.payload.pagination.total || 0; // tổng số item
+  const data: InventoryStockListResType["data"] = listInventoryStock?.payload.data || [];
+  const currentPage = listInventoryStock?.payload.pagination.page || 0; // trang hiện tại
+  const totalPages = listInventoryStock?.payload.pagination.totalPages || 0; // tổng số trang
+  const total = listInventoryStock?.payload.pagination.total || 0; // tổng số item
 
   const pagination = {
     pageIndex: queryConfig.page ? queryConfig.page - 1 : 0,
@@ -354,7 +354,7 @@ export default function InventoryStockTable() {
         <WarningStocksDialog data={listInventoryStockNoPagination.data?.payload.data || []} />
         <InventoryBatchesDialog showModal={showModal} setShowModal={setShowModal} />
 
-        <div className="flex items-center pb-4 pt-2">
+        <div className="flex items-center justify-between pb-4 pt-2">
           <Form {...form}>
             <form
               noValidate
@@ -403,6 +403,11 @@ export default function InventoryStockTable() {
               </Button>
             </form>
           </Form>
+          <div>
+            <Button variant="outline" className="bg-red-500! hover:bg-red-600!" onClick={() => refetch()}>
+              <RefreshCcw />
+            </Button>
+          </div>
         </div>
         <div className="rounded-md border">
           <Table>

@@ -20,7 +20,7 @@ import {
   SearchMenuType,
   UpdateMenuBodyType,
 } from "@/schemaValidations/menu.schema";
-import { CircleAlert, Search, X } from "lucide-react";
+import { CircleAlert, RefreshCcw, Search, X } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { handleErrorApi } from "@/lib/utils";
 import { toast } from "sonner";
@@ -179,12 +179,12 @@ export default function MenuTable() {
     router.push(`/manage/menus?${params.toString()}`);
   };
 
-  const listMenu = useGetListMenuQuery(queryConfig);
+  const { data: listMenu, refetch } = useGetListMenuQuery(queryConfig);
 
-  const data: MenuListResType["data"] = listMenu.data?.payload.data || [];
-  const currentPage = listMenu.data?.payload.pagination.page || 0; // trang hiện tại
-  const totalPages = listMenu.data?.payload.pagination.totalPages || 0; // tổng số trang
-  const total = listMenu.data?.payload.pagination.total || 0; // tổng số item
+  const data: MenuListResType["data"] = listMenu?.payload.data || [];
+  const currentPage = listMenu?.payload.pagination.page || 0; // trang hiện tại
+  const totalPages = listMenu?.payload.pagination.totalPages || 0; // tổng số trang
+  const total = listMenu?.payload.pagination.total || 0; // tổng số item
 
   const pagination = {
     pageIndex: queryConfig.page ? queryConfig.page - 1 : 0,
@@ -219,14 +219,14 @@ export default function MenuTable() {
   useEffect(() => {
     if (!socket) return;
     function updateMenuListener() {
-      listMenu.refetch();
+      refetch();
       toast.success(t("menuUpdated"), { duration: 2000 });
     }
     socket.on("update-menu", updateMenuListener);
     return () => {
       socket.off("update-menu", updateMenuListener);
     };
-  }, [socket, listMenu, t]);
+  }, [socket, listMenu, t, refetch]);
 
   return (
     <MenuTableContext.Provider value={{ updateStatusMenu }}>
@@ -263,13 +263,16 @@ export default function MenuTable() {
               </Button>
 
               <Button variant="outline" size="icon" className="bg-blue-500!" type="submit">
-                <Search color="white"/>
+                <Search color="white" />
               </Button>
             </form>
           </Form>
 
           <div className="ml-auto flex items-center gap-2">
             <AddMenu />
+            <Button variant="outline" className="bg-red-500! hover:bg-red-600!" onClick={() => refetch()}>
+              <RefreshCcw />
+            </Button>
           </div>
         </div>
 
